@@ -4,6 +4,12 @@
 #include <EthernetUdp.h>
 #include <SPI.h>
 
+/* TODO: 
+ * Add buzzer
+ * Determine how to grab MAC dynamically, or have easy way to build files with MAC inserted.
+ *  - Can arduino get file name?
+ */
+
 // #include <Keypad.h>
 
 // const byte ROWS = 4; //four rows
