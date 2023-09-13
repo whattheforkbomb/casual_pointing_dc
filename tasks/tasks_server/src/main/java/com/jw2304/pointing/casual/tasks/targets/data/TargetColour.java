@@ -1,4 +1,4 @@
-package com.jw2304.pointing.casual.tasks.data;
+package com.jw2304.pointing.casual.tasks.targets.data;
 
 /* control bitmasks:
     Colour  | Array  | LED
