@@ -1,7 +1,11 @@
 package com.jw2304.pointing.casual.tasks.targets;
 
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.io.StringWriter;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -26,6 +30,9 @@ import org.springframework.stereotype.Controller;
 public class TargetSequenceController {
 
     public static Logger LOG = LoggerFactory.getLogger(TargetSequenceController.class);
+
+    public static final byte OFF = 0b00000000;
+    public static final byte IDENTIFY = 0b01011010;
 
     private final Random rng = new Random(System.currentTimeMillis());
 
@@ -55,7 +62,7 @@ public class TargetSequenceController {
     ExecutorService executor;
 
     // The command sequence is setup as pairs of bytes, the first being the target, the second being the command
-    private byte[] generate(String targetTypeStr, HashMap<Integer, Integer> targetConnectionToPhysicalColumnMapping, TargetColour colour) {
+    private byte[] generate(String targetTypeStr, HashMap<Integer, Integer> targetConnectionToPhysicalColumnMapping, TargetColour colour, String participantId) {
         byte[] commandSequence = new byte[taskCount*2];
 
         int targetCount = targetSockets.size() * targetsPerConnection;
@@ -127,6 +134,11 @@ public class TargetSequenceController {
 
         for (int i=0; i<taskCount; i++) {
             Target nextTarget = possibleTargets.remove(rng.nextInt(possibleTargets.size()));
+            try (BufferedWriter bw = new BufferedWriter(new FileWriter("/home/whiff/data/%s_%s.txt".formatted(participantId, targetTypeStr)))) {
+                bw.write("%d,%d,%d,%d\n".formatted(nextTarget.id,nextTarget.row, nextTarget.col, nextTarget.subTarget));
+            } catch (IOException ioex) {
+                LOG.error("Unable to write to file: '/home/whiff/data/%s.txt'".formatted(participantId), ioex);
+            }
             TargetLED led;
             if (targetType == TargetType.CLUSTER) {
                 led = TargetLED.ALL;
@@ -174,37 +186,37 @@ public class TargetSequenceController {
         return (byte) (colour.mask | array.mask | led.mask);
     }
 
-    public void run(String targetSize, HashMap<Integer, Integer> targetConnectionToPhysicalColumnMapping, TargetColour colour) {
+    public void run(String targetSize, HashMap<Integer, Integer> targetConnectionToPhysicalColumnMapping, TargetColour colour, String participantId) {
         taskSequenceIdx.set(0);
-        byte[] commandSequence = generate(targetSize, targetConnectionToPhysicalColumnMapping, colour);
+        byte[] commandSequence = generate(targetSize, targetConnectionToPhysicalColumnMapping, colour, participantId);
 
         long currentTime = System.currentTimeMillis();
         targetScheduler.execute(() -> {
-            sendCommand(0, (byte)0b01011010);
-            sendCommand(1, (byte)0b01011010);
-            sendCommand(2, (byte)0b01011010);
-            sendCommand(3, (byte)0b01011010);
-            sendCommand(4, (byte)0b01011010);
+            sendCommand(0, IDENTIFY);
+            sendCommand(1, IDENTIFY);
+            sendCommand(2, IDENTIFY);
+            sendCommand(3, IDENTIFY);
+            sendCommand(4, IDENTIFY);
         });
 
         targetScheduler.schedule(() -> {
-            sendCommand(0, (byte)0b00000000);
+            sendCommand(0, OFF);
         }, 1000 - (System.currentTimeMillis() - currentTime), TimeUnit.MILLISECONDS);
 
         targetScheduler.schedule(() -> {
-            sendCommand(1, (byte)0b00000000);
+            sendCommand(1, OFF);
         }, 2000 - (System.currentTimeMillis() - currentTime), TimeUnit.MILLISECONDS);
 
         targetScheduler.schedule(() -> {
-            sendCommand(2, (byte)0b00000000);
+            sendCommand(2, OFF);
         }, 3000 - (System.currentTimeMillis() - currentTime), TimeUnit.MILLISECONDS);
 
         targetScheduler.schedule(() -> {
-            sendCommand(3, (byte)0b00000000);
+            sendCommand(3, OFF);
         }, 4000 - (System.currentTimeMillis() - currentTime), TimeUnit.MILLISECONDS);
 
         targetScheduler.schedule(() -> {
-            sendCommand(4, (byte)0b00000000);
+            sendCommand(4, OFF);
         }, 5000 - (System.currentTimeMillis() - currentTime), TimeUnit.MILLISECONDS);
 
         // turn target on
@@ -214,7 +226,7 @@ public class TargetSequenceController {
 
         // turn target off
         targetScheduler.scheduleAtFixedRate(() -> {
-            sendCommand(commandSequence[taskSequenceIdx.getAndIncrement()*2], (byte)0b00000000);
+            sendCommand(commandSequence[taskSequenceIdx.getAndIncrement()*2], OFF);
         }, 5500 - (System.currentTimeMillis() - currentTime) + targetOnDelay, targetOnDelay+targetOffDelay, TimeUnit.MILLISECONDS);
     }
 
