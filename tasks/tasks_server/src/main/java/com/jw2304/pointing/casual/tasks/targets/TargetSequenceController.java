@@ -15,9 +15,7 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.IntStream;
-import java.util.stream.Stream;
 
-import org.glassfish.jaxb.runtime.v2.runtime.unmarshaller.XsiNilLoader.Single;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -105,16 +103,20 @@ public class TargetSequenceController {
 
                 Set<Target> removed = new HashSet<>(omittedPerTarget*targetCount);
 
-                for (int i=0; i<targetCount; i++) {
-                    List<Target> filteredTargets = possibleTargets.stream().filter(target -> target.id == i).toList();
+                List<Target> filteredPossibleTargets = List.copyOf(possibleTargets);
+                IntStream.range(0, targetCount).forEach(i -> {
+                    List<Target> filteredTargets = filteredPossibleTargets.stream().filter(target -> target.id == i).toList();
                     for (int j=0; j<omittedPerTarget; j++) {
                         removed.add(filteredTargets.remove(rng.nextInt(filteredTargets.size())));
                     }
-                }
+                });
+                // remove omitted options to ensure equal number of omissions per cluster.
                 possibleTargets = possibleTargets.stream().filter(target -> removed.contains(target)).toList();
-                possibleTargets.remove(rng.nextInt(possibleTargets.size()));
                 
-                
+                // remove remaining omissions at random
+                for (int i=0; i<remainingOmissions; i++) {
+                    possibleTargets.remove(rng.nextInt(possibleTargets.size()));
+                }
             } else {
                 // we need to repeat some LEDs.
                 // IGNORE FOR NOW
