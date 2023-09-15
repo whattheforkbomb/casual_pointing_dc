@@ -106,6 +106,7 @@ void shift_out(int latchPin, int dataPin, int clockPin, int mask) {
     XX.00.XXXX => Top
     XX.01.XXXX => Mid
     XX.10.XXXX => Bottom
+    XX.11.XXXX => All
 
     Placement: Can compress location into 4 bits
     0000.0000  => RESET
