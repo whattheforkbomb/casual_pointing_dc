@@ -42,9 +42,9 @@ public class TargetRestController {
     @Autowired
     TargetSequenceController targetSequenceController;
 
-    HashMap<Integer, Integer> targetConnectionToPhysicalColumnMapping;
+    public HashMap<Integer, Integer> targetConnectionToPhysicalColumnMapping;
 
-    AtomicInteger targetColour = new AtomicInteger(2);
+    public AtomicInteger targetColour = new AtomicInteger(2);
 
     @PostConstruct
     public void initMapping() {
@@ -54,7 +54,7 @@ public class TargetRestController {
     @PostMapping("/start")
     public void start(@RequestParam("targetType") String targetType, @RequestParam("participantId") String participantId) {
         LOG.info("Resetting targets");
-        resetTargets();
+        targetSequenceController.resetTargets();
         executor.execute(() -> 
             targetSequenceController.run(targetType, targetConnectionToPhysicalColumnMapping, TargetColour.values()[targetColour.get()],participantId)
         );
@@ -76,24 +76,13 @@ public class TargetRestController {
 
     @PostMapping("/identify/{id}")
     public void identify(@PathVariable(name="id") int id) {
-        resetTargets();
+        targetSequenceController.resetTargets();
         targetSequenceController.sendCommand(id, TargetSequenceController.IDENTIFY);
     }
 
     @PostMapping("/map/{old}/{new}")
     public void updateTargetIDMapping(@PathVariable(name="old") int oldId, @PathVariable(name="new") int newId) {
         targetConnectionToPhysicalColumnMapping.put(newId, oldId);
-    }
-
-    private void resetTargets() {
-        targetSockets.forEach(socket -> {
-            try {
-                // reset all targets
-                socket.getOutputStream().write(new byte[] { TargetSequenceController.OFF });
-            } catch (IOException ioex) {
-                LOG.error("Unable to send command to socket: %s".formatted(socket.getInetAddress().getHostAddress()), ioex);
-            }
-        });
     }
 
 }

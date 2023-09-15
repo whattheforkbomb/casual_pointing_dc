@@ -239,6 +239,17 @@ public class TargetSequenceController {
         }
     }
 
+    public void resetTargets() {
+        targetSockets.forEach(socket -> {
+            try {
+                // reset all targets
+                socket.getOutputStream().write(new byte[] { OFF });
+            } catch (IOException ioex) {
+                LOG.error("Unable to send command to socket: %s".formatted(socket.getInetAddress().getHostAddress()), ioex);
+            }
+        });
+    }
+
     public class Target {
         public final int id;
         public final int subTarget;
