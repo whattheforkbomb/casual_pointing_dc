@@ -123,6 +123,8 @@ public class TargetSequenceController {
             }
         }
 
+        // Need to save to file which target is scheduled...
+
         for (int i=0; i<taskCount; i++) {
             Target nextTarget = possibleTargets.remove(rng.nextInt(possibleTargets.size()));
             TargetLED led;

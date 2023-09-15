@@ -34,7 +34,7 @@ public class TargetConnections {
     }
 
     @Bean
-    public ServerSocket server(@Value("${target.port}") int port) {
+    public ServerSocket server(@Value("${targets.port}") int port) {
         try {
             LOG.debug("Creating socket on port: %d".formatted(port));
             return new ServerSocket(port);
