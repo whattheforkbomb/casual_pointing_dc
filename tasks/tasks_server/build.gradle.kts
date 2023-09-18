@@ -17,6 +17,12 @@ application {
 	buildDir = file("$rootDir/../dist/server")
 }
 
+sourceSets {
+	create("ui") {
+		resources.srcDir("$rootDir/../dist/ui")
+	}
+}
+
 configurations {
 	compileOnly {
 		extendsFrom(configurations.annotationProcessor.get())
@@ -28,6 +34,7 @@ repositories {
 }
 
 dependencies {
+	implementation(sourceSets.named("ui").get().output)
 	implementation("org.springframework.boot:spring-boot-starter-data-jdbc")
 	implementation("org.springframework.boot:spring-boot-starter-data-jpa")
 	implementation("org.springframework.boot:spring-boot-starter-jdbc")
