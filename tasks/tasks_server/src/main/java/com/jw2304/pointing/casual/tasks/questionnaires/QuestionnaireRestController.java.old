@@ -23,16 +23,16 @@ public class QuestionnaireRestController implements WebMvcConfigurer {
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
         registry
-          .addResourceHandler("/resources/ui/**")
-          .addResourceLocations("/resources/ui/");
+          .addResourceHandler("/questionnaires/**")
+          .addResourceLocations("classpath:/static/");
           // .resourceChain(true)
           // .addResolver(new EncodedResourceResolver())
           // .addResolver(new PathResourceResolver());
         LOG.info("Adding UI to resource handler.");
     }
 
-    @GetMapping("favicon.ico")
-    @ResponseBody
-    void returnNoFavicon() {
-    }
+    // @GetMapping("favicon.ico")
+    // @ResponseBody
+    // void returnNoFavicon() {
+    // }
 }

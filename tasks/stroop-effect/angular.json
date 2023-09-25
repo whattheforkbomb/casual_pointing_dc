@@ -3,7 +3,7 @@
   "version": 1,
   "newProjectRoot": "projects",
   "projects": {
-    "task_ui": {
+    "stroop-effect": {
       "projectType": "application",
       "schematics": {
         "@schematics/angular:component": {
@@ -17,7 +17,7 @@
         "build": {
           "builder": "@angular-devkit/build-angular:browser",
           "options": {
-            "outputPath": "../dist/ui/questionnaire",
+            "outputPath": "../dist/ui/stroop",
             "index": "src/index.html",
             "main": "src/main.ts",
             "polyfills": [
@@ -30,8 +30,7 @@
               "src/assets"
             ],
             "styles": [
-              "src/styles.sass",
-              "node_modules/survey-core/defaultV2.min.css"
+              "src/styles.sass"
             ],
             "scripts": []
           },
@@ -40,8 +39,8 @@
               "budgets": [
                 {
                   "type": "initial",
-                  "maximumWarning": "4mb",
-                  "maximumError": "5mb"
+                  "maximumWarning": "500kb",
+                  "maximumError": "1mb"
                 },
                 {
                   "type": "anyComponentStyle",
@@ -66,10 +65,10 @@
           "builder": "@angular-devkit/build-angular:dev-server",
           "configurations": {
             "production": {
-              "browserTarget": "tasks_ui:build:production"
+              "browserTarget": "stroop-effect:build:production"
             },
             "development": {
-              "browserTarget": "tasks_ui:build:development"
+              "browserTarget": "stroop-effect:build:development"
             }
           },
           "defaultConfiguration": "development"
@@ -77,7 +76,7 @@
         "extract-i18n": {
           "builder": "@angular-devkit/build-angular:extract-i18n",
           "options": {
-            "browserTarget": "tasks_ui:build"
+            "browserTarget": "stroop-effect:build"
           }
         },
         "test": {

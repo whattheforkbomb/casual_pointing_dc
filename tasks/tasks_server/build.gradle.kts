@@ -2,7 +2,7 @@ plugins {
 	java
 	id("org.springframework.boot") version "3.1.2"
 	id("io.spring.dependency-management") version "1.1.2"
-	application 
+	application
 }
 
 group = "com.jw2304.pointing.casual"
@@ -12,16 +12,67 @@ java {
 	sourceCompatibility = JavaVersion.VERSION_17
 }
 
+// tasks.register<Copy>("copyUI") {
+// 	// dependsOn("build")
+// 	from(file("$rootDir/../dist/"))
+// 	include("ui/**")
+// 	into(layout.buildDirectory.dir("resources/main/static"))
+// }
+tasks.named("build") {
+	doFirst {
+		copy {
+			from(file("$rootDir/../dist/ui/"))
+			into(layout.buildDirectory.dir("resources/main/static/"))
+		}
+	}
+}
+
 application {
     mainClass.set("com.jw2304.pointing.casual.tasks.TasksApplication")
 	buildDir = file("$rootDir/../dist/server")
+	
+	// from("$rootDir/../dist/ui")
+	// into("src/main/resources")
+	// into "resources" {
+	// 	from "resources"
+	// }
+	// jar {
+	// 	include(sourceSets.named("ui"))
+	// }
+// 	from(sourceSets.named("ui")) {
+// 		include "ui/"
+// 	}
 }
 
-sourceSets {
-	create("ui") {
-		resources.srcDir("$rootDir/../dist/ui")
-	}
-}
+// sourceSets {
+// 	// create("static") {
+// 	// 	resources {
+// 	// 		srcDir("$rootDir/../dist/ui")
+// 	// 	}
+// 	// }
+// 	main {
+// 		resources {
+// 			srcDir("$rootDir/../dist/ui"
+// 				// fileTree("$rootDir/../dist").
+// 				// matching {
+// 				// 	include("ui/")
+// 				// }
+// 			)
+// 		}
+// 	}
+// }
+
+// jar {
+// 	// destinationDirectory.set(file("$rootDir/../dist/server"))
+// 	// manifest {
+// 	// 	attributes("Main-Class": "com.jw2304.pointing.casual.tasks.TasksApplication"
+// 	// 	)
+		
+//   	// }
+// 	from("$rootDir/../dist") {
+// 		include("ui/**")
+// 	}
+// }
 
 configurations {
 	compileOnly {
@@ -34,7 +85,7 @@ repositories {
 }
 
 dependencies {
-	implementation(sourceSets.named("ui").get().output)
+	// implementation(sourceSets.named("static").get().output)
 	implementation("org.springframework.boot:spring-boot-starter-data-jdbc")
 	implementation("org.springframework.boot:spring-boot-starter-data-jpa")
 	implementation("org.springframework.boot:spring-boot-starter-jdbc")
@@ -47,13 +98,6 @@ dependencies {
 	annotationProcessor("org.projectlombok:lombok")
 	testImplementation("org.springframework.boot:spring-boot-starter-test")
 }
-
-// jar {
-// 	destinationDirectory.set(file("$rootDir/../dist/server"))
-// 	manifest {
-// 		attributes 'Main-Class': com.jw2304.pointing.casual.tasks.TasksApplication
-//   	}
-// }
 
 tasks.withType<Test> {
 	useJUnitPlatform()
