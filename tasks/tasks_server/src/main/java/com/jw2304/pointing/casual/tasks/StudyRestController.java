@@ -11,6 +11,8 @@ import java.util.concurrent.ExecutorService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.jw2304.pointing.casual.tasks.stroop.StroopDistractorController;
+import com.jw2304.pointing.casual.tasks.stroop.StroopWebSocketHandler;
 import com.jw2304.pointing.casual.tasks.targets.TargetRestController;
 import com.jw2304.pointing.casual.tasks.targets.TargetSequenceController;
 import com.jw2304.pointing.casual.tasks.targets.TargetSequenceController.TargetColour;
@@ -27,6 +29,9 @@ public class StudyRestController {
     @Autowired
     TargetRestController targetRestController;
 
+    @Autowired
+    StroopWebSocketHandler stroophandler;
+
     // needed? might be fine to just loop over the 5 target columns?
     @Autowired
     ExecutorService executor;
@@ -35,11 +40,16 @@ public class StudyRestController {
     public void start(@RequestParam("targetType") String targetType, @RequestParam("participantId") String participantId, @RequestParam("distractor") boolean distractor) {
         LOG.info("Resetting targets");
         targetSequenceController.resetTargets();
-        executor.execute(() -> 
-            targetSequenceController.run(targetType, targetRestController.targetConnectionToPhysicalColumnMapping, TargetColour.values()[targetRestController.targetColour.get()],participantId)
-        );
-         executor.execute(() -> 
-            targetSequenceController.run(targetType, targetRestController.targetConnectionToPhysicalColumnMapping, TargetColour.values()[targetRestController.targetColour.get()],participantId)
-        );
+        // executor.execute(() -> 
+        //     targetSequenceController.run(targetType, targetRestController.targetConnectionToPhysicalColumnMapping, TargetColour.values()[targetRestController.targetColour.get()],participantId)
+        // );
+        //  executor.execute(() -> 
+        //     targetSequenceController.run(targetType, targetRestController.targetConnectionToPhysicalColumnMapping, TargetColour.values()[targetRestController.targetColour.get()],participantId)
+        // );
+        if (distractor) {
+            executor.execute(() -> {
+                stroophandler.start();
+            });
+        }
     }
 }
