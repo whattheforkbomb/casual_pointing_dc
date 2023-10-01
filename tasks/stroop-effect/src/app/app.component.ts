@@ -17,7 +17,7 @@ export class AppComponent implements OnInit {
     colour: "red",
     word: "GREEN"
   };
-  stroopWS: WebSocket | null = null;
+  stroopWS!: WebSocket;
 
   ngOnInit(): void {
     this.stroopWS = new WebSocket('ws://localhost:8888/stroop')    

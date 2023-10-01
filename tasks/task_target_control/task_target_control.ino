@@ -31,8 +31,8 @@
 int shift_pins = 0;
 boolean target_shifted = false;
 int array_count = 2;
-int latchPins[] = {2, 6};
-int dataPins[] = {3, 7};
+int latchPins[] = {3, 6};
+int dataPins[] = {4, 7};
 int clockPins[] = {5, 8};
 
 void shift_out(int latchPin, int dataPin, int clockPin, int mask) {
@@ -302,10 +302,10 @@ byte position = 0;
 //   } 
 // }
 
-byte shield_mac[] = {  0x90, 0xA2, 0xDA, 0x0D, 0xF3, 0xC0 };
-IPAddress ip(192, 168, 1, 3);
-EthernetServer ethernet_shield_server(80);
-EthernetClient client[1];
+byte shield_mac[] = {  0x90, 0xA2, 0xDA, 0x0D, 0xF3, 0xB8 };
+IPAddress server(192, 168, 0, 100);
+IPAddress ip(192, 168, 0, 3);
+EthernetClient client;
 
 void setup(){
   Serial.begin(115200);
@@ -316,35 +316,36 @@ void setup(){
     pinMode(clockPins[idx], OUTPUT);
     pinMode(latchPins[idx], OUTPUT);
   }
-  Ethernet.begin(shield_mac, ip);
+  Ethernet.begin(shield_mac);
   if (Ethernet.hardwareStatus() == EthernetNoHardware) {
     Serial.println("Ethernet shield was not found.  Sorry, can't run without hardware. :(");
   }
   if (Ethernet.linkStatus() == LinkOFF) {
     Serial.println("Ethernet cable is not connected.");
   }
-  ethernet_shield_server.begin();
+  // ethernet_shield_server.begin();
   Serial.print("Arduino Ethernet: ");
   Serial.println(Ethernet.localIP());
   reset();
 }
 
 void process_ethernet() {
-  EthernetClient newClient = ethernet_shield_server.accept();
-  if (newClient) {
+  Serial.println("Attempting to connect to server");
+  int connect = client.connect(server, 8080);
+  Serial.print("Connection attempted: ");
+  Serial.println(connect);
+  if (client) {
     Serial.println("New Client Detected.");
-    client[0] = newClient;
   }
-  if (client[0] & client[0].available()>0) {
-    byte buffer[1];
-    client[0].readBytes(buffer, 1);
+  if (client & client.available()>0) {
+    byte cmd = client.read();
     Serial.print("CMD Received: ");
-    Serial.println(buffer[0], BIN);
+    Serial.println(cmd, BIN);
 
-    generate_masks(buffer[0], masks);
+    generate_masks(cmd, masks);
   }
-  if (client[0] & !client[0].connected()) {
-    client[0].stop();
+  if (client & !client.connected()) {
+    client.stop();
   }
 }
 

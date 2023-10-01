@@ -4,15 +4,19 @@ import { BrowserModule } from '@angular/platform-browser';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { SurveyModule } from 'survey-angular-ui';
+import { HttpClientModule } from '@angular/common/http';
+import { ColorPickerComponent } from './questions/color-picker/color-picker.component'
 
 @NgModule({
   declarations: [
-    AppComponent
+    AppComponent,
+    ColorPickerComponent
   ],
   imports: [
     BrowserModule,
     SurveyModule,
-    AppRoutingModule
+    AppRoutingModule,
+    HttpClientModule
   ],
   providers: [],
   bootstrap: [AppComponent]
