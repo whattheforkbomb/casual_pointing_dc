@@ -34,6 +34,11 @@ public class StroopWebSocketHandler extends TextWebSocketHandler {
     // @Override
     // public void handleTextMessage(WebSocketSession session, TextMessage message) { }
 
+    // TODO:
+    /* Need to have this at consistent rate and probably generated with the targets...
+     * 
+     */
+
     public void start() {
         IntStream.rangeClosed(1, 3)
             .forEach(i -> {

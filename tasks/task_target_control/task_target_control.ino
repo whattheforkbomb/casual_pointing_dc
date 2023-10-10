@@ -10,30 +10,30 @@
  *  - Can arduino get file name?
  */
 
-// #include <Keypad.h>
+#include <Keypad.h>
 
-// const byte ROWS = 4; //four rows
-// const byte COLS = 4; //four columns
-// char keys[ROWS][COLS] = {
-//   {'1','2','3','A'},
-//   {'4','5','6','B'},
-//   {'7','8','9','C'},
-//   {'*','0','#','D'}
-// };
+const byte ROWS = 4; //four rows
+const byte COLS = 4; //four columns
+char keys[ROWS][COLS] = {
+  {'1','2','3','A'},
+  {'4','5','6','B'},
+  {'7','8','9','C'},
+  {'*','0','#','D'}
+};
 
-// byte rowPins[ROWS] = {13, 12, 11, 10}; //connect to the row pinouts of the keypad
-// byte colPins[COLS] = {9, 8, 7, 6}; //connect to the column pinouts of the keypad
+byte colPins[ROWS] = {9, 10, 11, 12}; //connect to the row pinouts of the keypad
+byte rowPins[COLS] = {5, 6, 7, 8}; //connect to the column pinouts of the keypad
 
 // //Create an object of keypad
-// Keypad keypad = Keypad(makeKeymap(keys), rowPins, colPins, ROWS, COLS);
+Keypad keypad = Keypad(makeKeymap(keys), rowPins, colPins, ROWS, COLS);
 
 // Shift Register
 int shift_pins = 0;
 boolean target_shifted = false;
 int array_count = 2;
-int latchPins[] = {3, 6};
-int dataPins[] = {4, 7};
-int clockPins[] = {5, 8};
+int dataPins[] = {2, 7};
+int clockPins[] = {3, 8};
+int latchPins[] = {4, 6};
 
 void shift_out(int latchPin, int dataPin, int clockPin, int mask) {
   //internal function setup
@@ -170,11 +170,11 @@ void process_target_pos(byte mask, int *target_col, int *target_row) {
   }
 }
 
-byte WHITE = B00000000;
-byte RED = B00000011;
-byte GREEN = B00000101;
-byte BLUE = B00000110;
-byte OFF = B00000111;
+byte WHITE = B00000111;
+byte RED = B00000001;
+byte GREEN = B00000010;
+byte BLUE = B00000100;
+byte OFF = B00000000;
 
 // Derived from ShftOut13 from: https://docs.arduino.cc/tutorials/communication/guide-to-shift-out
 void generate_masks(byte mask, int *generated_masks) {
@@ -190,23 +190,34 @@ void generate_masks(byte mask, int *generated_masks) {
 
   byte target = RED;
   byte others = OFF;
-   if (mode == 1) {
-    target = GREEN;
-    others = RED;
-  } else if (mode == 2) {
-    target = RED;
-    others = BLUE;
-  } else if (mode == 3) {
-    target = BLUE;
-    others = GREEN;
-  }
+  // if (mode == 1) {
+  //   Serial.println("Green - Red");
+  //   target = GREEN;
+  //   others = RED;
+  // } else if (mode == 2) {
+  //   Serial.println("Red - Blue");
+  //   target = RED;
+  //   others = BLUE;
+  // } else if (mode == 3) {
+  //   Serial.println("Blue - Green");
+  //   target = BLUE;
+  //   others = GREEN;
+  // }
 
   int new_shift_pins = (mask >> 4) & 3;
   target_shifted = new_shift_pins != shift_pins;
   shift_pins = new_shift_pins;
 
+  Serial.print("Target: ");
+  Serial.println(new_shift_pins);
+
   int target_col = -1, target_row = -1; // Default all are target
   process_target_pos(mask & B00001111, &target_col, &target_row); 
+  
+  Serial.print("Target Pos: ");
+  Serial.print(target_col);
+  Serial.print(", ");
+  Serial.println(target_row);
 
   // From this data, we need to compose the 12bit mask, where the first 9 are 3xRGB (for columns 1-3), the last 3 being power for rows 1-3.
 
@@ -225,6 +236,7 @@ void generate_masks(byte mask, int *generated_masks) {
         pin_out = pin_out | (others<<(current_column*3)+3);
       }
     }
+    Serial.println(pin_out, BIN);
     generated_masks[current_row] = pin_out;
   }
 }
@@ -241,66 +253,68 @@ int mask_idx = 0;
 byte mode = 0;
 byte position = 0;
 
-// void process_keypad() {
-//   char key = keypad.getKey();
-//   if (key) {
-//     byte shift_pin = shift_pins;
-//     switch (key) {  
-//       case 'A': // entire grid
-//         if (position == B00001010) {
-//           position = 0;
-//           mode = 0;
-//         } else {
-//           position = B00001010;
-//         }
-//         break;
-//       case 'B':
-//         reset();
-//         if (shift_pin >= array_count-1) {
-//           shift_pin = 0;
-//         } else {
-//           shift_pin++;
-//         }
-//         break;
-//       case '1':
-//         position = B00000001;
-//         break;
-//       case '2':
-//         position = B00000010;
-//         break;
-//       case '3':
-//         position = B00000011;
-//         break;
-//       case '4':
-//         position = B00000100;
-//         break;
-//       case '5':
-//         position = B00000101;
-//         break;
-//       case '6':
-//         position = B00000110;
-//         break;
-//       case '7':
-//         position = B00000111;
-//         break;
-//       case '8':
-//         position = B00001000;
-//         break;
-//       case '9':
-//         position = B00001001;
-//         break;
-//       default:
-//         if (mode > 2) {
-//           mode = 0;
-//         } else {
-//           mode++;
-//         }
-//         break;
-//     }
+void process_keypad() {
+  char key = keypad.getKey();
+  if (key) {
+    Serial.print("Detected: ");
+    Serial.println(key);
+    byte shift_pin = shift_pins;
+    switch (key) {  
+      case 'A': // entire grid
+        if (position == B00001010) {
+          position = 0;
+          mode = 0;
+        } else {
+          position = B00001010;
+        }
+        break;
+      case 'B':
+        reset();
+        if (shift_pin >= array_count-1) {
+          shift_pin = 0;
+        } else {
+          shift_pin++;
+        }
+        break;
+      case '1':
+        position = B00000001;
+        break;
+      case '2':
+        position = B00000010;
+        break;
+      case '3':
+        position = B00000011;
+        break;
+      case '4':
+        position = B00000100;
+        break;
+      case '5':
+        position = B00000101;
+        break;
+      case '6':
+        position = B00000110;
+        break;
+      case '7':
+        position = B00000111;
+        break;
+      case '8':
+        position = B00001000;
+        break;
+      case '9':
+        position = B00001001;
+        break;
+      default:
+        if (mode > 2) {
+          mode = 0;
+        } else {
+          mode++;
+        }
+        break;
+    }
 
-//     generate_masks((mode << 6) | (shift_pin << 4) | position, masks);
-//   } 
-// }
+    generate_masks((mode << 6) | (shift_pin << 4) | position, masks);
+  } 
+}
 
 byte shield_mac[] = {  0x90, 0xA2, 0xDA, 0x0D, 0xF3, 0xB8 };
 IPAddress server(192, 168, 0, 100);
@@ -316,16 +330,16 @@ void setup(){
     pinMode(clockPins[idx], OUTPUT);
     pinMode(latchPins[idx], OUTPUT);
   }
-  Ethernet.begin(shield_mac);
-  if (Ethernet.hardwareStatus() == EthernetNoHardware) {
-    Serial.println("Ethernet shield was not found.  Sorry, can't run without hardware. :(");
-  }
-  if (Ethernet.linkStatus() == LinkOFF) {
-    Serial.println("Ethernet cable is not connected.");
-  }
-  // ethernet_shield_server.begin();
-  Serial.print("Arduino Ethernet: ");
-  Serial.println(Ethernet.localIP());
+  // Ethernet.begin(shield_mac);
+  // if (Ethernet.hardwareStatus() == EthernetNoHardware) {
+  //   Serial.println("Ethernet shield was not found.  Sorry, can't run without hardware. :(");
+  // }
+  // if (Ethernet.linkStatus() == LinkOFF) {
+  //   Serial.println("Ethernet cable is not connected.");
+  // }
+  // // ethernet_shield_server.begin();
+  // Serial.print("Arduino Ethernet: ");
+  // Serial.println(Ethernet.localIP());
   reset();
 }
 
@@ -350,8 +364,8 @@ void process_ethernet() {
 }
 
 void loop() {
-  // process_keypad();
-  process_ethernet();
+  process_keypad();
+  // process_ethernet();
 
   multiplex_leds(latchPins[shift_pins], dataPins[shift_pins], clockPins[shift_pins], masks, mask_idx);
   
