@@ -1,4 +1,4 @@
-package com.jw2304.pointing.casual.tasks.questionnaires;
+package com.jw2304.pointing.casual.tasks;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,14 +16,14 @@ import org.springframework.web.servlet.resource.PathResourceResolver;
 @Configuration
 @EnableWebMvc
 @Controller
-public class QuestionnaireRestController implements WebMvcConfigurer {
+public class WebAppRestController implements WebMvcConfigurer {
 
-    public static Logger LOG = LoggerFactory.getLogger(QuestionnaireRestController.class);
+    public static Logger LOG = LoggerFactory.getLogger(WebAppRestController.class);
 
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
         registry
-          .addResourceHandler("/questionnaires/**")
+          .addResourceHandler("/app/**")
           .addResourceLocations("classpath:/static/");
           // .resourceChain(true)
           // .addResolver(new EncodedResourceResolver())

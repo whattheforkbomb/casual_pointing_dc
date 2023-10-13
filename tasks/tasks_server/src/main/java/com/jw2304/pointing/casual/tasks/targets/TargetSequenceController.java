@@ -32,7 +32,7 @@ public class TargetSequenceController {
     public static Logger LOG = LoggerFactory.getLogger(TargetSequenceController.class);
 
     public static final byte OFF = 0b00000000;
-    public static final byte IDENTIFY = 0b01011010;
+    public static final byte IDENTIFY = 0b00111010;
 
     private final Random rng = new Random(System.currentTimeMillis());
 
@@ -192,32 +192,45 @@ public class TargetSequenceController {
 
         long currentTime = System.currentTimeMillis();
         targetScheduler.execute(() -> {
-            sendCommand(0, IDENTIFY);
-            sendCommand(1, IDENTIFY);
-            sendCommand(2, IDENTIFY);
-            sendCommand(3, IDENTIFY);
-            sendCommand(4, IDENTIFY);
+            for (int i=0; i<targetSockets.size(); i++) {
+                sendCommand(i, IDENTIFY);
+            }
         });
-
         targetScheduler.schedule(() -> {
-            sendCommand(0, OFF);
+            for (int i=0; i<targetSockets.size(); i++) {
+                sendCommand(i, (byte)0b00100000);
+            }
         }, 1000 - (System.currentTimeMillis() - currentTime), TimeUnit.MILLISECONDS);
-
         targetScheduler.schedule(() -> {
-            sendCommand(1, OFF);
+            for (int i=0; i<targetSockets.size(); i++) {
+                sendCommand(i, (byte)0b00010000);
+            }
         }, 2000 - (System.currentTimeMillis() - currentTime), TimeUnit.MILLISECONDS);
-
         targetScheduler.schedule(() -> {
-            sendCommand(2, OFF);
+            for (int i=0; i<targetSockets.size(); i++) {
+                sendCommand(i, (byte)0b00000000);
+            }
         }, 3000 - (System.currentTimeMillis() - currentTime), TimeUnit.MILLISECONDS);
 
-        targetScheduler.schedule(() -> {
-            sendCommand(3, OFF);
-        }, 4000 - (System.currentTimeMillis() - currentTime), TimeUnit.MILLISECONDS);
+        // targetScheduler.schedule(() -> {
+        //     sendCommand(0, OFF);
+        // }, 1000 - (System.currentTimeMillis() - currentTime), TimeUnit.MILLISECONDS);
 
-        targetScheduler.schedule(() -> {
-            sendCommand(4, OFF);
-        }, 5000 - (System.currentTimeMillis() - currentTime), TimeUnit.MILLISECONDS);
+        // targetScheduler.schedule(() -> {
+        //     sendCommand(1, OFF);
+        // }, 2000 - (System.currentTimeMillis() - currentTime), TimeUnit.MILLISECONDS);
+
+        // targetScheduler.schedule(() -> {
+        //     sendCommand(2, OFF);
+        // }, 3000 - (System.currentTimeMillis() - currentTime), TimeUnit.MILLISECONDS);
+
+        // targetScheduler.schedule(() -> {
+        //     sendCommand(3, OFF);
+        // }, 4000 - (System.currentTimeMillis() - currentTime), TimeUnit.MILLISECONDS);
+
+        // targetScheduler.schedule(() -> {
+        //     sendCommand(4, OFF);
+        // }, 5000 - (System.currentTimeMillis() - currentTime), TimeUnit.MILLISECONDS);
 
         // turn target on
         targetScheduler.scheduleAtFixedRate(() -> {

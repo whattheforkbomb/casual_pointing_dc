@@ -1,7 +1,7 @@
-import { Questions } from './questions';
+import { QuestionColorPickerModel } from './questions';
 
 describe('Questions', () => {
   it('should create an instance', () => {
-    expect(new Questions()).toBeTruthy();
+    expect(new QuestionColorPickerModel("")).toBeTruthy();
   });
 });

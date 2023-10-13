@@ -20,7 +20,7 @@ export class AppComponent implements OnInit {
   stroopWS!: WebSocket;
 
   ngOnInit(): void {
-    this.stroopWS = new WebSocket('ws://localhost:8888/stroop')    
+    this.stroopWS = new WebSocket('ws://localhost:8080/stroop')    
     this.stroopWS.onopen = (event) => {
       console.log('Connected to server', event);
       this.stroop.word = "Ready";

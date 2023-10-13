@@ -31,9 +31,9 @@ Keypad keypad = Keypad(makeKeymap(keys), rowPins, colPins, ROWS, COLS);
 int shift_pins = 0;
 boolean target_shifted = false;
 int array_count = 2;
-int dataPins[] = {2, 7};
-int clockPins[] = {3, 8};
-int latchPins[] = {4, 6};
+int dataPins[] = {0, 3, 6};
+int latchPins[] = {1, 4, 7};
+int clockPins[] = {2, 5, 8};
 
 void shift_out(int latchPin, int dataPin, int clockPin, int mask) {
   //internal function setup
@@ -330,27 +330,27 @@ void setup(){
     pinMode(clockPins[idx], OUTPUT);
     pinMode(latchPins[idx], OUTPUT);
   }
-  // Ethernet.begin(shield_mac);
-  // if (Ethernet.hardwareStatus() == EthernetNoHardware) {
-  //   Serial.println("Ethernet shield was not found.  Sorry, can't run without hardware. :(");
-  // }
-  // if (Ethernet.linkStatus() == LinkOFF) {
-  //   Serial.println("Ethernet cable is not connected.");
-  // }
-  // // ethernet_shield_server.begin();
-  // Serial.print("Arduino Ethernet: ");
-  // Serial.println(Ethernet.localIP());
+  Ethernet.begin(shield_mac);
+  if (Ethernet.hardwareStatus() == EthernetNoHardware) {
+    Serial.println("Ethernet shield was not found.  Sorry, can't run without hardware. :(");
+  }
+  if (Ethernet.linkStatus() == LinkOFF) {
+    Serial.println("Ethernet cable is not connected.");
+  }
+  // ethernet_shield_server.begin();
+  Serial.print("Arduino Ethernet: ");
+  Serial.println(Ethernet.localIP());
+  Serial.println("Attempting to connect to server");
+  int connect = client.connect(server, 8888);
+  Serial.print("Connection attempted: ");
+  Serial.println(connect);
+  if (client.connected()) {
+    Serial.println("Connection successful");
+  }
   reset();
 }
 
 void process_ethernet() {
-  Serial.println("Attempting to connect to server");
-  int connect = client.connect(server, 8080);
-  Serial.print("Connection attempted: ");
-  Serial.println(connect);
-  if (client) {
-    Serial.println("New Client Detected.");
-  }
   if (client & client.available()>0) {
     byte cmd = client.read();
     Serial.print("CMD Received: ");
@@ -358,14 +358,23 @@ void process_ethernet() {
 
     generate_masks(cmd, masks);
   }
-  if (client & !client.connected()) {
-    client.stop();
-  }
+
+  // if (client & !client.connected()) {
+  //   Serial.println("No client connected. Closing anf trying to reconnect.");
+  //   client.stop();
+  //   Serial.println("Attempting to connect to server");
+  //   int connect = client.connect(server, 8888);
+  //   Serial.print("Connection attempted: ");
+  //   Serial.println(connect);
+  //   if (client.connected()) {
+  //     Serial.println("Connection successful");
+  //   }
+  // }
 }
 
 void loop() {
-  process_keypad();
-  // process_ethernet();
+  // process_keypad();
+  process_ethernet();
 
   multiplex_leds(latchPins[shift_pins], dataPins[shift_pins], clockPins[shift_pins], masks, mask_idx);
   
@@ -374,5 +383,5 @@ void loop() {
   } else {
     mask_idx++;
   }
-  delayMicroseconds(2000);
+  delayMicroseconds(200000);
 }
