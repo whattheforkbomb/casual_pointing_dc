@@ -49,14 +49,14 @@ public class TargetRestController {
          targetConnectionToPhysicalColumnMapping = new HashMap<>(targetSockets.size());
     }
 
-    @PostMapping("/start")
-    public void start(@RequestParam("targetType") String targetType, @RequestParam("participantId") String participantId) {
-        LOG.info("Resetting targets");
-        targetSequenceController.resetTargets();
-        executor.execute(() -> 
-            targetSequenceController.run(targetType, targetConnectionToPhysicalColumnMapping, TargetColour.values()[targetColour.get()],participantId)
-        );
-    }
+    // @PostMapping("/start")
+    // public void start(@RequestParam("targetType") String targetType, @RequestParam("participantId") String participantId) {
+    //     // LOG.info("Resetting targets");
+    //     // targetSequenceController.resetTargets();
+    //     // executor.execute(() -> 
+    //     //     targetSequenceController.run(targetType, targetConnectionToPhysicalColumnMapping, TargetColour.values()[targetColour.get()],participantId)
+    //     // );
+    // }
 
     @PostMapping("/colour/{id}")
     public void colour(@PathVariable(name="id") int colourId) {

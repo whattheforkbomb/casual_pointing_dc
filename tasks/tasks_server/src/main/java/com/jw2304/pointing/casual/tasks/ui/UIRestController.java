@@ -1,4 +1,4 @@
-package com.jw2304.pointing.casual.tasks;
+package com.jw2304.pointing.casual.tasks.ui;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,9 +16,9 @@ import org.springframework.web.servlet.resource.PathResourceResolver;
 @Configuration
 @EnableWebMvc
 @Controller
-public class WebAppRestController implements WebMvcConfigurer {
+public class UIRestController implements WebMvcConfigurer {
 
-    public static Logger LOG = LoggerFactory.getLogger(WebAppRestController.class);
+    public static Logger LOG = LoggerFactory.getLogger(UIRestController.class);
 
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {

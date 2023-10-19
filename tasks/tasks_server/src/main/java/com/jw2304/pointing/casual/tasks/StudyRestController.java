@@ -13,8 +13,8 @@ import java.util.concurrent.ExecutorService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.jw2304.pointing.casual.tasks.stroop.StroopDistractorController;
-import com.jw2304.pointing.casual.tasks.stroop.StroopWebSocketHandler;
+import com.jw2304.pointing.casual.tasks.connections.WebSocketRegistration;
+import com.jw2304.pointing.casual.tasks.stroop.StroopController;
 import com.jw2304.pointing.casual.tasks.targets.TargetRestController;
 import com.jw2304.pointing.casual.tasks.targets.TargetSequenceController;
 import com.jw2304.pointing.casual.tasks.targets.TargetSequenceController.TargetColour;
@@ -34,7 +34,7 @@ public class StudyRestController {
     TargetRestController targetRestController;
 
     @Autowired
-    StroopWebSocketHandler stroophandler;
+    StroopController stroophandler;
 
     // needed? might be fine to just loop over the 5 target columns?
     @Autowired
@@ -44,17 +44,14 @@ public class StudyRestController {
     public void start(@RequestParam("targetType") String targetType, @RequestParam("distractor") boolean distractor) {
         LOG.info("Resetting targets");
         targetSequenceController.resetTargets();
-        // executor.execute(() -> 
-        //     targetSequenceController.run(targetType, targetRestController.targetConnectionToPhysicalColumnMapping, TargetColour.values()[targetRestController.targetColour.get()],participantId)
-        // );
-        //  executor.execute(() -> 
-        //     targetSequenceController.run(targetType, targetRestController.targetConnectionToPhysicalColumnMapping, TargetColour.values()[targetRestController.targetColour.get()],participantId)
-        // );
-        if (distractor) {
-            executor.execute(() -> {
-                stroophandler.start();
-            });
-        }
+        executor.execute(() -> 
+            targetSequenceController.run(targetType, distractor, targetRestController.targetConnectionToPhysicalColumnMapping, TargetColour.values()[targetRestController.targetColour.get()], PID)
+        );
+        // if (distractor) {
+        //     executor.execute(() -> {
+        //         stroophandler.start();
+        //     });
+        // }
     }
 
     @GetMapping("/pid")

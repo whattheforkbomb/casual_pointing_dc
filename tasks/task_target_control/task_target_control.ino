@@ -4,36 +4,42 @@
 #include <EthernetUdp.h>
 #include <SPI.h>
 
-/* TODO: 
- * Add buzzer
- * Determine how to grab MAC dynamically, or have easy way to build files with MAC inserted.
- *  - Can arduino get file name?
- */
+// #include <Keypad.h>
 
-#include <Keypad.h>
+// const byte ROWS = 4; //four rows
+// const byte COLS = 4; //four columns
+// char keys[ROWS][COLS] = {
+//   {'1','2','3','A'},
+//   {'4','5','6','B'},
+//   {'7','8','9','C'},
+//   {'*','0','#','D'}
+// };
 
-const byte ROWS = 4; //four rows
-const byte COLS = 4; //four columns
-char keys[ROWS][COLS] = {
-  {'1','2','3','A'},
-  {'4','5','6','B'},
-  {'7','8','9','C'},
-  {'*','0','#','D'}
-};
+// byte colPins[ROWS] = {9, 10, 11, 12}; //connect to the row pinouts of the keypad
+// byte rowPins[COLS] = {5, 6, 7, 8}; //connect to the column pinouts of the keypad
 
-byte colPins[ROWS] = {9, 10, 11, 12}; //connect to the row pinouts of the keypad
-byte rowPins[COLS] = {5, 6, 7, 8}; //connect to the column pinouts of the keypad
-
-// //Create an object of keypad
-Keypad keypad = Keypad(makeKeymap(keys), rowPins, colPins, ROWS, COLS);
+// // //Create an object of keypad
+// Keypad keypad = Keypad(makeKeymap(keys), rowPins, colPins, ROWS, COLS);
 
 // Shift Register
 int shift_pins = 0;
-boolean target_shifted = false;
-int array_count = 2;
+int array_count = 3;
 int dataPins[] = {0, 3, 6};
 int latchPins[] = {1, 4, 7};
 int clockPins[] = {2, 5, 8};
+int tonePin = 9;
+int toneNotes[] = {33, 262, 2093};
+byte shield_mac[] = { 0x90, 0xA2, 0xDA, 0x0D, 0xF3, 0xA5 };
+// byte shield_mac[] = { 0x90, 0xA2, 0xDA, 0x0D, 0xF3, 0xB0 };
+// byte shield_mac[] = { 0x90, 0xA2, 0xDA, 0x0D, 0xF3, 0xB4 };
+// byte shield_mac[] = { 0x90, 0xA2, 0xDA, 0x0D, 0xF3, 0xB8 };
+// byte shield_mac[] = { 0x90, 0xA2, 0xDA, 0x0D, 0xF3, 0xC0 };
+IPAddress server(192, 168, 0, 1);
+IPAddress ip(192, 168, 0, 3);
+EthernetClient client;
+// #define NOTE_C2  65
+// #define NOTE_C3  131
+// #define NOTE_C4  262
 
 void shift_out(int latchPin, int dataPin, int clockPin, int mask) {
   //internal function setup
@@ -190,26 +196,32 @@ void generate_masks(byte mask, int *generated_masks) {
 
   byte target = RED;
   byte others = OFF;
-  // if (mode == 1) {
-  //   Serial.println("Green - Red");
-  //   target = GREEN;
-  //   others = RED;
-  // } else if (mode == 2) {
-  //   Serial.println("Red - Blue");
-  //   target = RED;
-  //   others = BLUE;
-  // } else if (mode == 3) {
-  //   Serial.println("Blue - Green");
-  //   target = BLUE;
-  //   others = GREEN;
-  // }
+  if (mode == 1) {
+    Serial.println("Green");
+    target = GREEN;
+    // others = RED;
+  } else if (mode == 2) {
+    Serial.println("Red");
+    target = RED;
+    // others = BLUE;
+  } else if (mode == 3) {
+    Serial.println("Blue");
+    target = BLUE;
+    // others = GREEN;
+  }
 
-  int new_shift_pins = (mask >> 4) & 3;
-  target_shifted = new_shift_pins != shift_pins;
-  shift_pins = new_shift_pins;
+  shift_pins = (mask >> 4) & 3;
+  tone(tonePin, toneNotes[shift_pins], 250);
 
   Serial.print("Target: ");
-  Serial.println(new_shift_pins);
+  Serial.println(shift_pins);
+  Serial.print("(Pins: [");
+  Serial.print(dataPins[shift_pins]);
+  Serial.print(",");
+  Serial.print(clockPins[shift_pins]);
+  Serial.print(",");
+  Serial.print(latchPins[shift_pins]);
+  Serial.print("])");
 
   int target_col = -1, target_row = -1; // Default all are target
   process_target_pos(mask & B00001111, &target_col, &target_row); 
@@ -253,77 +265,73 @@ int mask_idx = 0;
 byte mode = 0;
 byte position = 0;
 
-void process_keypad() {
-  char key = keypad.getKey();
-  if (key) {
-    Serial.print("Detected: ");
-    Serial.println(key);
-    byte shift_pin = shift_pins;
-    switch (key) {  
-      case 'A': // entire grid
-        if (position == B00001010) {
-          position = 0;
-          mode = 0;
-        } else {
-          position = B00001010;
-        }
-        break;
-      case 'B':
-        reset();
-        if (shift_pin >= array_count-1) {
-          shift_pin = 0;
-        } else {
-          shift_pin++;
-        }
-        break;
-      case '1':
-        position = B00000001;
-        break;
-      case '2':
-        position = B00000010;
-        break;
-      case '3':
-        position = B00000011;
-        break;
-      case '4':
-        position = B00000100;
-        break;
-      case '5':
-        position = B00000101;
-        break;
-      case '6':
-        position = B00000110;
-        break;
-      case '7':
-        position = B00000111;
-        break;
-      case '8':
-        position = B00001000;
-        break;
-      case '9':
-        position = B00001001;
-        break;
-      default:
-        if (mode > 2) {
-          mode = 0;
-        } else {
-          mode++;
-        }
-        break;
-    }
+// void process_keypad() {
+//   char key = keypad.getKey();
+//   if (key) {
+//     Serial.print("Detected: ");
+//     Serial.println(key);
+//     byte shift_pin = shift_pins;
+//     switch (key) {  
+//       case 'A': // entire grid
+//         if (position == B00001010) {
+//           position = 0;
+//           mode = 0;
+//         } else {
+//           position = B00001010;
+//         }
+//         break;
+//       case 'B':
+//         reset();
+//         if (shift_pin >= array_count-1) {
+//           shift_pin = 0;
+//         } else {
+//           shift_pin++;
+//         }
+//         break;
+//       case '1':
+//         position = B00000001;
+//         break;
+//       case '2':
+//         position = B00000010;
+//         break;
+//       case '3':
+//         position = B00000011;
+//         break;
+//       case '4':
+//         position = B00000100;
+//         break;
+//       case '5':
+//         position = B00000101;
+//         break;
+//       case '6':
+//         position = B00000110;
+//         break;
+//       case '7':
+//         position = B00000111;
+//         break;
+//       case '8':
+//         position = B00001000;
+//         break;
+//       case '9':
+//         position = B00001001;
+//         break;
+//       default:
+//         if (mode > 2) {
+//           mode = 0;
+//         } else {
+//           mode++;
+//         }
+//         break;
+//     }
 
-    generate_masks((mode << 6) | (shift_pin << 4) | position, masks);
-  } 
-}
-
-byte shield_mac[] = {  0x90, 0xA2, 0xDA, 0x0D, 0xF3, 0xB8 };
-IPAddress server(192, 168, 0, 100);
-IPAddress ip(192, 168, 0, 3);
-EthernetClient client;
+//     generate_masks((mode << 6) | (shift_pin << 4) | position, masks);
+//   } 
+// }
 
 void setup(){
-  Serial.begin(115200);
+  // Serial.begin(115200);
   while (!Serial);
+  Serial.println("Serial Connected");
   // Output to control LED
   for (int idx=0; idx<array_count; idx++) {
     pinMode(dataPins[idx], OUTPUT);
@@ -340,36 +348,40 @@ void setup(){
   // ethernet_shield_server.begin();
   Serial.print("Arduino Ethernet: ");
   Serial.println(Ethernet.localIP());
-  Serial.println("Attempting to connect to server");
-  int connect = client.connect(server, 8888);
-  Serial.print("Connection attempted: ");
-  Serial.println(connect);
-  if (client.connected()) {
-    Serial.println("Connection successful");
-  }
   reset();
 }
 
 void process_ethernet() {
+  if (!client) {
+    Serial.println("Attempting to connect to server");
+    int connect = client.connect(server, 8888);
+    Serial.print("Connection attempted: ");
+    Serial.println(connect);
+    if (client.connected()) {
+      Serial.println("Connection successful");
+    } else {
+      delayMicroseconds(200000);
+    }
+  }
+
   if (client & client.available()>0) {
     byte cmd = client.read();
     Serial.print("CMD Received: ");
     Serial.println(cmd, BIN);
-
     generate_masks(cmd, masks);
   }
 
-  // if (client & !client.connected()) {
-  //   Serial.println("No client connected. Closing anf trying to reconnect.");
-  //   client.stop();
-  //   Serial.println("Attempting to connect to server");
-  //   int connect = client.connect(server, 8888);
-  //   Serial.print("Connection attempted: ");
-  //   Serial.println(connect);
-  //   if (client.connected()) {
-  //     Serial.println("Connection successful");
-  //   }
-  // }
+  if (client & !client.connected()) {
+    Serial.println("No client connected. Closing and trying to reconnect.");
+    client.stop();
+    Serial.println("Attempting to connect to server");
+    int connect = client.connect(server, 8888);
+    Serial.print("Connection attempted: ");
+    Serial.println(connect);
+    if (client.connected()) {
+      Serial.println("Connection successful");
+    }
+  }
 }
 
 void loop() {
@@ -383,5 +395,5 @@ void loop() {
   } else {
     mask_idx++;
   }
-  delayMicroseconds(200000);
+  delayMicroseconds(20000);
 }

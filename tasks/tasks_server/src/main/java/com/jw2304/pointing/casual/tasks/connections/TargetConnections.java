@@ -1,6 +1,7 @@
-package com.jw2304.pointing.casual.tasks.targets;
+package com.jw2304.pointing.casual.tasks.connections;
 
 import java.io.IOException;
+import java.io.OutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
@@ -49,8 +50,10 @@ public class TargetConnections {
             executor.execute(() -> {
                 LOG.info("Accepting incoming connections from targets");
                 while (true) {
-                    try (Socket socket = server.accept()) {
+                    try {
+                        Socket socket = server.accept();
                         LOG.info("New Target Connection Established: %s".formatted(socket.getInetAddress().getHostAddress()));
+                        socket.setKeepAlive(true);
                         targetSockets.add(socket);
                     } catch (IOException ioex) {
                         LOG.error("Connection Failed To Be Accepted", ioex);

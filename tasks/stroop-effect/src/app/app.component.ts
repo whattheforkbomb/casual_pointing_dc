@@ -6,6 +6,10 @@ interface StroopBody {
   word: string;
 }
 
+interface CountdownBody {
+  count: number;
+}
+
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
@@ -13,29 +17,47 @@ interface StroopBody {
 })
 export class AppComponent implements OnInit {
   title: String = 'stroop-effect';
-  stroop = {
-    colour: "red",
-    word: "GREEN"
+  display = {
+    colour: "White",
+    word: "Pending"
   };
   stroopWS!: WebSocket;
+  countdownWS!: WebSocket;
 
   ngOnInit(): void {
-    this.stroopWS = new WebSocket('ws://localhost:8080/stroop')    
+    this.stroopWS = new WebSocket(`ws://${window.location.host}/stroop`)
+    this.countdownWS = new WebSocket(`ws://${window.location.host}/count`)
     this.stroopWS.onopen = (event) => {
       console.log('Connected to server', event);
-      this.stroop.word = "Ready";
-      this.stroop.colour = "green";
     };
     
     this.stroopWS.onmessage = (event: MessageEvent) => {
       let msg = <StroopBody>JSON.parse(event.data);
       console.log(`Received message from server: ${msg}`);
-      this.stroop.colour = msg.colour;
-      this.stroop.word = msg.word;
-      console.log(this.stroop);
+      this.display.colour = msg.colour;
+      this.display.word = msg.word;
+      console.log(this.display);
     };
     
     this.stroopWS.onclose = (event) => {
+      console.log('Disconnected from server');
+    };
+
+    this.countdownWS.onopen = (event) => {
+      console.log('Connected to server', event);
+    };
+    
+    this.countdownWS.onmessage = (event: MessageEvent) => {
+      let msg = <CountdownBody>JSON.parse(event.data);
+      console.log(`Received message from server: ${msg}`);
+      if (msg.count > 0 || this.display.word == "1") {
+        this.display.colour = "white";
+        this.display.word = msg.count.toString();
+        console.log(this.display);
+      }
+    };
+    
+    this.countdownWS.onclose = (event) => {
       console.log('Disconnected from server');
     };
 

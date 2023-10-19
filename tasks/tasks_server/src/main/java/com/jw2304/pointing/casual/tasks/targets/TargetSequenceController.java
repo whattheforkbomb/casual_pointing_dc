@@ -4,9 +4,10 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.io.OutputStream;
-import java.io.StringWriter;
 import java.net.Socket;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -25,9 +26,15 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.socket.TextMessage;
+import org.springframework.web.socket.WebSocketSession;
+
+import com.jw2304.pointing.casual.tasks.connections.WebSocketConnectionConsumer;
+import com.jw2304.pointing.casual.tasks.stroop.StroopController;
+import com.jw2304.pointing.casual.tasks.stroop.StroopController.StroopPayload;
 
 @Controller
-public class TargetSequenceController {
+public class TargetSequenceController  implements WebSocketConnectionConsumer {
 
     public static Logger LOG = LoggerFactory.getLogger(TargetSequenceController.class);
 
@@ -55,26 +62,52 @@ public class TargetSequenceController {
     @Value("${targets.delay.seconds.off}")
     public int targetOffDelay;
 
+    private TargetColour colour = TargetColour.RED;
+    private TargetType targetType = TargetType.UNKNOWN;
+
+    private List<Target> commandSequence = new ArrayList<>();
+
     @Autowired
     ArrayList<Socket> targetSockets;
 
     @Autowired
     ExecutorService executor;
 
-    // The command sequence is setup as pairs of bytes, the first being the target, the second being the command
-    private byte[] generate(String targetTypeStr, HashMap<Integer, Integer> targetConnectionToPhysicalColumnMapping, TargetColour colour, String participantId) {
-        byte[] commandSequence = new byte[taskCount*2];
+    @Autowired
+    StroopController stroopController;
 
+    private WebSocketSession uiWebSocket = null;
+
+    @Override
+    public String getSocketRegistrationPath() {
+        return "count";
+    }
+
+    @Override
+    public void connectionRegistered(WebSocketSession session) {
+        LOG.info("Countdown WebSocket connection Started");
+        uiWebSocket = session;
+        // try {
+        //     uiWebSocket.sendMessage(new TextMessage("{\"count\": \"CONNECTED\"}"));  
+        // } catch (IOException ioex) {
+        //     LOG.error("Unable to send connection message to the ", ioex);
+        // }
+    }
+
+    // The command sequence is setup as pairs of bytes, the first being the target, the second being the command
+    private void generate(String targetTypeStr, boolean distractor, HashMap<Integer, Integer> targetConnectionToPhysicalColumnMapping, TargetColour colour, String participantId) {
+        // byte[] cmdSequence = new byte[taskCount*2];
+        commandSequence = new ArrayList<>(taskCount);
+        
         int targetCount = targetSockets.size() * targetsPerConnection;
         int totalSubTargetCount = targetCount * subTargetCount;
-
-        TargetType targetType;
         try {
             targetType = TargetType.valueOf(targetTypeStr.toUpperCase());
         } catch (IllegalArgumentException iaex) {
             LOG.error("Unable to parse provided targetType: %s, accepted values are {'CLUSTER', 'INDIVIDUAL'}".formatted(targetTypeStr), iaex);
             throw iaex;
         }
+        this.colour = colour;
 
         // if whole target, we will repeat.
         // if single LED, we will omit the same number of LED from each target.
@@ -112,13 +145,13 @@ public class TargetSequenceController {
 
                 List<Target> filteredPossibleTargets = List.copyOf(possibleTargets);
                 IntStream.range(0, targetCount).forEach(i -> {
-                    List<Target> filteredTargets = filteredPossibleTargets.stream().filter(target -> target.id == i).toList();
+                    List<Target> filteredTargets = new ArrayList<>(filteredPossibleTargets.stream().filter(target -> target.id == i).toList());
                     for (int j=0; j<omittedPerTarget; j++) {
                         removed.add(filteredTargets.remove(rng.nextInt(filteredTargets.size())));
                     }
                 });
                 // remove omitted options to ensure equal number of omissions per cluster.
-                possibleTargets = possibleTargets.stream().filter(target -> removed.contains(target)).toList();
+                possibleTargets = new ArrayList<>(possibleTargets.stream().filter(target -> removed.contains(target)).toList());
                 
                 // remove remaining omissions at random
                 for (int i=0; i<remainingOmissions; i++) {
@@ -131,27 +164,19 @@ public class TargetSequenceController {
         }
 
         // Need to save to file which target is scheduled...
-
+        File sessionSequenceFile = new File("/home/whiff/data/%s/%s_%s_%s.txt".formatted(participantId, DateTimeFormatter.ISO_DATE_TIME.format(LocalDateTime.now(ZoneId.of("UTC"))).replace(":", "-"), targetTypeStr, distractor ? "Distracted": "Focussed"));
+        sessionSequenceFile.getParentFile().mkdirs();
         for (int i=0; i<taskCount; i++) {
             Target nextTarget = possibleTargets.remove(rng.nextInt(possibleTargets.size()));
-            try (BufferedWriter bw = new BufferedWriter(new FileWriter("/home/whiff/data/%s_%s.txt".formatted(participantId, targetTypeStr)))) {
-                bw.write("%d,%d,%d,%d\n".formatted(nextTarget.id,nextTarget.row, nextTarget.col, nextTarget.subTarget));
+           
+            commandSequence.add(i, nextTarget);
+
+            try (BufferedWriter bw = new BufferedWriter(new FileWriter(sessionSequenceFile, true))) {
+                bw.write("%d,%d,%d,%d,%s\n".formatted(nextTarget.id,nextTarget.row, nextTarget.col, nextTarget.subTarget, Integer.toBinaryString(nextTarget.getCommandByte(colour, targetType)).substring(0, 8)));
             } catch (IOException ioex) {
                 LOG.error("Unable to write to file: '/home/whiff/data/%s.txt'".formatted(participantId), ioex);
             }
-            TargetLED led;
-            if (targetType == TargetType.CLUSTER) {
-                led = TargetLED.ALL;
-            } else {
-                led = TargetLED.values()[nextTarget.subTarget+1];
-            }
-            TargetArray array = TargetArray.values()[nextTarget.row];
-            byte nextCommand = getCommandByte(colour, array, led);
-            commandSequence[i*2] = targetConnectionToPhysicalColumnMapping.get(nextTarget.col).byteValue();
-            commandSequence[(i*2)+1] = nextCommand;
         }
-
-        return commandSequence;
     }
 
     private void getNext(Target last, List<Target> remaining, boolean subTargets) {
@@ -182,70 +207,81 @@ public class TargetSequenceController {
         return repeats;
     }
 
-    private byte getCommandByte(TargetColour colour, TargetArray array, TargetLED led) {
-        return (byte) (colour.mask | array.mask | led.mask);
-    }
-
-    public void run(String targetSize, HashMap<Integer, Integer> targetConnectionToPhysicalColumnMapping, TargetColour colour, String participantId) {
+    public void run(String targetSize, boolean distractor, HashMap<Integer, Integer> targetConnectionToPhysicalColumnMapping, TargetColour colour, String participantId) {
         taskSequenceIdx.set(0);
-        byte[] commandSequence = generate(targetSize, targetConnectionToPhysicalColumnMapping, colour, participantId);
+        generate(targetSize, distractor, targetConnectionToPhysicalColumnMapping, colour, participantId);
 
         long currentTime = System.currentTimeMillis();
-        targetScheduler.execute(() -> {
-            for (int i=0; i<targetSockets.size(); i++) {
-                sendCommand(i, IDENTIFY);
-            }
-        });
-        targetScheduler.schedule(() -> {
-            for (int i=0; i<targetSockets.size(); i++) {
-                sendCommand(i, (byte)0b00100000);
-            }
-        }, 1000 - (System.currentTimeMillis() - currentTime), TimeUnit.MILLISECONDS);
-        targetScheduler.schedule(() -> {
-            for (int i=0; i<targetSockets.size(); i++) {
-                sendCommand(i, (byte)0b00010000);
-            }
-        }, 2000 - (System.currentTimeMillis() - currentTime), TimeUnit.MILLISECONDS);
-        targetScheduler.schedule(() -> {
-            for (int i=0; i<targetSockets.size(); i++) {
-                sendCommand(i, (byte)0b00000000);
-            }
-        }, 3000 - (System.currentTimeMillis() - currentTime), TimeUnit.MILLISECONDS);
-
+        // targetScheduler.execute(() -> {
+        //     LOG.info("3...");
+        //     for (int i=0; i<targetSockets.size(); i++) {
+        //         sendCommand(i, IDENTIFY);
+        //     }
+        // });
         // targetScheduler.schedule(() -> {
-        //     sendCommand(0, OFF);
+        //     LOG.info("2...");
+        //     for (int i=0; i<targetSockets.size(); i++) {
+        //         sendCommand(i, (byte)0b00100000);
+        //     }
         // }, 1000 - (System.currentTimeMillis() - currentTime), TimeUnit.MILLISECONDS);
-
         // targetScheduler.schedule(() -> {
-        //     sendCommand(1, OFF);
+        //     LOG.info("1...");
+        //     for (int i=0; i<targetSockets.size(); i++) {
+        //         sendCommand(i, (byte)0b00010000);
+        //     }
         // }, 2000 - (System.currentTimeMillis() - currentTime), TimeUnit.MILLISECONDS);
-
         // targetScheduler.schedule(() -> {
-        //     sendCommand(2, OFF);
+        //     for (int i=0; i<targetSockets.size(); i++) {
+        //         LOG.info("Go (Reset)");
+        //         sendCommand(i, (byte)0b00000000);
+        //     }
         // }, 3000 - (System.currentTimeMillis() - currentTime), TimeUnit.MILLISECONDS);
 
-        // targetScheduler.schedule(() -> {
-        //     sendCommand(3, OFF);
-        // }, 4000 - (System.currentTimeMillis() - currentTime), TimeUnit.MILLISECONDS);
+        IntStream.range(1, 4).forEach(i -> {
+            targetScheduler.schedule(() -> {
+                try {
+                    uiWebSocket.sendMessage(new TextMessage("{\"count\": %d}".formatted(i)));
+                } catch (IOException ioex) {
+                    LOG.error("Unable to send instructions to screen", ioex);
+                }
+            }, 3-i, TimeUnit.SECONDS);
+        });
 
-        // targetScheduler.schedule(() -> {
-        //     sendCommand(4, OFF);
-        // }, 5000 - (System.currentTimeMillis() - currentTime), TimeUnit.MILLISECONDS);
+        if (distractor) {
+            stroopController.start(new ArrayList<StroopPayload>());
+        }
 
-        // turn target on
-        targetScheduler.scheduleAtFixedRate(() -> {
-            sendCommand(commandSequence[taskSequenceIdx.get()*2], commandSequence[(taskSequenceIdx.get()*2)+1]);
-        }, 5500 - (System.currentTimeMillis() - currentTime), targetOnDelay+targetOffDelay, TimeUnit.MILLISECONDS);
+        scheduleTargetOn(3000 - (System.currentTimeMillis() - currentTime));
+    }
 
-        // turn target off
-        targetScheduler.scheduleAtFixedRate(() -> {
-            sendCommand(commandSequence[taskSequenceIdx.getAndIncrement()*2], OFF);
-        }, 5500 - (System.currentTimeMillis() - currentTime) + targetOnDelay, targetOnDelay+targetOffDelay, TimeUnit.MILLISECONDS);
+    private void scheduleTargetOn(long delay) {
+        int idx = taskSequenceIdx.get();
+        LOG.info("Scheduling Sending Pointing Command: %d".formatted(idx));
+        targetScheduler.schedule(() -> {
+            if (idx < commandSequence.size()) {
+                Target target = commandSequence.get(idx);
+                sendCommand(target.col, target.getCommandByte(colour, targetType));
+                LOG.info("Sending Pointing Command: %d/%d".formatted(idx, commandSequence.size()));
+                scheduleTargetOff();
+            }
+        }, delay, TimeUnit.MILLISECONDS);
+    }
+
+    private void scheduleTargetOff() {
+        int idx = taskSequenceIdx.getAndIncrement();
+        LOG.info("Scheduling Ending Command: %d".formatted(idx));
+        targetScheduler.schedule(() -> {
+            if (idx < commandSequence.size()) {
+                sendCommand(commandSequence.get(idx).col, OFF);
+                LOG.info("Ending Pointing Command: %d/%d".formatted(idx, commandSequence.size()));
+                scheduleTargetOn(TimeUnit.SECONDS.toMillis(targetOnDelay));
+            }
+        }, TimeUnit.SECONDS.toMillis(targetOffDelay), TimeUnit.MILLISECONDS);
     }
 
     public void sendCommand(int socketId, byte command) {
-        try (OutputStream out = targetSockets.get(socketId).getOutputStream()) {
-            out.write(new byte[] { 0b01011010 });
+        try {
+            targetSockets.get(socketId).getOutputStream().write(new byte[] { command });
         } catch (IOException ioex) {
             // do something more here???
             LOG.error("Unable to send message to socket", ioex);
@@ -274,6 +310,14 @@ public class TargetSequenceController {
             this.subTarget = subTarget;
             col = id / 3;
             row = id % 3;
+        }
+        
+        public byte getCommandByte(TargetColour colour, TargetType targetType) {
+            TargetArray array = TargetArray.values()[row];
+
+            TargetLED led = targetType == TargetType.CLUSTER ? TargetLED.ALL : TargetLED.values()[subTarget+1];
+
+            return (byte) (colour.mask | array.mask | led.mask);
         }
     }
 
@@ -356,4 +400,5 @@ public class TargetSequenceController {
             this.mask = (byte)mask;
         }
     }
+
 }
