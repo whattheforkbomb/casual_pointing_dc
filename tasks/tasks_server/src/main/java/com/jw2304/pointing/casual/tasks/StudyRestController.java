@@ -13,11 +13,11 @@ import java.util.concurrent.ExecutorService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.jw2304.pointing.casual.tasks.connections.WebSocketRegistration;
 import com.jw2304.pointing.casual.tasks.stroop.StroopController;
 import com.jw2304.pointing.casual.tasks.targets.TargetRestController;
 import com.jw2304.pointing.casual.tasks.targets.TargetSequenceController;
-import com.jw2304.pointing.casual.tasks.targets.TargetSequenceController.TargetColour;
+import com.jw2304.pointing.casual.tasks.targets.data.TargetColour;
+import com.jw2304.pointing.casual.tasks.targets.data.TargetType;
 
 @RestController
 @RequestMapping(value = "/study")
@@ -41,17 +41,18 @@ public class StudyRestController {
     ExecutorService executor;
 
     @PostMapping("/start")
-    public void start(@RequestParam("targetType") String targetType, @RequestParam("distractor") boolean distractor) {
+    public void start(@RequestParam("targetType") String targetTypeStr, @RequestParam("distractor") boolean distractor, @RequestParam(name = "targetDelay", defaultValue = "3000") int targetDelay, @RequestParam(name = "targetDuration", defaultValue = "3000") int targetDuration, @RequestParam(name = "stroopDelay", defaultValue = "3000") int stroopDelay, @RequestParam(name = "stroopDuration", defaultValue = "3000") int stroopDuration) {
         LOG.info("Resetting targets");
         targetSequenceController.resetTargets();
-        executor.execute(() -> 
-            targetSequenceController.run(targetType, distractor, targetRestController.targetConnectionToPhysicalColumnMapping, TargetColour.values()[targetRestController.targetColour.get()], PID)
-        );
-        // if (distractor) {
-        //     executor.execute(() -> {
-        //         stroophandler.start();
-        //     });
-        // }
+        TargetType targetType;
+        try {
+            targetType = TargetType.valueOf(targetTypeStr.toUpperCase());
+        } catch (IllegalArgumentException iaex) {
+            LOG.error("Unable to parse provided targetType: %s, accepted values are {'CLUSTER', 'INDIVIDUAL'}\nUsing INDIVIDUAL as Target Type.".formatted(targetTypeStr), iaex);
+            targetType = TargetType.INDIVIDUAL;
+        }
+
+        targetSequenceController.run(targetType, targetDelay, targetDuration, stroopDelay, stroopDuration, distractor, PID);
     }
 
     @GetMapping("/pid")

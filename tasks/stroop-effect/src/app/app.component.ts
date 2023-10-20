@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+// import { Synth } from 'tone';
 // import { WebSocket } from 'ws';
 
 interface StroopBody {

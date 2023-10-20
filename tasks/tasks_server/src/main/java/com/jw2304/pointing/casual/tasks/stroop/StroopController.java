@@ -18,6 +18,8 @@ import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
 
 import com.jw2304.pointing.casual.tasks.connections.WebSocketConnectionConsumer;
+import com.jw2304.pointing.casual.tasks.stroop.data.StroopColour;
+import com.jw2304.pointing.casual.tasks.stroop.data.Stroop;
 
 @Controller
 public class StroopController implements WebSocketConnectionConsumer {
@@ -26,7 +28,7 @@ public class StroopController implements WebSocketConnectionConsumer {
     private final ScheduledExecutorService stroopScheduler = Executors.newScheduledThreadPool(4);
     private ScheduledFuture<?> stroopFuture = null;
     private WebSocketSession uiWebSocket = null;
-    private List<StroopPayload> sequence = new ArrayList<StroopPayload>();
+    private List<Stroop> sequence = new ArrayList<Stroop>();
     private final AtomicInteger taskSequenceIdx = new AtomicInteger(0);
     private final Random rng = new Random(System.currentTimeMillis());
 
@@ -46,31 +48,30 @@ public class StroopController implements WebSocketConnectionConsumer {
         // }
     }
 
-    public void start(List<StroopPayload> sequence) {
+    public void start(List<Stroop> sequence, long elapsed) {
         this.sequence = sequence;
-        
+        taskSequenceIdx.set(0);
         stroopFuture = stroopScheduler.schedule(() -> {
             try {
-                uiWebSocket.sendMessage(new TextMessage("{\"word\": \"\", \"colour\": \"black\"}"));
+                uiWebSocket.sendMessage(Stroop.getResetMessage());
             } catch(IOException ioex) {
                 LOG.error("Unable to send reset to stroop", ioex);
             }
             scheduleStroop();
-        }, 3, TimeUnit.SECONDS);
+        }, 3000 - (System.currentTimeMillis() - elapsed), TimeUnit.MILLISECONDS);
     }
 
     public void scheduleStroop() {
         LOG.info("Sending next Stroop word");
         try {
-            String word = StroopColour.values()[rng.nextInt(StroopColour.values().length)].name();
-            String colour = StroopColour.values()[rng.nextInt(StroopColour.values().length)].cssColour;
-            uiWebSocket.sendMessage(new TextMessage("{\"word\": \"%s\", \"colour\": \"%s\"}".formatted(word, colour)));
+            Stroop stroopPayload = sequence.get(taskSequenceIdx.get());
+            uiWebSocket.sendMessage(stroopPayload.getMessage());
         } catch (IOException ioex) {
             LOG.error("Failed to send over stroop websocket", ioex);
         }
         stroopScheduler.schedule(() -> {
             try {
-                uiWebSocket.sendMessage(new TextMessage("{\"word\": \"\", \"colour\": \"black\"}"));
+                uiWebSocket.sendMessage(Stroop.getResetMessage());
             } catch (IOException ioex) {
                 LOG.error("Failed to send over stroop websocket", ioex);
             }
@@ -81,25 +82,6 @@ public class StroopController implements WebSocketConnectionConsumer {
     public void stop() {
         if (stroopFuture != null) {
             stroopFuture.cancel(true);
-        }
-    }
-
-    public class StroopPayload {
-        public StroopColour colour;
-        public String word;
-    }
-
-    public enum StroopColour {
-        RED("red"),
-        GREEN("dark-green"),
-        BLUE("dark-blue"),
-        YELLOW("yellow"),
-        PINK("pink"),
-        ORANGE("dark-orange");
-
-        public final String cssColour;
-        StroopColour(String css) {
-            cssColour = css;
         }
     }
 
