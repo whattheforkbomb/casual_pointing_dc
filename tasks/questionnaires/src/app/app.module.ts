@@ -5,12 +5,18 @@ import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { SurveyModule } from 'survey-angular-ui';
 import { HttpClientModule } from '@angular/common/http';
-import { ColorPickerComponent } from './questions/color-picker/color-picker.component'
+import { NasaTLXComponent } from './questions/nasa-tlx/nasa-tlx.component';
+import { BorgRPEComponent } from './questions/borg-rpe/borg-rpe.component';
+import { ImiComponent } from './questions/imi/imi.component';
+import { LikertComponent } from './questions/likert/likert.component'
 
 @NgModule({
   declarations: [
     AppComponent,
-    ColorPickerComponent
+    NasaTLXComponent,
+    BorgRPEComponent,
+    ImiComponent,
+    LikertComponent
   ],
   imports: [
     BrowserModule,

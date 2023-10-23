@@ -1,6 +1,9 @@
 import { Component, OnInit } from '@angular/core';
-// import { Synth } from 'tone';
+import * as Tone from 'tone';
 // import { WebSocket } from 'ws';
+
+const synth = new Tone.Synth().toDestination();
+// const now = Tone.now();
 
 interface StroopBody {
   colour: string;
@@ -37,6 +40,9 @@ export class AppComponent implements OnInit {
       console.log(`Received message from server: ${msg}`);
       this.display.colour = msg.colour;
       this.display.word = msg.word;
+      if (this.display.word.length > 0) {
+        synth.triggerAttackRelease("C4", 0.5)
+      }
       console.log(this.display);
     };
     
@@ -51,10 +57,12 @@ export class AppComponent implements OnInit {
     this.countdownWS.onmessage = (event: MessageEvent) => {
       let msg = <CountdownBody>JSON.parse(event.data);
       console.log(`Received message from server: ${msg}`);
-      if (msg.count > 0 || this.display.word == "1") {
+      if (msg.count > 0) {
         this.display.colour = "white";
         this.display.word = msg.count.toString();
         console.log(this.display);
+      } else if (msg.count == 0 && this.display.word == "1") {
+        this.display.word = "";
       }
     };
     

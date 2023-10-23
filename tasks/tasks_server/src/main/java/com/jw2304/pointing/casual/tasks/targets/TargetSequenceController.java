@@ -38,6 +38,7 @@ import com.jw2304.pointing.casual.tasks.targets.data.TargetArray;
 import com.jw2304.pointing.casual.tasks.targets.data.TargetColour;
 import com.jw2304.pointing.casual.tasks.targets.data.TargetLED;
 import com.jw2304.pointing.casual.tasks.targets.data.TargetType;
+import com.jw2304.pointing.casual.tasks.util.Helpers;
 
 import jakarta.annotation.PostConstruct;
 
@@ -73,7 +74,7 @@ public class TargetSequenceController  implements WebSocketConnectionConsumer {
     private TargetColour colour = TargetColour.RED;
     private TargetType targetType = TargetType.UNKNOWN;
 
-    private List<Target> commandSequence = new ArrayList<>();
+    private List<Target> targetSequence = new ArrayList<>();
 
     @Autowired
     ArrayList<Socket> targetSockets;
@@ -150,9 +151,9 @@ public class TargetSequenceController  implements WebSocketConnectionConsumer {
 
     public void run(
         TargetType targetType, int targetStartDelaySeconds, int targetDurationSeconds, int stroopStartDelaySeconds, 
-        int stroopDurationSeconds, boolean distractor, String participantId
+        int stroopDurationSeconds, boolean distractor, String participantId, String fileName
     ) {
-        File sessionSequenceFile = new File("/home/whiff/data/%s/%s_%s_%s.txt".formatted(participantId, getCurrentDateTimeString(), targetType.name(), distractor ? "Distracted": "Focussed"));
+        File sessionSequenceFile = new File("%s.txt".formatted(fileName));
         sessionSequenceFile.getParentFile().mkdirs();
 
         taskSequenceIdx.set(0);
@@ -161,8 +162,10 @@ public class TargetSequenceController  implements WebSocketConnectionConsumer {
         
         Pair<List<Target>, List<Stroop>> sequences = generator.generateSequence(targetType, targetStartDelaySeconds, targetDurationSeconds, stroopStartDelaySeconds, stroopDurationSeconds, distractor, targetCount);
 
+        targetSequence = sequences.getFirst();
+
         long currentTime = System.currentTimeMillis();
-        IntStream.range(1, 4).forEach(i -> {
+        IntStream.range(0, 4).forEach(i -> {
             targetScheduler.schedule(() -> {
                 try {
                     uiWebSocket.sendMessage(new TextMessage("{\"count\": %d}".formatted(i)));
@@ -171,31 +174,36 @@ public class TargetSequenceController  implements WebSocketConnectionConsumer {
                 }
             }, 3-i, TimeUnit.SECONDS);
         });
+        targetScheduler.schedule(() -> {
+            try {
+                uiWebSocket.sendMessage(new TextMessage("{\"count\": 0}"));
+            } catch (IOException ioex) {
+                LOG.error("Unable to send instructions to screen", ioex);
+            }
+        }, 4, TimeUnit.SECONDS);
 
+        long delay = 3000 - (System.currentTimeMillis() - currentTime);
         if (distractor) {
-            stroopController.start(sequences.getSecond(), currentTime);
+            stroopController.start(sequences.getSecond(), currentTime, fileName);
+            delay += targetSequence.get(0).startDelayMilliseconds;
         }
 
-        scheduleTargetOn(3000 - (System.currentTimeMillis() - currentTime), sessionSequenceFile);
-    }
-
-    private String getCurrentDateTimeString() {
-        return DateTimeFormatter.ISO_DATE_TIME.format(LocalDateTime.now(ZoneId.of("UTC"))).replace(":", ".").substring(0, 25);
+        scheduleTargetOn(delay, sessionSequenceFile);
     }
 
     private void scheduleTargetOn(long delay, File sessionSequenceFile) {
         int idx = taskSequenceIdx.get();
-        LOG.info("Scheduling Sending Pointing Command: %d".formatted(idx));
+        LOG.info("Scheduling Sending Pointing Command: %d - delay: %d".formatted(idx, delay));
         targetScheduler.schedule(() -> {
-            if (idx < commandSequence.size()) {
-                Target target = commandSequence.get(idx);
+            if (idx < targetSequence.size()) {
+                Target target = targetSequence.get(idx);
                 sendCommand(target.col, target.getCommandByte(colour, targetType));
                 try (BufferedWriter bw = new BufferedWriter(new FileWriter(sessionSequenceFile, true))) {
-                    bw.write("%s,ON,%d,%d,%d,%d,%s\n".formatted(getCurrentDateTimeString(), target.id,target.row, target.col, target.subTarget, Integer.toBinaryString(target.getCommandByte(colour, targetType)).substring(0, 8)));
+                    bw.write("%s,ON,%d,%d,%d,%d,%s\n".formatted(Helpers.getCurrentDateTimeString(), target.id,target.row, target.col, target.subTarget, Integer.toBinaryString(target.getCommandByte(colour, targetType)).substring(0, 8)));
                 } catch (IOException ioex) {
                     LOG.error("Unable to write to file: '/home/whiff/data/%s'".formatted(sessionSequenceFile.getName()), ioex);
                 }
-                LOG.info("Sending Pointing Command: %d/%d".formatted(idx+1, commandSequence.size()));
+                LOG.info("Sending Pointing Command: %d/%d".formatted(idx+1, targetSequence.size()));
                 scheduleTargetOff(target.durationMilliseconds, sessionSequenceFile);
             }
         }, delay, TimeUnit.MILLISECONDS);
@@ -203,18 +211,18 @@ public class TargetSequenceController  implements WebSocketConnectionConsumer {
 
     private void scheduleTargetOff(int duration, File sessionSequenceFile) {
         int idx = taskSequenceIdx.getAndIncrement();
-        LOG.info("Scheduling Ending Command: %d".formatted(idx));
+        LOG.info("Scheduling Ending Command: %d - delay: %d".formatted(idx, duration));
         targetScheduler.schedule(() -> {
-            if (idx < commandSequence.size()) {
-                Target target = commandSequence.get(idx);
-                sendCommand(commandSequence.get(idx).col, OFF);
+            if (idx < targetSequence.size()) {
+                Target target = targetSequence.get(idx);
+                sendCommand(targetSequence.get(idx).col, OFF);
                 try (BufferedWriter bw = new BufferedWriter(new FileWriter(sessionSequenceFile, true))) {
-                    bw.write("%s,OFF,%d,%d,%d,%d,%s\n".formatted(getCurrentDateTimeString(), target.id,target.row, target.col, target.subTarget, Integer.toBinaryString(target.getCommandByte(colour, targetType)).substring(0, 8)));
+                    bw.write("%s,OFF,%d,%d,%d,%d,%s\n".formatted(Helpers.getCurrentDateTimeString(), target.id,target.row, target.col, target.subTarget, Integer.toBinaryString(target.getCommandByte(colour, targetType)).substring(0, 8)));
                 } catch (IOException ioex) {
                     LOG.error("Unable to write to file: '/home/whiff/data/%s'".formatted(sessionSequenceFile.getName()), ioex);
                 }
-                LOG.info("Ending Pointing Command: %d/%d".formatted(idx+1, commandSequence.size()));
-                scheduleTargetOn(commandSequence.get(taskSequenceIdx.get()).startDelayMilliseconds, sessionSequenceFile);
+                LOG.info("Ending Pointing Command: %d/%d".formatted(idx+1, targetSequence.size()));
+                scheduleTargetOn(targetSequence.get(taskSequenceIdx.get()).startDelayMilliseconds, sessionSequenceFile);
             }
         }, duration, TimeUnit.MILLISECONDS);
     }

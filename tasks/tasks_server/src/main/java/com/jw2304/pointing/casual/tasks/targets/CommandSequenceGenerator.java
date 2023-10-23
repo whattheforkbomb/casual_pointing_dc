@@ -61,7 +61,7 @@ public class CommandSequenceGenerator {
     private final Random rng = new Random(System.currentTimeMillis());    
 
     public Pair<List<Target>, List<Stroop>> generateSequence(
-        TargetType targetType , int targetStartDelayMilliseconds, int targetDurationSeconds, int stroopStartDelayMilliseconds, 
+        TargetType targetType , int targetStartDelayMilliseconds, int targetDurationMilliseconds, int stroopStartDelayMilliseconds, 
         int stroopDurationMilliseconds, boolean distractor, int targetCount
     ) {
         List<Target> possibleTargets = new ArrayList<>(taskCount);
@@ -83,7 +83,7 @@ public class CommandSequenceGenerator {
             for (int i=0; i<targetCount; i++) {
                 for (int j=0; j<subTargetCount; j++) {
                     for (int k=0; k<(targetRepeats < 0 ? 1 : targetRepeats); k++) {
-                        possibleTargets.add(new Target(i, j));
+                        possibleTargets.add(new Target(i, j, targetStartDelayMilliseconds, targetDurationMilliseconds));
                     }
                 }
             }
@@ -137,27 +137,30 @@ public class CommandSequenceGenerator {
             stroopMessages.add(getStroop(stroopStartDelayMilliseconds, stroopDurationMilliseconds));
             stroopMessages.add(getStroop(stroopStartDelayMilliseconds, stroopDurationMilliseconds));
             boolean previousTargetPostStroop = false;
+            int overallElapsed = stroopStartDelayMilliseconds*2 + stroopDurationMilliseconds*2;
             for (Target target : possibleTargets) {
                 if (preStroop > 0 && postStroop > 0) {
                     boolean targetPostStroop = rng.nextBoolean();
                     if (targetPostStroop) { // post
-                        target.startDelayMilliseconds = stroopDurationMilliseconds + targetStartDelayMilliseconds;
+                        target.startDelayMilliseconds = (stroopMessages.size() * (stroopStartDelayMilliseconds + stroopDurationMilliseconds)) + targetStartDelayMilliseconds - overallElapsed;
                     } else {
                         if (previousTargetPostStroop) {
                             stroopMessages.add(getStroop(stroopStartDelayMilliseconds, stroopDurationMilliseconds));
                             // need to add a stroop test between these 2 cases
-                            target.startDelayMilliseconds = stroopStartDelayMilliseconds + (stroopDurationMilliseconds*2) - targetStartDelayMilliseconds;
                         }
-                        target.startDelayMilliseconds = stroopDurationMilliseconds - targetStartDelayMilliseconds;
+                        target.startDelayMilliseconds = (stroopMessages.size() * (stroopStartDelayMilliseconds + stroopDurationMilliseconds)) - targetStartDelayMilliseconds - overallElapsed;
                     }
                     previousTargetPostStroop = targetPostStroop;
                 } else if (preStroop > 0) {
-                    target.startDelayMilliseconds = stroopDurationMilliseconds - targetStartDelayMilliseconds;
+                    target.startDelayMilliseconds = (stroopMessages.size() * (stroopStartDelayMilliseconds + stroopDurationMilliseconds)) - targetStartDelayMilliseconds - overallElapsed;
                 } else {
-                    target.startDelayMilliseconds = stroopDurationMilliseconds + targetStartDelayMilliseconds;
+                    target.startDelayMilliseconds = (stroopMessages.size() * (stroopStartDelayMilliseconds + stroopDurationMilliseconds)) + targetStartDelayMilliseconds - overallElapsed;
                 }
+                overallElapsed += target.startDelayMilliseconds + targetDurationMilliseconds;
                 stroopMessages.add(getStroop(stroopStartDelayMilliseconds, stroopDurationMilliseconds));
+                finalTargets.add(target);
             }
+            finalTargets.get(0).startDelayMilliseconds += stroopStartDelayMilliseconds*2 + stroopDurationMilliseconds*2;
         } else {
             finalTargets = possibleTargets;
             stroopMessages = Collections.emptyList();

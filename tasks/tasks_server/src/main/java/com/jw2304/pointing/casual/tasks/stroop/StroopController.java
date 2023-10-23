@@ -1,5 +1,8 @@
 package com.jw2304.pointing.casual.tasks.stroop;
 
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -9,16 +12,14 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.stream.IntStream;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
 
 import com.jw2304.pointing.casual.tasks.connections.WebSocketConnectionConsumer;
-import com.jw2304.pointing.casual.tasks.stroop.data.StroopColour;
+import com.jw2304.pointing.casual.tasks.util.Helpers;
 import com.jw2304.pointing.casual.tasks.stroop.data.Stroop;
 
 @Controller
@@ -48,17 +49,65 @@ public class StroopController implements WebSocketConnectionConsumer {
         // }
     }
 
-    public void start(List<Stroop> sequence, long elapsed) {
+    public void start(List<Stroop> sequence, long elapsed, String fileName) {
         this.sequence = sequence;
         taskSequenceIdx.set(0);
-        stroopFuture = stroopScheduler.schedule(() -> {
-            try {
-                uiWebSocket.sendMessage(Stroop.getResetMessage());
-            } catch(IOException ioex) {
-                LOG.error("Unable to send reset to stroop", ioex);
+        File sessionSequenceFile = new File("%s_Stroop.txt".formatted(fileName));
+        sessionSequenceFile.getParentFile().mkdirs();
+
+        scheduleStroopShow(3000 - (System.currentTimeMillis() - elapsed), sessionSequenceFile);
+
+        // stroopScheduler.schedule(() -> {
+        //     try {
+        //         uiWebSocket.sendMessage(Stroop.getResetMessage());
+        //     } catch(IOException ioex) {
+        //         LOG.error("Unable to send reset to stroop", ioex);
+        //     }
+        //     scheduleStroopShow(0, sessionSequenceFile);
+        // }, 3000 - (System.currentTimeMillis() - elapsed), TimeUnit.MILLISECONDS);
+    }
+
+    private void scheduleStroopShow(long delay, File sessionSequenceFile) {
+        int idx = taskSequenceIdx.getAndIncrement();
+        LOG.info("Scheduling Sending Stroop: %d - delay: %d".formatted(idx, delay));
+        stroopScheduler.schedule(() -> {
+            if (idx < sequence.size()) {
+                Stroop stroopPayload = sequence.get(idx);
+                try {
+                    uiWebSocket.sendMessage(stroopPayload.getMessage());
+                } catch (IOException ioex) {
+                    LOG.error("Failed to send over stroop websocket", ioex);
+                }
+                try (BufferedWriter bw = new BufferedWriter(new FileWriter(sessionSequenceFile, true))) {
+                    bw.write("%s,SHOW,%s,%s\n".formatted(Helpers.getCurrentDateTimeString(), stroopPayload.word, stroopPayload.colour.name()));
+                } catch (IOException ioex) {
+                    LOG.error("Unable to write to file: '/home/whiff/data/%s'".formatted(sessionSequenceFile.getName()), ioex);
+                }
+                LOG.info("Sending Stroop: %d/%d".formatted(idx+1, sequence.size()));
+                scheduleStroopClear(idx, stroopPayload.durationMilliseconds, sessionSequenceFile);
             }
-            scheduleStroop();
-        }, 3000 - (System.currentTimeMillis() - elapsed), TimeUnit.MILLISECONDS);
+        }, delay, TimeUnit.MILLISECONDS);
+    }
+
+    private void scheduleStroopClear(int idx, int duration, File sessionSequenceFile) {
+        LOG.info("Scheduling Clearing Stroop: %d - delay: %d".formatted(idx, duration));
+        stroopScheduler.schedule(() -> {
+            if (idx < sequence.size()) {
+                Stroop stroopPayload = sequence.get(idx);
+                try {
+                    uiWebSocket.sendMessage(Stroop.getResetMessage());
+                } catch (IOException ioex) {
+                    LOG.error("Failed to send over stroop websocket", ioex);
+                }
+                try (BufferedWriter bw = new BufferedWriter(new FileWriter(sessionSequenceFile, true))) {
+                    bw.write("%s,CLEAR,%s,%s\n".formatted(Helpers.getCurrentDateTimeString(), stroopPayload.word, stroopPayload.colour.name()));
+                } catch (IOException ioex) {
+                    LOG.error("Unable to write to file: '/home/whiff/data/%s'".formatted(sessionSequenceFile.getName()), ioex);
+                }
+                LOG.info("Clearing Stroop: %d/%d".formatted(idx+1, sequence.size()));
+                scheduleStroopShow(sequence.get(taskSequenceIdx.get()).startDelayMilliseconds, sessionSequenceFile);
+            }
+        }, duration, TimeUnit.MILLISECONDS);
     }
 
     public void scheduleStroop() {

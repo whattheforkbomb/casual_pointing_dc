@@ -6,8 +6,8 @@ public class Stroop {
     public final String word;
     public final StroopColour colour;
 
-    public int startDelayMilliseconds = 3000;
-    public int durationMilliseconds = 3000;
+    public int startDelayMilliseconds = 250;
+    public int durationMilliseconds = 3750;
 
     public Stroop(String word, StroopColour colour) {
         this.word = word;

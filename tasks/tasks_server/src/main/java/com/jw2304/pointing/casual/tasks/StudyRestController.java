@@ -18,6 +18,7 @@ import com.jw2304.pointing.casual.tasks.targets.TargetRestController;
 import com.jw2304.pointing.casual.tasks.targets.TargetSequenceController;
 import com.jw2304.pointing.casual.tasks.targets.data.TargetColour;
 import com.jw2304.pointing.casual.tasks.targets.data.TargetType;
+import com.jw2304.pointing.casual.tasks.util.Helpers;
 
 @RestController
 @RequestMapping(value = "/study")
@@ -41,7 +42,7 @@ public class StudyRestController {
     ExecutorService executor;
 
     @PostMapping("/start")
-    public void start(@RequestParam("targetType") String targetTypeStr, @RequestParam("distractor") boolean distractor, @RequestParam(name = "targetDelay", defaultValue = "3000") int targetDelay, @RequestParam(name = "targetDuration", defaultValue = "3000") int targetDuration, @RequestParam(name = "stroopDelay", defaultValue = "3000") int stroopDelay, @RequestParam(name = "stroopDuration", defaultValue = "3000") int stroopDuration) {
+    public void start(@RequestParam("targetType") String targetTypeStr, @RequestParam("distractor") boolean distractor, @RequestParam(name = "targetDelay", defaultValue = "3000") int targetDelay, @RequestParam(name = "targetDuration", defaultValue = "3000") int targetDuration, @RequestParam(name = "stroopDelay", defaultValue = "250") int stroopDelay, @RequestParam(name = "stroopDuration", defaultValue = "3750") int stroopDuration) {
         LOG.info("Resetting targets");
         targetSequenceController.resetTargets();
         TargetType targetType;
@@ -51,8 +52,8 @@ public class StudyRestController {
             LOG.error("Unable to parse provided targetType: %s, accepted values are {'CLUSTER', 'INDIVIDUAL'}\nUsing INDIVIDUAL as Target Type.".formatted(targetTypeStr), iaex);
             targetType = TargetType.INDIVIDUAL;
         }
-
-        targetSequenceController.run(targetType, targetDelay, targetDuration, stroopDelay, stroopDuration, distractor, PID);
+        String sessionFileName = "/home/whiff/data/%s/%s_%s_%s".formatted(PID, targetType.name(), distractor ? "Distracted": "Focussed", Helpers.getCurrentDateTimeString());
+        targetSequenceController.run(targetType, targetDelay, targetDuration, stroopDelay, stroopDuration, distractor, PID, sessionFileName);
     }
 
     @GetMapping("/pid")

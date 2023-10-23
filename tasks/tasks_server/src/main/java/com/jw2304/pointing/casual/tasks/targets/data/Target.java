@@ -15,6 +15,15 @@ public class Target {
         col = id / 3;
         row = id % 3;
     }
+
+    public Target(int id, int subTarget, int startDelayMilliseconds, int durationMilliseconds) {
+        this.id = id;
+        this.subTarget = subTarget;
+        col = id / 3;
+        row = id % 3;
+        this.startDelayMilliseconds = startDelayMilliseconds;
+        this.durationMilliseconds = durationMilliseconds;
+    }
     
     public byte getCommandByte(TargetColour colour, TargetType targetType) {
         TargetArray array = TargetArray.values()[row];
