@@ -29,13 +29,17 @@ int latchPins[] = {1, 4, 7};
 int clockPins[] = {2, 5, 8};
 int tonePin = 9;
 int toneNotes[] = {33, 262, 2093};
-// byte shield_mac[] = { 0x90, 0xA2, 0xDA, 0x0D, 0xF3, 0xA5 };
-byte shield_mac[] = { 0x90, 0xA2, 0xDA, 0x0D, 0xF3, 0xB0 };
+byte shield_mac[] = { 0x90, 0xA2, 0xDA, 0x0D, 0xF3, 0xA5 };
+IPAddress ip(192, 168, 0, 2);
+// byte shield_mac[] = { 0x90, 0xA2, 0xDA, 0x0D, 0xF3, 0xB0 };
+// IPAddress ip(192, 168, 0, 3);
 // byte shield_mac[] = { 0x90, 0xA2, 0xDA, 0x0D, 0xF3, 0xB4 };
+// IPAddress ip(192, 168, 0, 4);
 // byte shield_mac[] = { 0x90, 0xA2, 0xDA, 0x0D, 0xF3, 0xB8 };
+// IPAddress ip(192, 168, 0, 5);
 // byte shield_mac[] = { 0x90, 0xA2, 0xDA, 0x0D, 0xF3, 0xC0 };
+// IPAddress ip(192, 168, 0, 6);
 IPAddress server(192, 168, 0, 1);
-IPAddress ip(192, 168, 0, 3);
 EthernetClient client;
 // #define NOTE_C2  65
 // #define NOTE_C3  131

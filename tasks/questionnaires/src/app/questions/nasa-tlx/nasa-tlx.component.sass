@@ -1,0 +1,27 @@
+.tick
+    background-color: black
+
+.scale-value
+    height: 25px
+    margin-left: auto
+    margin-right: auto
+    width: 2px
+
+.selected
+    width: 4px
+    background-color: var(--sjs-primary-backcolor, var(--primary, #19b394))
+
+.tlx-table
+    border-collapse: collapse
+    text-align: center
+    height: 50px
+    padding: 0px
+    margin-left: auto
+    margin-right: auto
+
+.cell
+    border-bottom: 1px solid black
+
+.cell:hover > .scale-value:not(.selected)
+    background-color: var(--sjs-primary-backcolor, var(--primary, #19b394))
+    width: 2px

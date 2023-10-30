@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { AngularComponentFactory, QuestionAngular } from 'survey-angular-ui';
 import { Question, Serializer, ElementFactory } from 'survey-core';
 
@@ -8,7 +8,7 @@ import { Question, Serializer, ElementFactory } from 'survey-core';
   styleUrls: ['./borg-rpe.component.sass']
 })
 export class BorgRPEComponent extends QuestionAngular<BorgRPEModel> {
-  // need logic here (or a binding) to set the model.value
+  borgScale: number[] = [6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20];
   updateSurveyValue(newValue: any) {
     this.model.value = newValue;
   }
@@ -21,6 +21,12 @@ export class BorgRPEModel extends Question {
   override getType() {
     return CUSTOM_TYPE;
   }
+  get questionText() {
+    return this.getPropertyValue("questionText");
+  }
+  set questionText(val) {
+    this.setPropertyValue("questionText", val);
+  }
 }
 
 ElementFactory.Instance.registerElement(CUSTOM_TYPE, (name) => {
@@ -28,7 +34,11 @@ ElementFactory.Instance.registerElement(CUSTOM_TYPE, (name) => {
 });
 Serializer.addClass(
   CUSTOM_TYPE,
-  [], // Define the additional properties we expect to see
+  [{
+    name: "questionText",
+    category: "general",
+    visibleIndex: 3
+  }], // Define the additional properties we expect to see
   function () {
     return new BorgRPEModel("");
   },

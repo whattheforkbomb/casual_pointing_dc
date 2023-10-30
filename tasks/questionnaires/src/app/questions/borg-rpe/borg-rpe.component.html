@@ -1,1 +1,22 @@
-<p>borg-rpe works!</p>
+<div style="width: 100%; text-align: left; word-wrap: break-word; white-space: normal">{{model.questionText}}</div>
+<div class="borgTable" style="max-width: 750px; margin-top: 20px">
+    <hr class="borgTable" />
+    <table class="borgTable" style="width: 100%; text-align: center;">
+        <tr style="width: 100%; margin-left: 0px">
+            <td style="width: calc(100% / 15)" (click)="updateSurveyValue(i)" *ngFor="let scaleValue of borgScale; index as i">
+                <button class="btn" (click)="updateSurveyValue(i)" [class.selected]="(model.value == i)">{{scaleValue}}</button>
+            </td>
+        </tr>
+    </table>
+    <hr class="borgTable" />
+    <table class="borgTable" style="width: 100%; text-align: center; margin-bottom: 10px; margin-top: 5px;">
+        <td class="borg-scale-text">Very, Very Light</td>
+        <td class="borg-scale-text">Very Light</td>
+        <td class="borg-scale-text">Fairly Light</td>
+        <td class="borg-scale-text">Somewhat Hard</td>
+        <td class="borg-scale-text">Hard</td>
+        <td class="borg-scale-text">Very Hard</td>
+        <td class="borg-scale-text">Very, Very Hard</td>
+    </table>
+    <hr class="borgTable" />
+</div>

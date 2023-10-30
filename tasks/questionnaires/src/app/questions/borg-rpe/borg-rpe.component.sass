@@ -1,0 +1,36 @@
+button
+    text-align: center
+    background: white
+    border: 5px
+    width: 100%
+    aspect-ratio : 1 / 1
+    margin-left: auto
+    margin-right: auto
+    border-radius: 50%
+    font-weight: bold
+    font-size: 20px
+
+%button-active
+    border: 3px solid var(--sjs-primary-backcolor, var(--primary, #19b394))
+button.selected
+    @extend %button-active
+button:hover
+    @extend %button-active
+
+td:hover > button
+    @extend %button-active
+
+hr
+    margin: 2px
+    border-top: 1px solid black
+
+.borgTable
+    margin-left: auto
+    margin-right: auto
+
+.borg-scale-text
+    width: calc(100% / 7)
+    word-wrap: break-word
+    font-size: 18px
+    white-space: normal
+    padding: 2px

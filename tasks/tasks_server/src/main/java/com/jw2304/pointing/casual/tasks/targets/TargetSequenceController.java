@@ -34,9 +34,7 @@ import com.jw2304.pointing.casual.tasks.connections.WebSocketConnectionConsumer;
 import com.jw2304.pointing.casual.tasks.stroop.StroopController;
 import com.jw2304.pointing.casual.tasks.stroop.data.Stroop;
 import com.jw2304.pointing.casual.tasks.targets.data.Target;
-import com.jw2304.pointing.casual.tasks.targets.data.TargetArray;
 import com.jw2304.pointing.casual.tasks.targets.data.TargetColour;
-import com.jw2304.pointing.casual.tasks.targets.data.TargetLED;
 import com.jw2304.pointing.casual.tasks.targets.data.TargetType;
 import com.jw2304.pointing.casual.tasks.util.Helpers;
 
@@ -104,51 +102,7 @@ public class TargetSequenceController  implements WebSocketConnectionConsumer {
     public void setupGenerator() {
         generator = CommandSequenceGenerator.create(colour, subTargetCount, targetsPerConnection, taskCount);
     }
-
-
-    // The command sequence is setup as pairs of bytes, the first being the target, the second being the command
-    private void generate(TargetType targetType2, boolean distractor, HashMap<Integer, Integer> targetConnectionToPhysicalColumnMapping, TargetColour colour, String participantId) {
-        // byte[] cmdSequence = new byte[taskCount*2];
-        
-
-        // if whole target, we will repeat.
-        // if single LED, we will omit the same number of LED from each target.
-        
-        // Need to uniformly distribute across the columns and rows (e.g. next target should be different column and row; for individual LED need different row column within target, but can reuse target, should not be the same row or column on different target).
-
-        
-
-        // Need to save to file which target is scheduled...
-        
-        // for (int i=0; i<taskCount; i++) {
-        //     Target nextTarget = possibleTargets.remove(rng.nextInt(possibleTargets.size()));
-           
-        //     commandSequence.add(i, nextTarget);
-
-        //     try (BufferedWriter bw = new BufferedWriter(new FileWriter(sessionSequenceFile, true))) {
-        //         bw.write("%d,%d,%d,%d,%s\n".formatted(nextTarget.id,nextTarget.row, nextTarget.col, nextTarget.subTarget, Integer.toBinaryString(nextTarget.getCommandByte(colour, targetType)).substring(0, 8)));
-        //     } catch (IOException ioex) {
-        //         LOG.error("Unable to write to file: '/home/whiff/data/%s.txt'".formatted(participantId), ioex);
-        //     }
-        // }
-    }
-
-    private void getNext(Target last, List<Target> remaining, boolean subTargets) {
-        // filter out similar targets (same row and column)
-        if (last != null) {
-            if (subTargets) {
-                // filter out targets
-            } else {
-                // remaining.stream().filter()
-            }
-        }
-
-        // find next target from remaining
-        rng.nextInt(remaining.size());
-    } 
-
     
-
     public void run(
         TargetType targetType, int targetStartDelaySeconds, int targetDurationSeconds, int stroopStartDelaySeconds, 
         int stroopDurationSeconds, boolean distractor, String participantId, String fileName

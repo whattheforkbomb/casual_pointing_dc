@@ -1,0 +1,24 @@
+.button
+    text-align: center
+    background: white
+    border: 2px solid black
+    border-radius: 5%
+    aspect-ratio : 1 / 1
+    margin-left: auto
+    margin-right: auto
+
+%button-active
+    border: 3px solid var(--sjs-primary-backcolor, var(--primary, #19b394))
+.button:hover
+    @extend %button-active
+
+td:hover > div > div > .button
+    @extend %button-active
+
+.selected
+    border-radius: 5%
+    margin-top: 10%
+    margin-left: 10%
+    background-color: var(--sjs-primary-backcolor, var(--primary, #19b394))
+    width: 80%
+    height: 80%

@@ -1,1 +1,21 @@
-<p>nasa-tlx works!</p>
+<div style="width: 85%; margin-left: auto; margin-right: auto;">
+    <div style="font-weight: bolder; width: 30%; float: left; margin-left: 1%">{{model.scaleTitle}}</div>
+    <div style="width: 65%; margin-left: 5%">{{model.scaleDescription}}</div>
+</div>
+<br>
+<table class="tlx-table" style="width: 80%; max-width: 40pw;">
+    <tr style="width: 100%; margin-left: 0px; padding: 0px;">
+        <td class="cell" style="padding: 0px; width: calc(100% / 102); align-content: center;" (mouseup)="updateSurveyValue(i)" *ngFor="let _ of [].constructor(101); index as i">
+            <div class="scale-value" [class.tick]="(i) == 50" [class.selected]="value == i" [style.margin-left]="i==0 ? '0px' : 'auto'" [style.margin-right]="i==100 ? '0px' : 'auto'">
+            </div>
+            <div class="scale-value" [class.tick]="(i)%5 == 0 || i == 0" [class.selected]="value == i" [style.margin-left]="i==0 ? '0px' : 'auto'" [style.margin-right]="i==100 ? '0px' : 'auto'">
+            </div>
+        </td>
+        <!-- Need this following td to ensure selector doesn't change size... -->
+        <td style="padding: 0px; width: calc(100% / 102); align-content: center;"></td>
+    </tr>
+</table>
+<div style="width:85%; margin-top: 10px; margin-left: auto; margin-right: auto;">
+    <div style="font-weight: bolder; width: 20%; float: left; margin-left: 1%;">Very Low</div>
+    <div style="font-weight: bolder; width: 20%; float: right; text-align: right; margin-right: 1%;">Very High</div>
+</div>

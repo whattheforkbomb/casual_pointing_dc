@@ -1,1 +1,23 @@
-<p>imi works!</p>
+<table style="width: 80%; margin-left: auto; margin-right: auto">
+    <tr style="text-align: center; word-wrap: break-word; white-space: normal; font-weight: bold;">
+        <td style="width: calc(100% / 7);" >Not True At All</td>
+        <td style="width: calc(100% / 7);" ></td>
+        <td style="width: calc(100% / 7);" ></td>
+        <td style="width: calc(100% / 7);" >Somewhat True</td>
+        <td style="width: calc(100% / 7);" ></td>
+        <td style="width: calc(100% / 7);" ></td>
+        <td style="width: calc(100% / 7);" >Very True</td>
+    </tr>
+    <tr style="text-align: center; word-wrap: break-word; white-space: normal;">
+        <td style="width: calc(100% / 7); text-align: center; word-wrap: break-word; white-space: normal; padding-top: 10px;" *ngFor="let _ of [].constructor(7), index as i">
+            <div style="width: 100%;">
+                <div style="height: 54px">
+                    <div class="button" (click)="updateSurveyValue(i)" style="width: 50px; aspect-ratio: 1/1; margin-left: auto; margin-right: auto;">
+                        <div [class.selected]="(model.value == i)"></div>
+                    </div>
+                </div>
+            </div>
+            <div style="margin-top: 10px; font-weight: bold; text-align: center; width: 100%;">{{i}}</div>
+        </td>
+    </tr>
+</table>

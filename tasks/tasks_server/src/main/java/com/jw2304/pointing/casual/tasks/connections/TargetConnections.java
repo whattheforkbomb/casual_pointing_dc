@@ -48,8 +48,8 @@ public class TargetConnections {
 	public CommandLineRunner acceptTargetConnections(ExecutorService executor, ServerSocket server, ArrayList<Socket> targetSockets) throws Exception {
 		return args -> {
             executor.execute(() -> {
-                LOG.info("Accepting incoming connections from targets");
                 while (true) {
+                    LOG.info("Accepting incoming connections from targets");
                     try {
                         Socket socket = server.accept();
                         LOG.info("New Target Connection Established: %s".formatted(socket.getInetAddress().getHostAddress()));
