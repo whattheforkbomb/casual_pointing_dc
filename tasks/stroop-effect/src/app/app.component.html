@@ -1,4 +1,7 @@
 
-<div style="height: 100%; background-color: black; text-align: center;"><h1 [style.color]="display.colour">{{display.word}}</h1></div>
+<div style="width: 100vw; height: 100%; background-color: black; text-align: center;">
+    <mat-progress-bar mode="determinate" value="{{display.progress}}" style="height: 2vh;"></mat-progress-bar>
+    <h1 [style.color]="display.colour" [style.font-size]="(100 / display.word.length) + 'cqw'">{{display.word}}</h1>
+</div>
 
 <router-outlet></router-outlet>
