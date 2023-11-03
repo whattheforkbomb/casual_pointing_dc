@@ -12,12 +12,12 @@ java {
 	sourceCompatibility = JavaVersion.VERSION_17
 }
 
-// tasks.register<Copy>("copyUI") {
-// 	// dependsOn("build")
-// 	from(file("$rootDir/../dist/"))
-// 	include("ui/**")
-// 	into(layout.buildDirectory.dir("resources/main/static"))
-// }
+tasks.register<Copy>("copyUI") {
+	copy {
+		from(file("$rootDir/../dist/ui/"))
+		into(layout.buildDirectory.dir("resources/main/static/"))
+	}
+}
 tasks.named("build") {
 	doFirst {
 		copy {

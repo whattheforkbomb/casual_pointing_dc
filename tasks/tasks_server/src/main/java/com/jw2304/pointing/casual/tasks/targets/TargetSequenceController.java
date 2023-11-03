@@ -39,9 +39,9 @@ public class TargetSequenceController  implements WebSocketConnectionConsumer {
 
     public static Logger LOG = LoggerFactory.getLogger(TargetSequenceController.class);
 
-    public static final byte OFF = 0b00000000;
+    // public static final byte OFF = 0b00000000;
     public static final Target identifyColumn(int col) {
-        return new Target(col, col);
+        return new Target((col*3)+1, col);
     }
 
     private final AtomicInteger taskSequenceIdx = new AtomicInteger(0);
@@ -139,6 +139,11 @@ public class TargetSequenceController  implements WebSocketConnectionConsumer {
             if (idx < targetSequence.size()) {
                 Target target = targetSequence.get(idx);
                 sendCommand(socketToColumnMapping.get(target.col), target.getCommandByte(colour, targetType));
+                try {
+                    uiWebSocket.sendMessage(new TextMessage("{\"count\": -1, \"progress\": -1, \"target\": %d}".formatted(target.id)));
+                } catch (IOException ioex) {
+                    LOG.error("Unable to send current target for visual", ioex);
+                }
                 try (BufferedWriter bw = new BufferedWriter(new FileWriter(sessionSequenceFile, true))) {
                     bw.write("%s,ON,%d,%d,%d,%d,%s\n".formatted(Helpers.getCurrentDateTimeString(), target.id,target.row, target.col, target.subTarget, Integer.toBinaryString(target.getCommandByte(colour, targetType)).substring(0, 8)));
                 } catch (IOException ioex) {
@@ -156,7 +161,15 @@ public class TargetSequenceController  implements WebSocketConnectionConsumer {
         targetScheduler.schedule(() -> {
             if (idx < targetSequence.size()) {
                 Target target = targetSequence.get(idx);
-                sendCommand(socketToColumnMapping.get(targetSequence.get(idx).col), OFF);
+                sendCommand(socketToColumnMapping.get(targetSequence.get(idx).col), Target.OFF);
+                try {
+                    LOG.info("Preparing to send progress");
+                    float progress = (float) idx+1 / targetSequence.size();
+                    int progressRounded = Math.round(progress * 100);
+                    uiWebSocket.sendMessage(new TextMessage("{\"count\": -1, \"progress\": %d, \"target\": -1}".formatted(progressRounded)));
+                } catch (IOException ioex) {
+                    LOG.error("Unable to send progress update...", ioex);
+                }
                 try (BufferedWriter bw = new BufferedWriter(new FileWriter(sessionSequenceFile, true))) {
                     bw.write("%s,OFF,%d,%d,%d,%d,%s\n".formatted(Helpers.getCurrentDateTimeString(), target.id,target.row, target.col, target.subTarget, Integer.toBinaryString(target.getCommandByte(colour, targetType)).substring(0, 8)));
                 } catch (IOException ioex) {
@@ -164,25 +177,6 @@ public class TargetSequenceController  implements WebSocketConnectionConsumer {
                 }
                 LOG.info("Ending Pointing Command: %d/%d".formatted(idx+1, targetSequence.size()));
                 scheduleTargetOn(targetSequence.get(taskSequenceIdx.get()).startDelayMilliseconds, sessionSequenceFile, socketToColumnMapping);
-                try {
-                    LOG.info("Preparing to send progress");
-                    float progress = (float) idx / targetSequence.size();
-                    int progressRounded = Math.round(progress * 100);
-                    uiWebSocket.sendMessage(new TextMessage("{\"count\": -1, \"progress\": %d}".formatted(progressRounded)));
-                } catch (IOException ioex) {
-                    LOG.error("Unable to send progress update...", ioex);
-                } catch (Exception ex) {
-                    LOG.error("Something is going wrong, not sure what", ex);
-                }
-            } else {
-                try {
-                    LOG.info("Preparing to send progress");
-                    uiWebSocket.sendMessage(new TextMessage("{\"count\": -1, \"progress\": 100}"));
-                } catch (IOException ioex) {
-                    LOG.error("Unable to send progress update...", ioex);
-                } catch (Exception ex) {
-                    LOG.error("Something is going wrong, not sure what", ex);
-                }
             }
         }, duration, TimeUnit.MILLISECONDS);
     }
@@ -200,7 +194,7 @@ public class TargetSequenceController  implements WebSocketConnectionConsumer {
         targetSockets.forEach(socket -> {
             try {
                 // reset all targets
-                socket.getOutputStream().write(new byte[] { OFF });
+                socket.getOutputStream().write(new byte[] { Target.OFF });
             } catch (IOException ioex) {
                 LOG.error("Unable to send command to socket: %s".formatted(socket.getInetAddress().getHostAddress()), ioex);
             }

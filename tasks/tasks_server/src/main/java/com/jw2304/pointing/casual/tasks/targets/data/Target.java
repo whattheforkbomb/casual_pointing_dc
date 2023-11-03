@@ -33,4 +33,7 @@ public class Target {
         return (byte) (colour.mask | array.mask | led.mask);
     }
 
+    public static byte OFF = 0b00000000;
+    public static byte TONE = 0b00111111;
+
 }

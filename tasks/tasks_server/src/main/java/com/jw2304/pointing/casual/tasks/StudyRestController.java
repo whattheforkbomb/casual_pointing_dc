@@ -128,7 +128,7 @@ public class StudyRestController {
             List<Target> targets = IntStream.range(0, targetSockets.size()*3)
                 .mapToObj(i -> {
                     return IntStream.range(0, subTargetCount)
-                        .mapToObj(j -> new Target(i, j, 250, 2000));
+                        .mapToObj(j -> new Target(i, j, 250, 1000));
                         // .collect(Collectors.toList());
                 }).flatMap(x -> x)
                 .collect(Collectors.toList());
@@ -152,7 +152,7 @@ public class StudyRestController {
         public void identifyMapping() {
             targetSequenceController.resetTargets();
             for (int i=0; i<targetSockets.size(); i++) {
-                targetSequenceController.sendCommand(i, TargetSequenceController.identifyColumn(i).getCommandByte(TargetColour.RED, TargetType.INDIVIDUAL));
+                targetSequenceController.sendCommand(targetConnectionToPhysicalColumnMapping.get(i), TargetSequenceController.identifyColumn(i).getCommandByte(TargetColour.RED, TargetType.INDIVIDUAL));
             }
         }
         
@@ -160,7 +160,7 @@ public class StudyRestController {
         public void identifySocket() {
             targetSequenceController.resetTargets();
             for (int i=0; i<targetSockets.size(); i++) {
-                targetSequenceController.sendCommand(targetConnectionToPhysicalColumnMapping.get(i), TargetSequenceController.identifyColumn(i).getCommandByte(TargetColour.RED, TargetType.INDIVIDUAL));
+                targetSequenceController.sendCommand(i, TargetSequenceController.identifyColumn(i).getCommandByte(TargetColour.RED, TargetType.INDIVIDUAL));
             }
         }
 

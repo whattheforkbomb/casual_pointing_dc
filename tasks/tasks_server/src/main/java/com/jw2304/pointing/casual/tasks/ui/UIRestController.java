@@ -6,6 +6,8 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
+import org.springframework.web.servlet.config.annotation.ViewControllerRegistry;
 
 @Controller
 public class UIRestController {
@@ -21,11 +23,8 @@ public class UIRestController {
 
     // @Override
     // public void addViewControllers(ViewControllerRegistry registry) {
-    //     registry.addViewController("/app/questionnaire/").setViewName("/app/questionnaire/index.html");
-    //     registry.addViewController("/app/stroop/").setViewName("forward:/app/stroop/index.html");
-    //     registry.addViewController("/app/stroop2/").setViewName("forward:/stroop/index.html");
-    //     registry.addViewController("/app/stroop3/").setViewName("forward:stroop/index.html");
-    //     registry.addViewController("/app/stroop4/").setViewName("forward:app/stroop/index.html");
+    //     registry.addViewController("/app/questionnaire/").setViewName("redirect:/app/questionnaire/index.html");
+    //     registry.addViewController("/app/stroop/").setViewName("redirect:/app/stroop/index.html");
     // }
 
     @GetMapping("/app/{site}/")

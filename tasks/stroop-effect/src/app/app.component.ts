@@ -13,6 +13,7 @@ interface StroopBody {
 interface MetaBody {
   count: number;
   progress: number;
+  target: number;
 }
 
 @Component({
@@ -23,19 +24,20 @@ interface MetaBody {
 export class AppComponent implements OnInit {
   title: String = 'stroop-effect';
   display = {
-    colour: "White",
+    colour: "black",
     word: "Pending",
     progress: 0
   };
   stroopWS!: WebSocket;
   metaWS!: WebSocket;
+  activeIdx : number = -1;
 
   ngOnInit(): void {
     this.stroopWS = new WebSocket(`ws://${window.location.hostname}:8080/stroop`)
     this.metaWS = new WebSocket(`ws://${window.location.hostname}:8080/meta`)
     this.stroopWS.onopen = (event) => {
       console.log('Connected to server', event);
-      this.display.colour = "black";
+      this.display.colour = "gray";
       this.display.word = "";
       synth.triggerAttackRelease("C4", "8n", now);
     };
@@ -65,14 +67,18 @@ export class AppComponent implements OnInit {
       let isCountdown = msg.count > -1;
       if (isCountdown) {
         if (msg.count > 0) {
-          this.display.colour = "white";
+          this.display.colour = "black";
           this.display.word = msg.count.toString();
+          this.display.progress = 0;
           console.log(this.display);
         } else if (msg.count == 0 && this.display.word == "1") {
           this.display.word = "";
         }
       } else {
-        this.display.progress = msg.progress
+        if (msg.progress > -1) {
+          this.display.progress = msg.progress;
+        }
+        this.activeIdx = msg.target;
       }
     };
     

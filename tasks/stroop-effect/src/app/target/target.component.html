@@ -1,0 +1,7 @@
+<table style="height: 100%; aspect-ratio: 16/9; padding: 2%; margin-top: -2%; margin-left: auto; margin-right: auto;">
+    <tr style="width: 90%; height: 30%" *ngFor="let _ of [].constructor(3), index as i">
+        <td style="height: 40%;" *ngFor="let _ of [].constructor(5), index as j">
+            <div class="target" [class.active]="i*3 + j == activeIdx" [style.transform]="getTransform(i, j)"></div>
+        </td>
+    </tr>
+</table>
