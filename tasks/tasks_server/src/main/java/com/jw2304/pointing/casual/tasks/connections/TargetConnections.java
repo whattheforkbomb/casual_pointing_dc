@@ -4,6 +4,9 @@ import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -24,7 +27,12 @@ public class TargetConnections {
     public int expectedConnections;
 
     @Bean
-    public ArrayList<Socket> targetSockets() {
+    public Map<String, Socket> targetSockets() {
+        return new HashMap<>(expectedConnections);
+    } 
+
+    @Bean
+    public List<String> targetSocketIds() {
         return new ArrayList<>(expectedConnections);
     } 
 
@@ -44,16 +52,18 @@ public class TargetConnections {
     }
 
     @Bean
-	public CommandLineRunner acceptTargetConnections(ExecutorService executor, ServerSocket server, ArrayList<Socket> targetSockets) throws Exception {
+	public CommandLineRunner acceptTargetConnections(ExecutorService executor, ServerSocket server, Map<String, Socket> targetSockets, List<String> targetSocketIds) throws Exception {
 		return args -> {
             executor.execute(() -> {
                 while (true) {
                     LOG.info("Accepting incoming connections from targets");
                     try {
                         Socket socket = server.accept();
-                        LOG.info("New Target Connection Established: %s".formatted(socket.getInetAddress().getHostAddress()));
+                        String address = socket.getInetAddress().getHostAddress();
+                        LOG.info("New Target Connection Established: %s".formatted(address));
                         socket.setKeepAlive(true);
-                        targetSockets.add(socket);
+                        targetSockets.put(address, socket);
+                        targetSocketIds.add(address);
                     } catch (IOException ioex) {
                         LOG.error("Connection Failed To Be Accepted", ioex);
                     }

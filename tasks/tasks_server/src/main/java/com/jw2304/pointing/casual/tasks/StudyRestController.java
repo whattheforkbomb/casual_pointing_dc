@@ -15,8 +15,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.NoSuchElementException;
 import java.util.UUID;
-import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -41,11 +41,14 @@ public class StudyRestController {
 
     // Session State
     private String PID = "UNKNOWN";
-    public Map<Integer, Integer> targetConnectionToPhysicalColumnMapping = new HashMap<Integer, Integer>();
+    public Map<Integer, String> targetConnectionToPhysicalColumnMapping = new HashMap<Integer, String>();
     // public AtomicInteger targetColour = new AtomicInteger(2);
 
     @Autowired
-    ArrayList<Socket> targetSockets;
+    Map<String, Socket> targetSockets;
+    
+    @Autowired
+    List<String> targetSocketIds;
 
     @Value("${data.filepath}")
     String rootFilePath;
@@ -68,6 +71,7 @@ public class StudyRestController {
         @RequestParam("distractor") boolean distractor, 
         @RequestParam(name = "targetDelay", defaultValue = "3000") int targetDelay, 
         @RequestParam(name = "targetDuration", defaultValue = "3000") int targetDuration, 
+        @RequestParam(name = "jitter", defaultValue = "250") int jitterAmount, 
         @RequestParam(name = "stroopDelay", defaultValue = "250") int stroopDelay, 
         @RequestParam(name = "stroopDuration", defaultValue = "3750") int stroopDuration
     ) {
@@ -91,7 +95,7 @@ public class StudyRestController {
         File file = new File("%s/%s".formatted(rootFilePath, PID));
         file.mkdirs();
         String sessionFileName = "%s/%s/%s_%s_%s".formatted(rootFilePath, PID, targetType.name(), distractor ? "Distracted": "Focussed", Helpers.getCurrentDateTimeString());
-        targetSequenceController.run(targetType, targetDelay, targetDuration, stroopDelay, stroopDuration, distractor, PID, sessionFileName, targetConnectionToPhysicalColumnMapping);
+        targetSequenceController.run(targetType, targetDelay, targetDuration, stroopDelay, stroopDuration, jitterAmount, distractor, PID, sessionFileName, targetConnectionToPhysicalColumnMapping);
     }
 
     @GetMapping("/pid")
@@ -117,6 +121,11 @@ public class StudyRestController {
         //     targetColour.set(colourId);
         // }
 
+        @PostMapping("/reset")
+        public void reset() {
+            targetSequenceController.resetTargets();
+        }
+
         @GetMapping("/count")
         public @ResponseBody int count() {
             return targetSockets.size();
@@ -139,7 +148,7 @@ public class StudyRestController {
                 long delay = ((target.startDelayMilliseconds + target.durationMilliseconds) * i) + target.startDelayMilliseconds;
                 targetScheduler.schedule(() -> {
                     LOG.info("Identify %d (%d) [(%d,%d),%d] - delay: %d".formatted(target.id, targetConnectionToPhysicalColumnMapping.get(target.col), target.col, target.row, target.subTarget, delay));
-                    targetSequenceController.sendCommand(targetConnectionToPhysicalColumnMapping.get(target.col), target.getCommandByte(TargetColour.RED, TargetType.INDIVIDUAL));
+                    targetSequenceController.sendCommand(targetConnectionToPhysicalColumnMapping.get(target.col), target.getCommandByte(TargetColour.RED));
                 }, delay, TimeUnit.MILLISECONDS);
                 targetScheduler.schedule(() -> {
                     LOG.info("End Identify %d (%d) [(%d,%d),%d] - delay: %d".formatted(target.id, targetConnectionToPhysicalColumnMapping.get(target.col), target.col, target.row, target.subTarget, delay));
@@ -152,15 +161,15 @@ public class StudyRestController {
         public void identifyMapping() {
             targetSequenceController.resetTargets();
             for (int i=0; i<targetSockets.size(); i++) {
-                targetSequenceController.sendCommand(targetConnectionToPhysicalColumnMapping.get(i), TargetSequenceController.identifyColumn(i).getCommandByte(TargetColour.RED, TargetType.INDIVIDUAL));
+                targetSequenceController.sendCommand(targetConnectionToPhysicalColumnMapping.get(i), Target.identifyColumn(i).getCommandByte(TargetColour.RED));
             }
         }
         
         @PostMapping("/identify/socket")
         public void identifySocket() {
             targetSequenceController.resetTargets();
-            for (int i=0; i<targetSockets.size(); i++) {
-                targetSequenceController.sendCommand(i, TargetSequenceController.identifyColumn(i).getCommandByte(TargetColour.RED, TargetType.INDIVIDUAL));
+            for (int i=0; i<targetSocketIds.size(); i++) {
+                targetSequenceController.sendCommand(targetSocketIds.get(i), Target.identifyColumn(i).getCommandByte(TargetColour.RED));
             }
         }
 
@@ -174,10 +183,19 @@ public class StudyRestController {
                     "  \"4\": 4\n" + 
                     "}") Map<String, String> map
         ) {
-            Map<Integer, Integer> processedMap = map.entrySet().stream()
-            .collect(Collectors.toMap(x -> Integer.parseInt(x.getKey()), y -> Integer.parseInt(y.getValue())));
+            Map<Integer, Integer> processedMap = map.entrySet()
+                .stream()
+                .collect(Collectors.toMap(x -> Integer.parseInt(x.getKey()), y -> Integer.parseInt(y.getValue())));
             LOG.info("%d - %s".formatted(processedMap.size(), processedMap.entrySet().stream().map((a) -> String.format("(%d,%d)", a.getKey(), a.getValue())).collect(Collectors.joining(", ", "{", "}"))));
-            targetConnectionToPhysicalColumnMapping = processedMap;//.put(newId, oldId);
+            // go through map and change to correct address
+            for (Map.Entry<Integer, Integer> entry : processedMap.entrySet()) {
+                try {
+                    targetConnectionToPhysicalColumnMapping.put(entry.getKey(), targetSocketIds.get(entry.getValue()));
+                } catch(IndexOutOfBoundsException ioobex) {
+                    LOG.error("Tried assigning a socket that doesn't exist, so skipping", ioobex);
+                }
+            }
+            // targetConnectionToPhysicalColumnMapping = processedMap;//.put(newId, oldId);
             LOG.info("Mapping size: %d".formatted(targetConnectionToPhysicalColumnMapping.size()));
         }
     }

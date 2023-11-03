@@ -40,9 +40,7 @@ public class TargetSequenceController  implements WebSocketConnectionConsumer {
     public static Logger LOG = LoggerFactory.getLogger(TargetSequenceController.class);
 
     // public static final byte OFF = 0b00000000;
-    public static final Target identifyColumn(int col) {
-        return new Target((col*3)+1, col);
-    }
+    
 
     private final AtomicInteger taskSequenceIdx = new AtomicInteger(0);
 
@@ -64,12 +62,11 @@ public class TargetSequenceController  implements WebSocketConnectionConsumer {
     public int targetOffDelay;
 
     private TargetColour colour = TargetColour.RED;
-    private TargetType targetType = TargetType.UNKNOWN;
 
     private List<Target> targetSequence = new ArrayList<>();
 
     @Autowired
-    ArrayList<Socket> targetSockets;
+    Map<String, Socket> targetSockets;
 
     @Autowired
     ExecutorService executor;
@@ -98,8 +95,9 @@ public class TargetSequenceController  implements WebSocketConnectionConsumer {
     }
     
     public void run(
-        TargetType targetType, int targetStartDelaySeconds, int targetDurationSeconds, int stroopStartDelaySeconds, 
-        int stroopDurationSeconds, boolean distractor, String participantId, String fileName, Map<Integer, Integer> socketToColumnMapping
+        TargetType targetType, int targetStartDelayMilliSeconds, int targetDurationMilliSeconds, 
+        int stroopStartDelayMilliSeconds, int stroopDurationMilliSeconds, int jitterAmount, 
+        boolean distractor, String participantId, String fileName, Map<Integer, String> socketToColumnMapping
     ) {
         File sessionSequenceFile = new File("%s.txt".formatted(fileName));
         sessionSequenceFile.getParentFile().mkdirs();
@@ -108,7 +106,7 @@ public class TargetSequenceController  implements WebSocketConnectionConsumer {
         
         int targetCount = targetSockets.size() * targetsPerConnection;
         
-        Pair<List<Target>, List<Stroop>> sequences = generator.generateSequence(targetType, targetStartDelaySeconds, targetDurationSeconds, stroopStartDelaySeconds, stroopDurationSeconds, distractor, targetCount);
+        Pair<List<Target>, List<Stroop>> sequences = generator.generateSequence(targetType, targetStartDelayMilliSeconds, targetDurationMilliSeconds, stroopStartDelayMilliSeconds, stroopDurationMilliSeconds, jitterAmount, distractor, targetCount);
 
         targetSequence = sequences.getFirst();
 
@@ -132,66 +130,74 @@ public class TargetSequenceController  implements WebSocketConnectionConsumer {
         scheduleTargetOn(delay, sessionSequenceFile, socketToColumnMapping);
     }
 
-    private void scheduleTargetOn(long delay, File sessionSequenceFile, Map<Integer, Integer> socketToColumnMapping) {
+    private void scheduleTargetOn(long delay, File sessionSequenceFile, Map<Integer, String> socketToColumnMapping) {
         int idx = taskSequenceIdx.get();
-        LOG.info("Scheduling Sending Pointing Command: %d - delay: %d".formatted(idx, delay));
-        targetScheduler.schedule(() -> {
-            if (idx < targetSequence.size()) {
+        if (idx < targetSequence.size()) {
+            LOG.info("Scheduling Sending Pointing Command: %d - delay: %d - %s".formatted(idx+1, delay, targetSequence.get(idx)));
+            targetScheduler.schedule(() -> {
                 Target target = targetSequence.get(idx);
-                sendCommand(socketToColumnMapping.get(target.col), target.getCommandByte(colour, targetType));
                 try {
-                    uiWebSocket.sendMessage(new TextMessage("{\"count\": -1, \"progress\": -1, \"target\": %d}".formatted(target.id)));
-                } catch (IOException ioex) {
-                    LOG.error("Unable to send current target for visual", ioex);
+                    byte cmd = target.getCommandByte(colour);
+                    sendCommand(socketToColumnMapping.get(target.col), cmd);
+                    try {
+                        uiWebSocket.sendMessage(new TextMessage("{\"count\": -1, \"progress\": -1, \"target\": %d}".formatted(target.id)));
+                    } catch (IOException ioex) {
+                        LOG.error("Unable to send current target for visual", ioex);
+                    }
+                    try (BufferedWriter bw = new BufferedWriter(new FileWriter(sessionSequenceFile, true))) {
+                        bw.write("%s,ON,%d,%d,%d,%d,%s\n".formatted(Helpers.getCurrentDateTimeString(), target.id,target.row, target.col, target.subTarget, Integer.toBinaryString(cmd).substring(0, 8)));
+                    } catch (IOException ioex) {
+                        LOG.error("Unable to write to file: '/home/whiff/data/%s'".formatted(sessionSequenceFile.getName()), ioex);
+                    }
+                    LOG.info("Sending Pointing Command: %d/%d - %s".formatted(idx+1, targetSequence.size(), target));
+                } catch (Exception pkmn) {
+                    LOG.error("Sometimes getting program silently crashing/stopping, hoping can be caught by this...", pkmn);
                 }
-                try (BufferedWriter bw = new BufferedWriter(new FileWriter(sessionSequenceFile, true))) {
-                    bw.write("%s,ON,%d,%d,%d,%d,%s\n".formatted(Helpers.getCurrentDateTimeString(), target.id,target.row, target.col, target.subTarget, Integer.toBinaryString(target.getCommandByte(colour, targetType)).substring(0, 8)));
-                } catch (IOException ioex) {
-                    LOG.error("Unable to write to file: '/home/whiff/data/%s'".formatted(sessionSequenceFile.getName()), ioex);
-                }
-                LOG.info("Sending Pointing Command: %d/%d".formatted(idx+1, targetSequence.size()));
                 scheduleTargetOff(target.durationMilliseconds, sessionSequenceFile, socketToColumnMapping);
-            }
-        }, delay, TimeUnit.MILLISECONDS);
+            }, delay, TimeUnit.MILLISECONDS);
+        }
     }
 
-    private void scheduleTargetOff(int duration, File sessionSequenceFile, Map<Integer, Integer> socketToColumnMapping) {
+    private void scheduleTargetOff(int duration, File sessionSequenceFile, Map<Integer, String> socketToColumnMapping) {
         int idx = taskSequenceIdx.getAndIncrement();
-        LOG.info("Scheduling Ending Command: %d - delay: %d".formatted(idx, duration));
-        targetScheduler.schedule(() -> {
-            if (idx < targetSequence.size()) {
+        if (idx < targetSequence.size()) {
+            LOG.info("Scheduling Ending Command: %d - delay: %d".formatted(idx+1, duration));
+            targetScheduler.schedule(() -> {
                 Target target = targetSequence.get(idx);
-                sendCommand(socketToColumnMapping.get(targetSequence.get(idx).col), Target.OFF);
                 try {
-                    LOG.info("Preparing to send progress");
-                    float progress = (float) idx+1 / targetSequence.size();
-                    int progressRounded = Math.round(progress * 100);
-                    uiWebSocket.sendMessage(new TextMessage("{\"count\": -1, \"progress\": %d, \"target\": -1}".formatted(progressRounded)));
-                } catch (IOException ioex) {
-                    LOG.error("Unable to send progress update...", ioex);
+                    LOG.info("Ending Pointing Command: %d/%d - %s".formatted(idx+1, targetSequence.size(), target));
+                    sendCommand(socketToColumnMapping.get(targetSequence.get(idx).col), Target.OFF);
+                    try {
+                        float progress = (idx+1) / (float) targetSequence.size()*100;
+                        LOG.info("Preparing to send progress %f/100: %s".formatted(progress, target));
+                        uiWebSocket.sendMessage(new TextMessage("{\"count\": -1, \"progress\": %d, \"target\": -1}".formatted(Math.round(progress))));
+                    } catch (IOException ioex) {
+                        LOG.error("Unable to send progress update...", ioex);
+                    }
+                    try (BufferedWriter bw = new BufferedWriter(new FileWriter(sessionSequenceFile, true))) {
+                        bw.write("%s,OFF,%d,%d,%d,%d,%s\n".formatted(Helpers.getCurrentDateTimeString(), target.id, target.row, target.col, target.subTarget, Integer.toBinaryString(Target.OFF)));
+                    } catch (IOException ioex) {
+                        LOG.error("Unable to write to file: '%s'".formatted(sessionSequenceFile.getPath()), ioex);
+                    }
+                } catch (Exception pkmn) {
+                    LOG.error("Sometimes getting program silently crashing/stopping, hoping can be caught by this...", pkmn);
                 }
-                try (BufferedWriter bw = new BufferedWriter(new FileWriter(sessionSequenceFile, true))) {
-                    bw.write("%s,OFF,%d,%d,%d,%d,%s\n".formatted(Helpers.getCurrentDateTimeString(), target.id,target.row, target.col, target.subTarget, Integer.toBinaryString(target.getCommandByte(colour, targetType)).substring(0, 8)));
-                } catch (IOException ioex) {
-                    LOG.error("Unable to write to file: '%s'".formatted(sessionSequenceFile.getPath()), ioex);
-                }
-                LOG.info("Ending Pointing Command: %d/%d".formatted(idx+1, targetSequence.size()));
                 scheduleTargetOn(targetSequence.get(taskSequenceIdx.get()).startDelayMilliseconds, sessionSequenceFile, socketToColumnMapping);
-            }
-        }, duration, TimeUnit.MILLISECONDS);
+            }, duration, TimeUnit.MILLISECONDS);
+        }
     }
 
-    public void sendCommand(int socketId, byte command) {
+    public void sendCommand(String socketId, byte command) {
         try {
             targetSockets.get(socketId).getOutputStream().write(new byte[] { command });
         } catch (IOException ioex) {
             // do something more here???
-            LOG.error("Unable to send message to socket", ioex);
+            // LOG.error("Unable to send message to socket", ioex);
         }
     }
 
     public void resetTargets() {
-        targetSockets.forEach(socket -> {
+        targetSockets.values().forEach(socket -> {
             try {
                 // reset all targets
                 socket.getOutputStream().write(new byte[] { Target.OFF });

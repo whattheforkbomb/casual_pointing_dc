@@ -6,6 +6,6 @@ import java.time.format.DateTimeFormatter;
 
 public class Helpers {
     public static String getCurrentDateTimeString() {
-        return DateTimeFormatter.ISO_DATE_TIME.format(LocalDateTime.now(ZoneId.of("UTC"))).replace(":", ".").substring(0, 25);
+        return DateTimeFormatter.ISO_DATE_TIME.format(LocalDateTime.now(ZoneId.of("UTC"))).replace(":", ".").substring(0, 23);
     }
 }

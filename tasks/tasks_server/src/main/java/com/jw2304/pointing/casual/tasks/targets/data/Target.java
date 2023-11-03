@@ -25,10 +25,10 @@ public class Target {
         this.durationMilliseconds = durationMilliseconds;
     }
     
-    public byte getCommandByte(TargetColour colour, TargetType targetType) {
+    public byte getCommandByte(TargetColour colour) {
         TargetArray array = TargetArray.values()[row];
 
-        TargetLED led = targetType == TargetType.CLUSTER ? TargetLED.ALL : TargetLED.values()[subTarget+1];
+        TargetLED led = subTarget == -1 ? TargetLED.ALL : TargetLED.values()[subTarget+1];
 
         return (byte) (colour.mask | array.mask | led.mask);
     }
@@ -36,4 +36,13 @@ public class Target {
     public static byte OFF = 0b00000000;
     public static byte TONE = 0b00111111;
 
+    public static final Target identifyColumn(int col) {
+        return new Target((col*3)+1, col);
+    }
+
+    @Override
+    public String toString() {
+        return "Target[col: %d, row: %d, sub: %d, id: %d, delayMS: %d, durationMS: %d]"
+            .formatted(col, row, subTarget, id, startDelayMilliseconds, durationMilliseconds);
+    }
 }
