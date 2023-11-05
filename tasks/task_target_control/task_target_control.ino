@@ -106,6 +106,9 @@ void shift_out(int latchPin, int dataPin, int clockPin, int mask) {
     Colour  | Array  | LED
     |XX|....|XX|.....|XXXX|
 
+    Tone:
+    XX.XX.1111 => Emit tone
+
     Colour:
     00.XXXXXX  => Single LED (White?)
     01.XXXXXX  => Green target, rest red
@@ -116,7 +119,6 @@ void shift_out(int latchPin, int dataPin, int clockPin, int mask) {
     XX.00.XXXX => Top
     XX.01.XXXX => Mid
     XX.10.XXXX => Bottom
-    XX.11.XXXX => All
 
     Placement: Can compress location into 4 bits
     0000.0000  => RESET
@@ -194,6 +196,12 @@ void generate_masks(byte mask, int *generated_masks) {
     generated_masks[2] = 0;
     return;
   }
+
+  shift_pins = (mask >> 4) & 3;
+  if (mask & 0x00001111 == 0x00001111) {
+    tone(tonePin, toneNotes[shift_pins], 250);
+    return;
+  }
   
   // process mask
   byte mode = mask >> 6;
@@ -213,9 +221,6 @@ void generate_masks(byte mask, int *generated_masks) {
     target = BLUE;
     // others = GREEN;
   }
-
-  shift_pins = (mask >> 4) & 3;
-  tone(tonePin, toneNotes[shift_pins], 250);
 
   Serial.print("Target: ");
   Serial.println(shift_pins);
@@ -334,7 +339,7 @@ byte position = 0;
 
 void setup(){
   // Serial.begin(115200);
-  while (!Serial);
+  // while (!Serial);
   Serial.println("Serial Connected");
   // Output to control LED
   for (int idx=0; idx<array_count; idx++) {
@@ -362,6 +367,8 @@ void process_ethernet() {
     Serial.print("Connection attempted: ");
     Serial.println(connect);
     if (client.connected()) {
+      client.write(shield_mac, 6);
+      client.flush();
       Serial.println("Connection successful");
     } else {
       delayMicroseconds(200000);
@@ -378,13 +385,6 @@ void process_ethernet() {
   if (client & !client.connected()) {
     Serial.println("No client connected. Closing and trying to reconnect.");
     client.stop();
-    Serial.println("Attempting to connect to server");
-    int connect = client.connect(server, 8888);
-    Serial.print("Connection attempted: ");
-    Serial.println(connect);
-    if (client.connected()) {
-      Serial.println("Connection successful");
-    }
   }
 }
 
