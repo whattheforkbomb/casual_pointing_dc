@@ -33,8 +33,13 @@ public class Target {
         return (byte) (colour.mask | array.mask | led.mask);
     }
 
+    public byte getToneCommandByte() {
+        TargetArray array = TargetArray.values()[row];
+        return (byte) (array.mask | TONE);
+    }
+
     public static byte OFF = 0b00000000;
-    public static byte TONE = 0b00111111;
+    public static byte TONE = 0b00001111;
 
     public static final Target identifyColumn(int col) {
         return new Target((col*3)+1, col);

@@ -138,6 +138,7 @@ public class TargetSequenceController  implements WebSocketConnectionConsumer {
                 Target target = targetSequence.get(idx);
                 try {
                     byte cmd = target.getCommandByte(colour);
+                    sendCommand(socketToColumnMapping.get(target.col), target.getToneCommandByte());
                     sendCommand(socketToColumnMapping.get(target.col), cmd);
                     try {
                         uiWebSocket.sendMessage(new TextMessage("{\"count\": -1, \"progress\": -1, \"target\": %d}".formatted(target.id)));

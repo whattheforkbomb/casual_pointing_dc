@@ -27,7 +27,8 @@ public enum TargetLED {
     BOTTOM_LEFT(0b00000111),
     BOTTOM_CENTRE(0b00001000),
     BOTTOM_RIGHT(0b00001001),
-    ALL(0b00001010);
+    ALL(0b00001010),
+    TONE(0b00001111);
 
     public final byte mask;
     TargetLED(int mask) {

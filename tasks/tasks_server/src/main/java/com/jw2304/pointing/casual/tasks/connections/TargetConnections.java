@@ -1,6 +1,7 @@
 package com.jw2304.pointing.casual.tasks.connections;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
@@ -61,9 +62,15 @@ public class TargetConnections {
                         Socket socket = server.accept();
                         String address = socket.getInetAddress().getHostAddress();
                         LOG.info("New Target Connection Established: %s".formatted(address));
+                        InputStream in = socket.getInputStream();
+                        int MACLen = in.available(); // should be 6?
+                        byte[] socketMAC = new byte[MACLen];
+                        in.read(socketMAC);
+                        String MACStr = new String(socketMAC);
+                        LOG.info("Socket MAC sent: %s - %d".formatted(MACStr, MACLen));
                         socket.setKeepAlive(true);
-                        targetSockets.put(address, socket);
-                        targetSocketIds.add(address);
+                        targetSockets.put(MACStr, socket);
+                        targetSocketIds.add(MACStr);
                     } catch (IOException ioex) {
                         LOG.error("Connection Failed To Be Accepted", ioex);
                     }
