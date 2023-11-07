@@ -135,9 +135,7 @@ public class TargetSequenceController  implements WebSocketConnectionConsumer {
         scheduleTargetOn(delay, sessionSequenceFile, socketToColumnMapping, flashCountDown, flashRate);
     }
 
-    private void scheduleTargetOn(long delay, File sessionSequenceFile, Map<Integer, String> socketToColumnMapping, int currentFlash, int flashRate) {
-        int flash = flashRate > 0 && currentFlash < 1 ? flashRate : currentFlash;
-        
+    private void scheduleTargetOn(long delay, File sessionSequenceFile, Map<Integer, String> socketToColumnMapping, int flash, int flashRate) {        
         int idx = taskSequenceIdx.get();
         if (idx < targetSequence.size()) {
             LOG.info("Scheduling Sending Pointing Command: %d - delay: %d - %s".formatted(idx+1, delay, targetSequence.get(idx)));
@@ -169,8 +167,9 @@ public class TargetSequenceController  implements WebSocketConnectionConsumer {
         }
     }
 
-    private void scheduleTargetOff(int duration, File sessionSequenceFile, Map<Integer, String> socketToColumnMapping, int flash, int flashRate) {
-        int idx = flash > 0 ? taskSequenceIdx.get() : taskSequenceIdx.getAndIncrement();
+    private void scheduleTargetOff(int duration, File sessionSequenceFile, Map<Integer, String> socketToColumnMapping, int currentFlash, int flashRate) {
+        int idx = flashRate > 0 && currentFlash > 0 ? taskSequenceIdx.get() : taskSequenceIdx.getAndIncrement();
+        int flash = flashRate > 0 && currentFlash < 1 ? flashRate : currentFlash-1;
         if (idx < targetSequence.size()) {
             LOG.info("Scheduling Ending Command: %d - delay: %d".formatted(idx+1, duration));
             targetScheduler.schedule(() -> {
@@ -178,7 +177,7 @@ public class TargetSequenceController  implements WebSocketConnectionConsumer {
                 try {
                     LOG.info("Ending Pointing Command: %d/%d - %s".formatted(idx+1, targetSequence.size(), target));
                     sendCommand(socketToColumnMapping.get(targetSequence.get(idx).col), Target.OFF);
-                    if (flashRate == -1 || flash == 1) {
+                    if (flashRate == flash) {
                         try {
                             float progress = (idx+1) / (float) targetSequence.size()*100;
                             LOG.info("Preparing to send progress %f/100: %s".formatted(progress, target));
@@ -195,7 +194,7 @@ public class TargetSequenceController  implements WebSocketConnectionConsumer {
                 } catch (Exception pkmn) {
                     LOG.error("Sometimes getting program silently crashing/stopping, hoping can be caught by this...", pkmn);
                 }
-                scheduleTargetOn(flashRate > -1 && flash > 0 ? target.durationMilliseconds / (2 * flashRate) : targetSequence.get(taskSequenceIdx.get()).startDelayMilliseconds, sessionSequenceFile, socketToColumnMapping, flashRate > -1 ? flash-1 : -1, flashRate);
+                scheduleTargetOn(flashRate == flash ? targetSequence.get(idx).startDelayMilliseconds : target.durationMilliseconds / (2 * flashRate), sessionSequenceFile, socketToColumnMapping, flashRate > -1 ? flash : -1, flashRate);
             }, duration, TimeUnit.MILLISECONDS);
         }
     }
