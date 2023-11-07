@@ -6,6 +6,7 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HexFormat;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
@@ -65,14 +66,18 @@ public class TargetConnections {
                         InputStream in = socket.getInputStream();
                         int MACLen = in.available(); // should be 6?
                         byte[] socketMAC = new byte[MACLen];
+                        HexFormat socketMACHex = HexFormat.of();
                         in.read(socketMAC);
-                        String MACStr = new String(socketMAC);
+                        String MACStr = socketMACHex.formatHex(socketMAC);
+                        // if ("".equals(MACStr)) MACStr = address;
                         LOG.info("Socket MAC sent: %s - %d".formatted(MACStr, MACLen));
                         socket.setKeepAlive(true);
-                        targetSockets.put(MACStr, socket);
-                        targetSocketIds.add(MACStr);
+                        targetSockets.put(address, socket);
+                        targetSocketIds.add(address);
                     } catch (IOException ioex) {
                         LOG.error("Connection Failed To Be Accepted", ioex);
+                    } catch (Exception pkmn) {
+                        LOG.error("Who knows...", pkmn);
                     }
                 }
             });

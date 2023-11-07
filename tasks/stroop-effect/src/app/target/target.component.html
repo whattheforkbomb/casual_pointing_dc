@@ -1,7 +1,11 @@
 <table style="height: 100%; aspect-ratio: 16/11; padding: 2%; margin-top: -2%; margin-left: auto; margin-right: auto;">
     <tr style="width: 90%" *ngFor="let _ of [].constructor(3), index as i">
         <td *ngFor="let _ of [].constructor(5), index as j">
-            <div class="target" [class.active]="(j*5) + i == activeIdx" [style.transform]="getTransform(i, j)"></div>
+            <!-- [class.active]="(j*5) + i == activeIdx" -->
+            <!-- ((b*3) + a == activeLED -->
+            <div class="target" [style.transform]="getTransform(i, j)">
+                <app-led-array [activeLED]="activeLED" [clusterActive]="isActive(i, j)"></app-led-array>
+            </div>
         </td>
     </tr>
 </table>

@@ -30,14 +30,14 @@ int clockPins[] = {2, 5, 8};
 int tonePin = 9;
 int toneNotes[] = {33, 262, 2093};
 byte shield_mac[] = { 0x90, 0xA2, 0xDA, 0x0D, 0xF3, 0xA5 };
-IPAddress ip(192, 168, 0, 2);
-// byte shield_mac[] = { 0x90, 0xA2, 0xDA, 0x0D, 0xF3, 0xB0 };
+// IPAddress ip(192, 168, 0, 2);
+// byte shield_mac[] = { 0x90, 0xA2, 0xDA, 0x0D, 0xF3, 0xB0 };                                         
 // IPAddress ip(192, 168, 0, 3);
 // byte shield_mac[] = { 0x90, 0xA2, 0xDA, 0x0D, 0xF3, 0xB4 };
 // IPAddress ip(192, 168, 0, 4);
 // byte shield_mac[] = { 0x90, 0xA2, 0xDA, 0x0D, 0xF3, 0xB8 };
 // IPAddress ip(192, 168, 0, 5);
-// byte shield_mac[] = { 0x90, 0xA2, 0xDA, 0x0D, 0xF3, 0xC0 };
+// byte shield_mac[] = { 0x90, 0xA2, 0xDA, 0x0D, 0xF3, 0xC0 };            
 // IPAddress ip(192, 168, 0, 6);
 IPAddress server(192, 168, 0, 1);
 EthernetClient client;
@@ -197,8 +197,11 @@ void generate_masks(byte mask, int *generated_masks) {
     return;
   }
 
+  Serial.print("LED Mask: ");
+  Serial.println((mask & 0x0F), BIN);
+  Serial.println((mask & 0x0F) == 0x00001111);
   shift_pins = (mask >> 4) & 3;
-  if (mask & 0x00001111 == 0x00001111) {
+  if ((mask & 0x0F) == 0x0F) {
     tone(tonePin, toneNotes[shift_pins], 250);
     return;
   }
@@ -340,7 +343,7 @@ byte position = 0;
 void setup(){
   // Serial.begin(115200);
   // while (!Serial);
-  Serial.println("Serial Connected");
+  // Serial.println("Serial Connected");
   // Output to control LED
   for (int idx=0; idx<array_count; idx++) {
     pinMode(dataPins[idx], OUTPUT);

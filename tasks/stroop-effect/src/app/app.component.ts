@@ -14,6 +14,7 @@ interface MetaBody {
   count: number;
   progress: number;
   target: number;
+  subTarget: number;
 }
 
 @Component({
@@ -31,6 +32,7 @@ export class AppComponent implements OnInit {
   stroopWS!: WebSocket;
   metaWS!: WebSocket;
   activeIdx : number = -1;
+  activeLED : number = -1;
 
   ngOnInit(): void {
     this.stroopWS = new WebSocket(`ws://${window.location.hostname}:8080/stroop`)
@@ -79,6 +81,7 @@ export class AppComponent implements OnInit {
           this.display.progress = msg.progress;
         }
         this.activeIdx = msg.target;
+        this.activeLED = msg.subTarget;
       }
     };
     

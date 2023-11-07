@@ -69,6 +69,8 @@ public class StudyRestController {
     public void start(
         @RequestParam(name = "targetType", defaultValue = "INDIVIDUAL") String targetTypeStr, 
         @RequestParam("distractor") boolean distractor, 
+        @RequestParam("flash") boolean flash, 
+        @RequestParam(name = "flashRate", defaultValue = "6") int flashRate, 
         @RequestParam(name = "targetDelay", defaultValue = "3000") int targetDelay, 
         @RequestParam(name = "targetDuration", defaultValue = "3000") int targetDuration, 
         @RequestParam(name = "jitter", defaultValue = "250") int jitterAmount, 
@@ -95,7 +97,7 @@ public class StudyRestController {
         File file = new File("%s/%s".formatted(rootFilePath, PID));
         file.mkdirs();
         String sessionFileName = "%s/%s/%s_%s_%s".formatted(rootFilePath, PID, targetType.name(), distractor ? "Distracted": "Focussed", Helpers.getCurrentDateTimeString());
-        targetSequenceController.run(targetType, targetDelay, targetDuration, stroopDelay, stroopDuration, jitterAmount, distractor, PID, sessionFileName, targetConnectionToPhysicalColumnMapping);
+        targetSequenceController.run(targetType, targetDelay, targetDuration, stroopDelay, stroopDuration, jitterAmount, distractor, flash, flashRate, PID, sessionFileName, targetConnectionToPhysicalColumnMapping);
     }
 
     @GetMapping("/pid")
@@ -147,12 +149,20 @@ public class StudyRestController {
                 Target target = targets.get(i);
                 long delay = ((target.startDelayMilliseconds + target.durationMilliseconds) * i) + target.startDelayMilliseconds;
                 targetScheduler.schedule(() -> {
-                    LOG.info("Identify %d (%d) [(%d,%d),%d] - delay: %d".formatted(target.id, targetConnectionToPhysicalColumnMapping.get(target.col), target.col, target.row, target.subTarget, delay));
-                    targetSequenceController.sendCommand(targetConnectionToPhysicalColumnMapping.get(target.col), target.getCommandByte(TargetColour.RED));
+                    try {
+                        LOG.info("Identify %d (%s) [(%d,%d),%d] - delay: %d".formatted(target.id, targetConnectionToPhysicalColumnMapping.get(target.col), target.col, target.row, target.subTarget, delay));
+                        targetSequenceController.sendCommand(targetConnectionToPhysicalColumnMapping.get(target.col), target.getCommandByte(TargetColour.RED));
+                    } catch (Exception pkmn) {
+                        LOG.error("Failing to send command to identify subtarget", pkmn);
+                    }
                 }, delay, TimeUnit.MILLISECONDS);
                 targetScheduler.schedule(() -> {
-                    LOG.info("End Identify %d (%d) [(%d,%d),%d] - delay: %d".formatted(target.id, targetConnectionToPhysicalColumnMapping.get(target.col), target.col, target.row, target.subTarget, delay));
-                    targetSequenceController.sendCommand(targetConnectionToPhysicalColumnMapping.get(target.col), (byte)0);
+                    try {
+                        LOG.info("End Identify %d (%s) [(%d,%d),%d] - delay: %d".formatted(target.id, targetConnectionToPhysicalColumnMapping.get(target.col), target.col, target.row, target.subTarget, delay));
+                        targetSequenceController.sendCommand(targetConnectionToPhysicalColumnMapping.get(target.col), (byte)0);
+                    } catch (Exception pkmn) {
+                        LOG.error("Failing to send command to turnoff subtarget", pkmn);
+                    }
                 }, delay + target.durationMilliseconds, TimeUnit.MILLISECONDS);
             }
         }
@@ -189,11 +199,14 @@ public class StudyRestController {
             LOG.info("%d - %s".formatted(processedMap.size(), processedMap.entrySet().stream().map((a) -> String.format("(%d,%d)", a.getKey(), a.getValue())).collect(Collectors.joining(", ", "{", "}"))));
             // go through map and change to correct address
             for (Map.Entry<Integer, Integer> entry : processedMap.entrySet()) {
+                String socketAddress;
                 try {
-                    targetConnectionToPhysicalColumnMapping.put(entry.getKey(), targetSocketIds.get(entry.getValue()));
+                    socketAddress = targetSocketIds.get(entry.getValue());
                 } catch(IndexOutOfBoundsException ioobex) {
                     LOG.error("Tried assigning a socket that doesn't exist, so skipping", ioobex);
+                    socketAddress = "uh oh"; // setting for testing
                 }
+                targetConnectionToPhysicalColumnMapping.put(entry.getKey(), socketAddress);
             }
             // targetConnectionToPhysicalColumnMapping = processedMap;//.put(newId, oldId);
             LOG.info("Mapping size: %d".formatted(targetConnectionToPhysicalColumnMapping.size()));

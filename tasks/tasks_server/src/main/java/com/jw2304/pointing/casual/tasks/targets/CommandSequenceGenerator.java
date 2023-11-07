@@ -5,7 +5,6 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Random;
-import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,6 +34,7 @@ public class CommandSequenceGenerator {
     }
 
     private final Random rng = new Random(System.currentTimeMillis());    
+    private final Random sequenceRNG = new Random(1234567890);    
 
     public Pair<List<Target>, List<Stroop>> generateSequence(
         TargetType targetType , int targetStartDelayMilliseconds, int targetDurationMilliseconds, 
@@ -67,7 +67,7 @@ public class CommandSequenceGenerator {
                 LOG.info("Repeating Individual LEDs - Cluster[%d]".formatted(i));
                 int[] subTargetIndexes = IntStream.range(0, subTargetCount).toArray();
                 for (int j=0; j<2; j++) {
-                    int subTarget = subTargetIndexes[rng.nextInt(subTargetIndexes.length)];
+                    int subTarget = subTargetIndexes[sequenceRNG.nextInt(subTargetIndexes.length)];
                     LOG.info("Repeating Individual LEDs - LED[%d]".formatted(subTarget));
                     Collections.addAll(
                         possibleTargets, 
@@ -91,7 +91,7 @@ public class CommandSequenceGenerator {
             }
         }
         LOG.info("Shuffling possible targets");
-        Collections.shuffle(possibleTargets, rng);
+        Collections.shuffle(possibleTargets, sequenceRNG);
 
         List<Target> finalTargets = new ArrayList<Target>(totalTargetCount);
         List<Stroop> stroopMessages;

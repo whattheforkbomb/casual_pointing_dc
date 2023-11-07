@@ -7,12 +7,14 @@ import { AppComponent } from './app.component';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { TargetComponent } from './target/target.component';
 import { LedFilterPipe } from './led-filter.pipe';
+import { LedArrayComponent } from './led-array/led-array.component';
 
 @NgModule({
   declarations: [
     AppComponent,
     TargetComponent,
-    LedFilterPipe
+    LedFilterPipe,
+    LedArrayComponent
   ],
   imports: [
     BrowserModule,

@@ -11,6 +11,7 @@ import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.IntStream;
@@ -97,14 +98,14 @@ public class TargetSequenceController  implements WebSocketConnectionConsumer {
     public void run(
         TargetType targetType, int targetStartDelayMilliSeconds, int targetDurationMilliSeconds, 
         int stroopStartDelayMilliSeconds, int stroopDurationMilliSeconds, int jitterAmount, 
-        boolean distractor, String participantId, String fileName, Map<Integer, String> socketToColumnMapping
+        boolean distractor, boolean flash, int flashRate, String participantId, String fileName, Map<Integer, String> socketToColumnMapping
     ) {
         File sessionSequenceFile = new File("%s.txt".formatted(fileName));
         sessionSequenceFile.getParentFile().mkdirs();
 
         taskSequenceIdx.set(0);
         
-        int targetCount = targetSockets.size() * targetsPerConnection;
+        int targetCount = socketToColumnMapping.size() * targetsPerConnection;
         
         Pair<List<Target>, List<Stroop>> sequences = generator.generateSequence(targetType, targetStartDelayMilliSeconds, targetDurationMilliSeconds, stroopStartDelayMilliSeconds, stroopDurationMilliSeconds, jitterAmount, distractor, targetCount);
 
@@ -127,10 +128,16 @@ public class TargetSequenceController  implements WebSocketConnectionConsumer {
             delay += targetSequence.get(0).startDelayMilliseconds;
         }
 
-        scheduleTargetOn(delay, sessionSequenceFile, socketToColumnMapping);
+        int flashCountDown = flash ? flashRate : -1;
+        if (!flash) flashRate = -1;
+        LOG.info("Flash: %b, Flash Countdown: %d, Flash Rate: %d".formatted(flash, flashCountDown, flashRate));
+
+        scheduleTargetOn(delay, sessionSequenceFile, socketToColumnMapping, flashCountDown, flashRate);
     }
 
-    private void scheduleTargetOn(long delay, File sessionSequenceFile, Map<Integer, String> socketToColumnMapping) {
+    private void scheduleTargetOn(long delay, File sessionSequenceFile, Map<Integer, String> socketToColumnMapping, int currentFlash, int flashRate) {
+        int flash = flashRate > 0 && currentFlash < 1 ? flashRate : currentFlash;
+        
         int idx = taskSequenceIdx.get();
         if (idx < targetSequence.size()) {
             LOG.info("Scheduling Sending Pointing Command: %d - delay: %d - %s".formatted(idx+1, delay, targetSequence.get(idx)));
@@ -138,29 +145,32 @@ public class TargetSequenceController  implements WebSocketConnectionConsumer {
                 Target target = targetSequence.get(idx);
                 try {
                     byte cmd = target.getCommandByte(colour);
-                    sendCommand(socketToColumnMapping.get(target.col), target.getToneCommandByte());
-                    sendCommand(socketToColumnMapping.get(target.col), cmd);
-                    try {
-                        uiWebSocket.sendMessage(new TextMessage("{\"count\": -1, \"progress\": -1, \"target\": %d}".formatted(target.id)));
-                    } catch (IOException ioex) {
-                        LOG.error("Unable to send current target for visual", ioex);
-                    }
-                    try (BufferedWriter bw = new BufferedWriter(new FileWriter(sessionSequenceFile, true))) {
-                        bw.write("%s,ON,%d,%d,%d,%d,%s\n".formatted(Helpers.getCurrentDateTimeString(), target.id,target.row, target.col, target.subTarget, Integer.toBinaryString(cmd).substring(0, 8)));
-                    } catch (IOException ioex) {
-                        LOG.error("Unable to write to file: '/home/whiff/data/%s'".formatted(sessionSequenceFile.getName()), ioex);
+                    if (flash == flashRate) {
+                        LOG.info("Sending Tone Request: %s".formatted(Integer.toBinaryString(target.getToneCommandByte())));
+                        sendCommand(socketToColumnMapping.get(target.col), target.getToneCommandByte());
+                        try {
+                            uiWebSocket.sendMessage(new TextMessage("{\"count\": -1, \"progress\": -1, \"target\": %d, \"subTarget\": %d}".formatted(target.id, target.subTarget)));
+                        } catch (IOException ioex) {
+                            LOG.error("Unable to send current target for visual", ioex);
+                        }
+                        try (BufferedWriter bw = new BufferedWriter(new FileWriter(sessionSequenceFile, true))) {
+                            bw.write("%s,ON,%d,%d,%d,%d,%s\n".formatted(Helpers.getCurrentDateTimeString(), target.id,target.row, target.col, target.subTarget, Integer.toBinaryString(cmd).substring(0, 8)));
+                        } catch (IOException ioex) {
+                            LOG.error("Unable to write to file: '/home/whiff/data/%s'".formatted(sessionSequenceFile.getName()), ioex);
+                        }
                     }
                     LOG.info("Sending Pointing Command: %d/%d - %s".formatted(idx+1, targetSequence.size(), target));
+                    sendCommand(socketToColumnMapping.get(target.col), cmd);
                 } catch (Exception pkmn) {
                     LOG.error("Sometimes getting program silently crashing/stopping, hoping can be caught by this...", pkmn);
                 }
-                scheduleTargetOff(target.durationMilliseconds, sessionSequenceFile, socketToColumnMapping);
+                scheduleTargetOff(flashRate > 0 ? target.durationMilliseconds / (2 * flashRate) : target.durationMilliseconds, sessionSequenceFile, socketToColumnMapping, flash, flashRate);
             }, delay, TimeUnit.MILLISECONDS);
         }
     }
 
-    private void scheduleTargetOff(int duration, File sessionSequenceFile, Map<Integer, String> socketToColumnMapping) {
-        int idx = taskSequenceIdx.getAndIncrement();
+    private void scheduleTargetOff(int duration, File sessionSequenceFile, Map<Integer, String> socketToColumnMapping, int flash, int flashRate) {
+        int idx = flash > 0 ? taskSequenceIdx.get() : taskSequenceIdx.getAndIncrement();
         if (idx < targetSequence.size()) {
             LOG.info("Scheduling Ending Command: %d - delay: %d".formatted(idx+1, duration));
             targetScheduler.schedule(() -> {
@@ -168,22 +178,24 @@ public class TargetSequenceController  implements WebSocketConnectionConsumer {
                 try {
                     LOG.info("Ending Pointing Command: %d/%d - %s".formatted(idx+1, targetSequence.size(), target));
                     sendCommand(socketToColumnMapping.get(targetSequence.get(idx).col), Target.OFF);
-                    try {
-                        float progress = (idx+1) / (float) targetSequence.size()*100;
-                        LOG.info("Preparing to send progress %f/100: %s".formatted(progress, target));
-                        uiWebSocket.sendMessage(new TextMessage("{\"count\": -1, \"progress\": %d, \"target\": -1}".formatted(Math.round(progress))));
-                    } catch (IOException ioex) {
-                        LOG.error("Unable to send progress update...", ioex);
-                    }
-                    try (BufferedWriter bw = new BufferedWriter(new FileWriter(sessionSequenceFile, true))) {
-                        bw.write("%s,OFF,%d,%d,%d,%d,%s\n".formatted(Helpers.getCurrentDateTimeString(), target.id, target.row, target.col, target.subTarget, Integer.toBinaryString(Target.OFF)));
-                    } catch (IOException ioex) {
-                        LOG.error("Unable to write to file: '%s'".formatted(sessionSequenceFile.getPath()), ioex);
+                    if (flashRate == -1 || flash == 1) {
+                        try {
+                            float progress = (idx+1) / (float) targetSequence.size()*100;
+                            LOG.info("Preparing to send progress %f/100: %s".formatted(progress, target));
+                            uiWebSocket.sendMessage(new TextMessage("{\"count\": -1, \"progress\": %d, \"target\": -1, \"subTarget\": -1}".formatted(Math.round(progress))));
+                        } catch (IOException ioex) {
+                            LOG.error("Unable to send progress update...", ioex);
+                        }
+                        try (BufferedWriter bw = new BufferedWriter(new FileWriter(sessionSequenceFile, true))) {
+                            bw.write("%s,OFF,%d,%d,%d,%d,%s\n".formatted(Helpers.getCurrentDateTimeString(), target.id, target.row, target.col, target.subTarget, Integer.toBinaryString(Target.OFF)));
+                        } catch (IOException ioex) {
+                            LOG.error("Unable to write to file: '%s'".formatted(sessionSequenceFile.getPath()), ioex);
+                        }
                     }
                 } catch (Exception pkmn) {
                     LOG.error("Sometimes getting program silently crashing/stopping, hoping can be caught by this...", pkmn);
                 }
-                scheduleTargetOn(targetSequence.get(taskSequenceIdx.get()).startDelayMilliseconds, sessionSequenceFile, socketToColumnMapping);
+                scheduleTargetOn(flashRate > -1 && flash > 0 ? target.durationMilliseconds / (2 * flashRate) : targetSequence.get(taskSequenceIdx.get()).startDelayMilliseconds, sessionSequenceFile, socketToColumnMapping, flashRate > -1 ? flash-1 : -1, flashRate);
             }, duration, TimeUnit.MILLISECONDS);
         }
     }
@@ -193,7 +205,9 @@ public class TargetSequenceController  implements WebSocketConnectionConsumer {
             targetSockets.get(socketId).getOutputStream().write(new byte[] { command });
         } catch (IOException ioex) {
             // do something more here???
-            // LOG.error("Unable to send message to socket", ioex);
+            LOG.error("Unable to send message to socket", ioex);
+        } catch (NullPointerException npex) {
+            LOG.error("Unable to retrieve socket from address: %s".formatted(socketId), npex);
         }
     }
 

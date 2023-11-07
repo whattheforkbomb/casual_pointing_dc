@@ -4,10 +4,10 @@
     <div style="margin-left: auto; margin-right: 0px; height: 2vh; background-color: darkblue; width: auto;" [style.width.%]="100 - display.progress"></div>
 </div>
 <div id="stroopCountdown" style="border-left: lightgray solid 1vh; border-right: lightgray solid 1vh; height: 48vh; background-color: rgb(240, 240, 240); text-align: center; align-content: center;">
-    <span [style.color]="display.colour" style="text-shadow: -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000; height: 100%; font-size: 15em; font-weight: bolder; line-height: 48vh;">{{display.word}}</span>
+    <span [style.color]="display.colour" style="text-shadow: -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000; height: 100%; font-size: 13em; font-weight: bolder; line-height: 48vh;">{{display.word}}</span>
 </div>
 <div id="targetIdentifier" style="margin-right: auto; margin-left: auto; height: 46vh; background-color: rgb(239, 239, 239); border: lightgray solid 1vh; text-align: center; color: white;">
-    <app-target [activeIdx]="activeIdx"></app-target>
+    <app-target [activeIdx]="activeIdx" [activeLED]="activeLED"></app-target>
 </div>
 
 <router-outlet></router-outlet>

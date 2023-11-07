@@ -1,0 +1,7 @@
+<table style="height: 100%; aspect-ratio: 1/1; padding: 2%; margin-left: auto; margin-right: auto;">
+    <tr style="width: 80%" *ngFor="let _ of [].constructor(3), index as i">
+        <td *ngFor="let _ of [].constructor(3), index as j">
+            <div class="target" [class.active]="clusterActive && ((i*3) + j == activeLED)"></div>
+        </td>
+    </tr>
+</table>
