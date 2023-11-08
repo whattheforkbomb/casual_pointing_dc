@@ -166,25 +166,25 @@ export function perceivedAccuracyAndPrecision(i: number) {
         "title": "Please indicate if you agree or disagree with the following statements",
         "columns": [{
             "value": 7,
-            "text": "Strongly agree"
+            "text": "Strongly Disagree"
         }, {
             "value": 6,
-            "text": "Agree"
+            "text": "Disagree"
         }, {
             "value": 5,
-            "text": "Somewhat Agree"
+            "text": "Somewhat Disagree"
         }, {
             "value": 4,
             "text": "Neutral"
         }, {
             "value": 3,
-            "text": "Somewhat Disagree"
+            "text": "Somewhat Agree"
         }, {
             "value": 2,
-            "text": "Disagree"
+            "text": "Agree"
         }, {
             "value": 1,
-            "text": "Strongly disagree"
+            "text": "Strongly Agree"
         }],
         "rows": [
             {
