@@ -6,8 +6,8 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
-import org.springframework.web.servlet.config.annotation.ViewControllerRegistry;
+// import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
+// import org.springframework.web.servlet.config.annotation.ViewControllerRegistry;
 
 @Controller
 public class UIRestController {
@@ -27,7 +27,7 @@ public class UIRestController {
     //     registry.addViewController("/app/stroop/").setViewName("redirect:/app/stroop/index.html");
     // }
 
-    @GetMapping("/app/{site}/")
+    @GetMapping("/app/{site}")
     public String redirect(@PathVariable("site") String site) {
         return "redirect:/app/" + site + "/index.html";
     }

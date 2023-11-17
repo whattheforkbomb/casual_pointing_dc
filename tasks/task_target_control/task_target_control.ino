@@ -29,15 +29,15 @@ int latchPins[] = {1, 4, 7};
 int clockPins[] = {2, 5, 8};
 int tonePin = 9;
 int toneNotes[] = {33, 262, 2093};
-byte shield_mac[] = { 0x90, 0xA2, 0xDA, 0x0D, 0xF3, 0xA5 };
+// byte shield_mac[] = { 0x90, 0xA2, 0xDA, 0x0D, 0xF3, 0xA5 };
 // IPAddress ip(192, 168, 0, 2);
-// byte shield_mac[] = { 0x90, 0xA2, 0xDA, 0x0D, 0xF3, 0xB0 };                                         
+byte shield_mac[] = { 0x90, 0xA2, 0xDA, 0x0D, 0xF3, 0xB0 };                                         
 // IPAddress ip(192, 168, 0, 3);
 // byte shield_mac[] = { 0x90, 0xA2, 0xDA, 0x0D, 0xF3, 0xB4 };
 // IPAddress ip(192, 168, 0, 4);
 // byte shield_mac[] = { 0x90, 0xA2, 0xDA, 0x0D, 0xF3, 0xB8 };
 // IPAddress ip(192, 168, 0, 5);
-// byte shield_mac[] = { 0x90, 0xA2, 0xDA, 0x0D, 0xF3, 0xC0 };            
+// byte shield_mac[] = { 0x90, 0xA2, 0xDA, 0x0D, 0xF3, 0xC0 };
 // IPAddress ip(192, 168, 0, 6);
 IPAddress server(192, 168, 0, 1);
 EthernetClient client;
@@ -244,8 +244,6 @@ void generate_masks(byte mask, int *generated_masks) {
   Serial.println(target_row);
 
   // From this data, we need to compose the 12bit mask, where the first 9 are 3xRGB (for columns 1-3), the last 3 being power for rows 1-3.
-
-  // TODO: Might need to update this to account for different connection to shift register pins
   for (int current_row = 0; current_row < 3; current_row++) {
     int pin_out = 0x00;
 
@@ -370,6 +368,7 @@ void process_ethernet() {
     Serial.print("Connection attempted: ");
     Serial.println(connect);
     if (client.connected()) {
+      delayMicroseconds(200000);
       client.write(shield_mac, 6);
       client.flush();
       Serial.println("Connection successful");

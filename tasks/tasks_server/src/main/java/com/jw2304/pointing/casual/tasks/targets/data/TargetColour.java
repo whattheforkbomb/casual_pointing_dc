@@ -12,7 +12,7 @@ package com.jw2304.pointing.casual.tasks.targets.data;
     Ideally manager app will just need to send this byte to identify the target appearance
 */
 public enum TargetColour {
-    WHITE(0b00000000),
+    OFF(0b00000000),
     GREEN(0b01000000),
     RED(0b10000000),
     BLUE(0b11000000);

@@ -23,6 +23,8 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class TargetConnections {
 
+    private static final int MAC_LEN = 6;
+
     public static Logger LOG = LoggerFactory.getLogger(TargetConnections.class);
 
     @Value("${targets.expected.connections}")
@@ -61,19 +63,28 @@ public class TargetConnections {
                     LOG.info("Accepting incoming connections from targets");
                     try {
                         Socket socket = server.accept();
-                        String address = socket.getInetAddress().getHostAddress();
-                        LOG.info("New Target Connection Established: %s".formatted(address));
+                        String ipAddress = socket.getInetAddress().getHostAddress();
+                        String MACStr = null;
+
+                        LOG.info("New Target Connection Established: %s".formatted(ipAddress));
                         InputStream in = socket.getInputStream();
-                        int MACLen = in.available(); // should be 6?
-                        byte[] socketMAC = new byte[MACLen];
-                        HexFormat socketMACHex = HexFormat.of();
-                        in.read(socketMAC);
-                        String MACStr = socketMACHex.formatHex(socketMAC);
-                        // if ("".equals(MACStr)) MACStr = address;
-                        LOG.info("Socket MAC sent: %s - %d".formatted(MACStr, MACLen));
+                        byte[] socketMAC = new byte[MAC_LEN];
+                        int availableBytes = in.available();
+                        int bytesRead = 0;
+                        if (availableBytes > 0) {
+                            bytesRead = in.read(socketMAC);
+                            if (bytesRead > 0) {
+                                HexFormat socketMACHex = HexFormat.of();
+                                MACStr = socketMACHex.formatHex(socketMAC);
+                                LOG.info("Socket MAC sent: %s - %d".formatted(MACStr, bytesRead));
+                            }
+                        }
+                        String address = ipAddress;
+                        LOG.info("Socket ID: %s".formatted(address));
                         socket.setKeepAlive(true);
                         targetSockets.put(address, socket);
-                        targetSocketIds.add(address);
+                        if (targetSocketIds.stream().filter(address::equals).findFirst().isEmpty())
+                            targetSocketIds.add(address);
                     } catch (IOException ioex) {
                         LOG.error("Connection Failed To Be Accepted", ioex);
                     } catch (Exception pkmn) {
@@ -83,6 +94,5 @@ public class TargetConnections {
             });
         };
 	}
-
 
 }

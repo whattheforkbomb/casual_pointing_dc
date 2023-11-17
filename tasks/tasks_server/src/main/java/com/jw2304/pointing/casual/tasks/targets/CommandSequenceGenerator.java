@@ -34,7 +34,7 @@ public class CommandSequenceGenerator {
     }
 
     private final Random rng = new Random(System.currentTimeMillis());    
-    private final Random sequenceRNG = new Random(1234567890);    
+    private final Random sequenceRNG = new Random(123456789); // Inventive, I know
 
     public Pair<List<Target>, List<Stroop>> generateSequence(
         TargetType targetType , int targetStartDelayMilliseconds, int targetDurationMilliseconds, 
@@ -170,7 +170,7 @@ public class CommandSequenceGenerator {
                 finalTargets.add(target);
                 targetElapsed += offset + target.durationMilliseconds;
 
-                // Need top now add additional stroop to cover the duration of the target;
+                // Need to now add additional stroop to cover the duration of the target;
                 // int targetDurationStroopOverlap = target.durationMilliseconds + offset;
                 // while(targetDurationStroopOverlap > stroopStartDelayMilliseconds + stroopDurationMilliseconds) {
                 //     stroopMessages.add(getStroop(stroopStartDelayMilliseconds, stroopDurationMilliseconds));
@@ -179,6 +179,12 @@ public class CommandSequenceGenerator {
                 // }
                 // stroopMessages.add(getStroop(stroopStartDelayMilliseconds, stroopDurationMilliseconds));
                 // stroopElapsed += stroopStartDelayMilliseconds + stroopDurationMilliseconds;
+            }
+
+            // remove dead-space at the end
+            while(targetElapsed-stroopDurationMilliseconds > stroopElapsed) {
+                stroopMessages.add(getStroop(stroopStartDelayMilliseconds, stroopDurationMilliseconds));
+                stroopElapsed += stroopStartDelayMilliseconds + stroopDurationMilliseconds;
             }
             
             finalTargets.get(0).startDelayMilliseconds += initialDelay;

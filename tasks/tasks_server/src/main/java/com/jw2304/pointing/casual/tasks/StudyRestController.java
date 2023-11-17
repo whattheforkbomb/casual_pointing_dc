@@ -11,11 +11,9 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.io.File;
 import java.net.Socket;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.NoSuchElementException;
 import java.util.UUID;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -28,8 +26,8 @@ import org.slf4j.LoggerFactory;
 
 import com.jw2304.pointing.casual.tasks.stroop.StroopController;
 import com.jw2304.pointing.casual.tasks.targets.TargetSequenceController;
+import com.jw2304.pointing.casual.tasks.targets.data.ResetTarget;
 import com.jw2304.pointing.casual.tasks.targets.data.Target;
-import com.jw2304.pointing.casual.tasks.targets.data.TargetColour;
 import com.jw2304.pointing.casual.tasks.targets.data.TargetType;
 import com.jw2304.pointing.casual.tasks.util.Helpers;
 
@@ -67,15 +65,13 @@ public class StudyRestController {
 
     @PostMapping("/start")
     public void start(
+        @RequestParam(name = "pointingBehaviour", defaultValue = "PRECISE") String pointingBehaviour, 
         @RequestParam(name = "targetType", defaultValue = "INDIVIDUAL") String targetTypeStr, 
-        @RequestParam("distractor") boolean distractor, 
-        @RequestParam("flash") boolean flash, 
-        @RequestParam(name = "flashRate", defaultValue = "6") int flashRate, 
-        @RequestParam(name = "targetDelay", defaultValue = "3000") int targetDelay, 
+        @RequestParam(name = "flash", defaultValue = "true") boolean flash, 
+        @RequestParam(name = "flashRate", defaultValue = "5") int flashRate, 
+        @RequestParam(name = "targetDelay", defaultValue = "2000") int targetDelay, 
         @RequestParam(name = "targetDuration", defaultValue = "3000") int targetDuration, 
-        @RequestParam(name = "jitter", defaultValue = "250") int jitterAmount, 
-        @RequestParam(name = "stroopDelay", defaultValue = "250") int stroopDelay, 
-        @RequestParam(name = "stroopDuration", defaultValue = "3750") int stroopDuration
+        @RequestParam(name = "jitter", defaultValue = "250") int jitterAmount
     ) {
         LOG.info("Resetting targets");
         targetSequenceController.resetTargets();
@@ -96,8 +92,42 @@ public class StudyRestController {
         }
         File file = new File("%s/%s".formatted(rootFilePath, PID));
         file.mkdirs();
-        String sessionFileName = "%s/%s/%s_%s_%s".formatted(rootFilePath, PID, targetType.name(), distractor ? "Distracted": "Focussed", Helpers.getCurrentDateTimeString());
-        targetSequenceController.run(targetType, targetDelay, targetDuration, stroopDelay, stroopDuration, jitterAmount, distractor, flash, flashRate, PID, sessionFileName, targetConnectionToPhysicalColumnMapping);
+        String sessionFileName = "%s/%s/%s_%s_%s_%s".formatted(rootFilePath, PID, pointingBehaviour, targetType.name(), "Focussed", Helpers.getCurrentDateTimeString());
+        targetSequenceController.run(targetType, targetDelay, targetDuration, 0, 0, jitterAmount, false, flash, flashRate, PID, sessionFileName, targetConnectionToPhysicalColumnMapping);
+    }
+
+    @PostMapping("/start/stroop")
+    public void startStroop(
+        @RequestParam(name = "pointingBehaviour", defaultValue = "PRECISE") String pointingBehaviour, 
+        @RequestParam(name = "targetType", defaultValue = "INDIVIDUAL") String targetTypeStr, 
+        @RequestParam(name = "flash", defaultValue = "true") boolean flash, 
+        @RequestParam(name = "flashRate", defaultValue = "5") int flashRate, 
+        @RequestParam(name = "targetDelay", defaultValue = "500") int targetDelay, 
+        @RequestParam(name = "targetDuration", defaultValue = "3000") int targetDuration,
+        @RequestParam(name = "stroopDelay", defaultValue = "100") int stroopDelay, 
+        @RequestParam(name = "stroopDuration", defaultValue = "1900") int stroopDuration
+    ) {
+        LOG.info("Resetting targets");
+        targetSequenceController.resetTargets();
+
+        if ("UNKNOWN".equals(PID)) {
+            generatePID();
+            LOG.warn("Generated PID as was missing...: %s".formatted(PID));
+        }
+
+        LOG.info("Checking map has been updated: %d".formatted(targetConnectionToPhysicalColumnMapping.size()));
+
+        TargetType targetType;
+        try {
+            targetType = TargetType.valueOf(targetTypeStr.toUpperCase());
+        } catch (IllegalArgumentException iaex) {
+            LOG.error("Unable to parse provided targetType: %s, accepted values are {'CLUSTER', 'INDIVIDUAL'}\nUsing INDIVIDUAL as Target Type.".formatted(targetTypeStr), iaex);
+            targetType = TargetType.INDIVIDUAL;
+        }
+        File file = new File("%s/%s".formatted(rootFilePath, PID));
+        file.mkdirs();
+        String sessionFileName = "%s/%s/%s_%s_%s_%s".formatted(rootFilePath, PID, pointingBehaviour, targetType.name(), "Distracted", Helpers.getCurrentDateTimeString());
+        targetSequenceController.run(targetType, targetDelay, targetDuration, stroopDelay, stroopDuration, 0, true, flash, flashRate, PID, sessionFileName, targetConnectionToPhysicalColumnMapping);
     }
 
     @GetMapping("/pid")
@@ -151,7 +181,7 @@ public class StudyRestController {
                 targetScheduler.schedule(() -> {
                     try {
                         LOG.info("Identify %d (%s) [(%d,%d),%d] - delay: %d".formatted(target.id, targetConnectionToPhysicalColumnMapping.get(target.col), target.col, target.row, target.subTarget, delay));
-                        targetSequenceController.sendCommand(targetConnectionToPhysicalColumnMapping.get(target.col), target.getCommandByte(TargetColour.RED));
+                        targetSequenceController.sendCommand(targetConnectionToPhysicalColumnMapping, target, true);
                     } catch (Exception pkmn) {
                         LOG.error("Failing to send command to identify subtarget", pkmn);
                     }
@@ -159,7 +189,7 @@ public class StudyRestController {
                 targetScheduler.schedule(() -> {
                     try {
                         LOG.info("End Identify %d (%s) [(%d,%d),%d] - delay: %d".formatted(target.id, targetConnectionToPhysicalColumnMapping.get(target.col), target.col, target.row, target.subTarget, delay));
-                        targetSequenceController.sendCommand(targetConnectionToPhysicalColumnMapping.get(target.col), (byte)0);
+                        targetSequenceController.sendCommand(targetConnectionToPhysicalColumnMapping, new ResetTarget(target.col), false);
                     } catch (Exception pkmn) {
                         LOG.error("Failing to send command to turnoff subtarget", pkmn);
                     }
@@ -171,7 +201,7 @@ public class StudyRestController {
         public void identifyMapping() {
             targetSequenceController.resetTargets();
             for (int i=0; i<targetSockets.size(); i++) {
-                targetSequenceController.sendCommand(targetConnectionToPhysicalColumnMapping.get(i), Target.identifyColumn(i).getCommandByte(TargetColour.RED));
+                targetSequenceController.sendCommand(targetConnectionToPhysicalColumnMapping, Target.identifyColumn(i), true);
             }
         }
         
@@ -179,7 +209,7 @@ public class StudyRestController {
         public void identifySocket() {
             targetSequenceController.resetTargets();
             for (int i=0; i<targetSocketIds.size(); i++) {
-                targetSequenceController.sendCommand(targetSocketIds.get(i), Target.identifyColumn(i).getCommandByte(TargetColour.RED));
+                targetSequenceController.sendCommand(targetSockets.get(targetSocketIds.get(i)), Target.identifyColumn(i), true);
             }
         }
 
@@ -210,6 +240,7 @@ public class StudyRestController {
             }
             // targetConnectionToPhysicalColumnMapping = processedMap;//.put(newId, oldId);
             LOG.info("Mapping size: %d".formatted(targetConnectionToPhysicalColumnMapping.size()));
+            identifyMapping();
         }
     }
 }

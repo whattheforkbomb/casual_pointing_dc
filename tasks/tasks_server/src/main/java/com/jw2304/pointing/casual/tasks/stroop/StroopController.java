@@ -55,7 +55,7 @@ public class StroopController implements WebSocketConnectionConsumer {
         File sessionSequenceFile = new File("%s_Stroop.txt".formatted(fileName));
         sessionSequenceFile.getParentFile().mkdirs();
 
-        scheduleStroopShow(3000 - (System.currentTimeMillis() - elapsed), sessionSequenceFile);
+        scheduleStroopShow(5000 - (System.currentTimeMillis() - elapsed), sessionSequenceFile);
 
         // stroopScheduler.schedule(() -> {
         //     try {
