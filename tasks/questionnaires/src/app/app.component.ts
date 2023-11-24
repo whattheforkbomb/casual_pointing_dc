@@ -8,6 +8,12 @@ import { BorgRPEComponent } from './questions/borg-rpe/borg-rpe.component';
 import { LikertComponent } from './questions/likert/likert.component';
 import * as QuestionModels from './questions/questionModels';
 
+/* TODO:
+ *  Have welcome page showing PID and button to select relevant condition (starting with precise or casual), or pull from server???
+ *  Create model generator, take the condition (standing / sitting (for full session), precise or casual (or whatever we want to call it...))
+ *  Need to use angular router, Or update an angular component containing the survey?
+ */
+
 const postRoundSurvey = {
   // "progressBarType": "pages",
   // "showProgressBar": "top",
@@ -19,10 +25,18 @@ const postRoundSurvey = {
       "title": "Welcome",
       "elements": [{
         "type": "html",
-        "html": "<p>This Survey is split into 9 sections. The first section will include the information for this study (which will have been made available to you when you registered to take part). At the end of this section will be a few demographics questions for you to complete. Once this first section has been completed, let the researcher know and we can start the study. The final 8 sections will be filled-in after each round of pointing that you perform during the study, and will ask you to evaluate your self-reported performance during the preceding part of the study.</p>"
+        "html": "<p>This Survey is split into 5 sections. The first will be for before you perform any actions within the study, each of the final 4 will be performed after each session within the study. Upon completing each section, please inform the researcher and do not continue filling in questions.</p>"
       }]
     }, 
-    QuestionModels.demographics, 
+    QuestionModels.demographics,
+    { 
+      "title": "Demographics Complete",
+      "elements": [{
+        "type": "html",
+        "html": "<p>Please tell the researcher that you have completed this section of the questionnaire. Do not proceed.</p>"
+      }]
+    },
+    QuestionModels.researcherDemographics,
     {
       "title": "Session 1 - Borg RPE",
       "description": "",
@@ -37,7 +51,11 @@ const postRoundSurvey = {
       elements: QuestionModels.perceivedAccuracyAndPrecision(1)
     },
     {
-      "title": "Section 1 Complete",
+      title: "Session 4 - IMI",
+      elements: QuestionModels.imi(1)
+    },
+    {
+      "title": "Session 1 Complete",
       "elements": [{
         "type": "html",
         "html": "<p>Please tell the researcher that you have completed this section of the questionnaire. Do not proceed.</p>"
@@ -57,7 +75,11 @@ const postRoundSurvey = {
       elements: QuestionModels.perceivedAccuracyAndPrecision(2)
     },
     {
-      "title": "Section 2 Complete",
+      title: "Session 2 - IMI",
+      elements: QuestionModels.imi(2)
+    },
+    {
+      "title": "Session 2 Complete",
       "elements": [{
         "type": "html",
         "html": "<p>Please tell the researcher that you have completed this section of the questionnaire. Do not proceed.</p>"
@@ -77,7 +99,11 @@ const postRoundSurvey = {
       elements: QuestionModels.perceivedAccuracyAndPrecision(3)
     },
     {
-      "title": "Section 3 Complete",
+      title: "Session 3 - IMI",
+      elements: QuestionModels.imi(3)
+    },
+    {
+      "title": "Session 3 Complete",
       "elements": [{
         "type": "html",
         "html": "<p>Please tell the researcher that you have completed this section of the questionnaire. Do not proceed.</p>"
@@ -99,96 +125,12 @@ const postRoundSurvey = {
     {
       title: "Session 4 - IMI",
       elements: QuestionModels.imi(4)
-    },
-    {
-      "title": "Section 4 Complete",
-      "elements": [{
-        "type": "html",
-        "html": "<p>Please tell the researcher that you have completed this section of the questionnaire. Do not proceed.</p>"
-      }]
-    },
-    {
-      "title": "Session 5 - Borg RPE",
-      "description": "",
-      "elements": QuestionModels.borgQuestions(5)
-    }, 
-    {
-      "title": "Session 5 - NASA TLX",
-      "elements": QuestionModels.tlxQuestions(5)
-    },
-    {
-      title: "Session 5 - Perceived Accuracy and Precision",
-      elements: QuestionModels.perceivedAccuracyAndPrecision(5)
-    },
-    {
-      "title": "Section 5 Complete",
-      "elements": [{
-        "type": "html",
-        "html": "<p>Please tell the researcher that you have completed this section of the questionnaire. Do not proceed.</p>"
-      }]
-    },
-    {
-      "title": "Session 6 - Borg RPE",
-      "description": "",
-      "elements": QuestionModels.borgQuestions(6)
-    }, 
-    {
-      "title": "Session 6 - NASA TLX",
-      "elements": QuestionModels.tlxQuestions(6)
-    },
-    {
-      title: "Session 6 - Perceived Accuracy and Precision",
-      elements: QuestionModels.perceivedAccuracyAndPrecision(6)
-    },
-    {
-      "title": "Section 6 Complete",
-      "elements": [{
-        "type": "html",
-        "html": "<p>Please tell the researcher that you have completed this section of the questionnaire. Do not proceed.</p>"
-      }]
-    },
-    {
-      "title": "Session 7 - Borg RPE",
-      "description": "",
-      "elements": QuestionModels.borgQuestions(7)
-    }, 
-    {
-      "title": "Session 7 - NASA TLX",
-      "elements": QuestionModels.tlxQuestions(7)
-    },
-    {
-      title: "Session 7 - Perceived Accuracy and Precision",
-      elements: QuestionModels.perceivedAccuracyAndPrecision(7)
-    },
-    {
-      "title": "Section 7 Complete",
-      "elements": [{
-        "type": "html",
-        "html": "<p>Please tell the researcher that you have completed this section of the questionnaire. Do not proceed.</p>"
-      }]
-    },
-    {
-      "title": "Session 8 - Borg RPE",
-      "description": "",
-      "elements": QuestionModels.borgQuestions(8)
-    }, 
-    {
-      "title": "Session 8 - NASA TLX",
-      "elements": QuestionModels.tlxQuestions(8)
-    },
-    {
-      title: "Session 8 - IMI",
-      elements: QuestionModels.imi(8)
-    },
-    {
-      title: "Session 8 - Perceived Accuracy and Precision",
-      elements: QuestionModels.perceivedAccuracyAndPrecision(8)
     }
   ],
   completedHtml: "You have now completed the final questionnaire. Please let the researcher know to perform the final interview."
 }
 
-const inProgressStorageKey = "study-questionnaire-id"
+// const inProgressStorageKey = "study-questionnaire-id"
 
 const model = new Model(postRoundSurvey);
 
@@ -216,7 +158,7 @@ export class AppComponent implements OnInit {
     this.surveyModel = model;
     console.log("Model", this.surveyModel);
 
-    this.surveyModel.onCurrentPageChanged.add(this.inProgressSaveChanges);
+    // this.surveyModel.onCurrentPageChanged.add(this.inProgressSaveChanges);
     this.surveyModel.onComplete.add((sender) => {
       let data = JSON.stringify(sender.data);
       console.log("attempting to save data", data, sender);
@@ -226,22 +168,22 @@ export class AppComponent implements OnInit {
         });
       console.log("Data hopefully sent");
       
-      window.localStorage.setItem(inProgressStorageKey, "");
+      // window.localStorage.setItem(inProgressStorageKey, "");
       console.log("cleared temp stored progress");
     });
   }
 
-  inProgressSaveChanges(sender: Model) {
-    console.log("savingData", sender, model, this.surveyModel);
-    if (model.currentPageNo == undefined) {
-      console.log("saving failed, cannot determine page");
-      return
-    }
-    sender.data.pageNo = model.currentPageNo;
-    console.log("Saving...", sender.data);
-    window.localStorage.setItem(inProgressStorageKey, JSON.stringify(sender.data));
-    console.log("Saved?", window.localStorage.getItem(inProgressStorageKey));
-  }
+  // inProgressSaveChanges(sender: Model) {
+  //   console.log("savingData", sender, model, this.surveyModel);
+  //   if (model.currentPageNo == undefined) {
+  //     console.log("saving failed, cannot determine page");
+  //     return
+  //   }
+  //   sender.data.pageNo = model.currentPageNo;
+  //   console.log("Saving...", sender.data);
+  //   // window.localStorage.setItem(inProgressStorageKey, JSON.stringify(sender.data));
+  //   // console.log("Saved?", window.localStorage.getItem(inProgressStorageKey));
+  // }
 
   surveyComplete(client: HttpClient, sender: Model) {
     this.http.post(`http://${window.location.host}/questionnaire/save/${this.pid}`, JSON.stringify(sender.data), {headers: {'Content-Type': 'application/json'}}).subscribe;
@@ -251,15 +193,15 @@ export class AppComponent implements OnInit {
     // const survey = new Model(postRoundSurvey);
     // this.surveyModel = survey;
     // this.surveyModel.width = "50%";
-    let incompleteSurveyData = window.localStorage.getItem(inProgressStorageKey);
-    if (incompleteSurveyData != null && incompleteSurveyData.length > 0) {
-      console.log("Loading data", incompleteSurveyData)
-      let surveyData = JSON.parse(incompleteSurveyData)
-      this.surveyModel.data = surveyData;
-      if (surveyData.pageNo) {
-        this.surveyModel.currentPageNo = surveyData.pageNo;
-      }
-    }
+    // let incompleteSurveyData = window.localStorage.getItem(inProgressStorageKey);
+    // if (incompleteSurveyData != null && incompleteSurveyData.length > 0) {
+    //   console.log("Loading data", incompleteSurveyData)
+    //   let surveyData = JSON.parse(incompleteSurveyData)
+    //   this.surveyModel.data = surveyData;
+    //   if (surveyData.pageNo) {
+    //     this.surveyModel.currentPageNo = surveyData.pageNo;
+    //   }
+    // }
 
     // this.surveyModel.applyTheme(SurveyTheme.PlainLight);
     this.surveyModel.applyTheme({

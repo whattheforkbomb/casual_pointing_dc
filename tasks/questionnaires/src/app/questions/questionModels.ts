@@ -28,8 +28,51 @@ export const demographics = {
       "Yes - Frequently"
     ],
     isRequired: true
+  }, {
+    name: "Hand Dominance",
+    title: "Which hand is your dominant hand?",
+    type: "dropdown",
+    choices: [
+      "I'm Left Handed",
+      "I'm Right Handed",
+      "I'm Ambidextrous"
+    ],
+    isRequired: true
   }]
 };
+
+export const researcherDemographics = {
+    name: "Researcher Demographics",
+    elements: [{
+      name: "Age",
+      title: "Please enter your age:",
+      type: "text",
+      inputType: "number",
+      isRequired: true
+    }, {
+      name: "Gender",
+      title: "Please enter the gender you identify as:",
+      type: "dropdown",
+      choices: [
+        "Male",
+        "Female",
+        "Non-Binary", // Do we want info on bio sex or gender identity?
+        "Prefer Not To Say"
+      ],
+      isRequired: true
+    }, {
+      name: "VR / AR Exposure",
+      title: "Have you used VR or AR headsets before?",
+      type: "dropdown",
+      choices: [
+        "No",
+        "Yes - Once or Twice",
+        "Yes - A few Times",
+        "Yes - Frequently"
+      ],
+      isRequired: true
+    }]
+  };
 
 export function borgQuestions(i: number) {
     return [
@@ -264,7 +307,7 @@ export function imi(i: number) {
                     isRequired: true,
                 }, {
                     name: `imi-perceived-competence${i}2`,
-                    title: "I think I did pretty well at this activity, compared to other students",
+                    title: "I think I did pretty well at this activity, compared to other participants",
                     type: "imi",
                     isRequired: true,
                 }, {

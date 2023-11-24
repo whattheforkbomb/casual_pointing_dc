@@ -71,9 +71,9 @@ public class CommandSequenceGenerator {
                     LOG.info("Repeating Individual LEDs - LED[%d]".formatted(subTarget));
                     Collections.addAll(
                         possibleTargets, 
-                        new Target(i, subTarget, targetStartDelayMilliseconds, targetDurationMilliseconds),
-                        new Target(i, subTarget, targetStartDelayMilliseconds, targetDurationMilliseconds),
-                        new Target(i, subTarget, targetStartDelayMilliseconds, targetDurationMilliseconds)
+                        new Target(i, subTarget, targetStartDelayMilliseconds, targetDurationMilliseconds)//,
+                        // new Target(i, subTarget, targetStartDelayMilliseconds, targetDurationMilliseconds),
+                        // new Target(i, subTarget, targetStartDelayMilliseconds, targetDurationMilliseconds)
                     );
                     subTargetIndexes = IntStream.of(subTargetIndexes)
                         .filter((idx) -> !(idx / 3 == subTarget / 3 || idx % 3 == subTarget % 3))
@@ -84,14 +84,25 @@ public class CommandSequenceGenerator {
                 // after final filter, should only be one option
                 Collections.addAll(
                     possibleTargets, 
-                    new Target(i, subTargetIndexes[0], targetStartDelayMilliseconds, targetDurationMilliseconds),
-                    new Target(i, subTargetIndexes[0], targetStartDelayMilliseconds, targetDurationMilliseconds),
-                    new Target(i, subTargetIndexes[0], targetStartDelayMilliseconds, targetDurationMilliseconds)
+                    new Target(i, subTargetIndexes[0], targetStartDelayMilliseconds, targetDurationMilliseconds)//,
+                    // new Target(i, subTargetIndexes[0], targetStartDelayMilliseconds, targetDurationMilliseconds),
+                    // new Target(i, subTargetIndexes[0], targetStartDelayMilliseconds, targetDurationMilliseconds)
                 );
             }
         }
         LOG.info("Shuffling possible targets");
+        
         Collections.shuffle(possibleTargets, sequenceRNG);
+        List<Target> copy = new ArrayList<Target>(possibleTargets.size());
+        Collections.copy(copy, possibleTargets);
+
+        // repeat the LEDs but reordered.
+        for (int i=0; i<taskCount-1; i++) {
+            Collections.shuffle(copy);
+            for (Target target : copy) {
+                possibleTargets.add(new Target(target.id, target.subTarget, targetStartDelayMilliseconds, targetDurationMilliseconds));
+            }
+        }
 
         List<Target> finalTargets = new ArrayList<Target>(totalTargetCount);
         List<Stroop> stroopMessages;
@@ -192,7 +203,7 @@ public class CommandSequenceGenerator {
             // finalTargets = possibleTargets;
             // add some jitter across target delays (e.g. +/-(0 - jitterAmount))
             for (Target target : possibleTargets) {
-                target.startDelayMilliseconds += rng.nextInt(jitterAmount*2) - jitterAmount;
+                // target.startDelayMilliseconds += rng.nextInt(jitterAmount*2) - jitterAmount;
                 finalTargets.add(target);
             }
             stroopMessages = Collections.emptyList();
