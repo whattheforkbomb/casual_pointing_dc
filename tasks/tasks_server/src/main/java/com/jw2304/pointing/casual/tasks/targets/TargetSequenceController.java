@@ -8,6 +8,7 @@ import java.io.OutputStream;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -28,6 +29,7 @@ import org.springframework.web.socket.WebSocketSession;
 import com.jw2304.pointing.casual.tasks.connections.WebSocketConnectionConsumer;
 import com.jw2304.pointing.casual.tasks.stroop.StroopController;
 import com.jw2304.pointing.casual.tasks.stroop.data.Stroop;
+import com.jw2304.pointing.casual.tasks.stroop.data.StroopColour;
 import com.jw2304.pointing.casual.tasks.targets.data.ResetTarget;
 import com.jw2304.pointing.casual.tasks.targets.data.Target;
 import com.jw2304.pointing.casual.tasks.targets.data.TargetColour;
@@ -62,7 +64,10 @@ public class TargetSequenceController  implements WebSocketConnectionConsumer {
 
     private TargetColour colour = TargetColour.RED;
 
-    private List<Target> targetSequence = new ArrayList<>();
+    private File sessionSequenceFile = null;
+    private String sessionSequenceFilename = null;
+    private List<Target> activeTargetSequence = new ArrayList<>();
+    private List<Pair<List<Target>, List<Stroop>>> stagedSequences = new ArrayList<>();
 
     @Autowired
     Map<String, Socket> targetSockets;
@@ -89,53 +94,65 @@ public class TargetSequenceController  implements WebSocketConnectionConsumer {
     public void run(
         TargetType targetType, int targetStartDelayMilliSeconds, int targetDurationMilliSeconds, 
         int stroopStartDelayMilliSeconds, int stroopDurationMilliSeconds, int jitterAmount, 
-        boolean distractor, boolean flash, int flashRate, String participantId, String fileName, Map<Integer, String> socketToColumnMapping
+        boolean distractor, boolean flash, int flashRate, String participantId, String fileName, 
+        Map<Integer, String> socketToColumnMapping, Set<StroopColour> colourFilter
     ) {
-        File sessionSequenceFile = new File("%s.txt".formatted(fileName));
+        sessionSequenceFilename = fileName;
+        sessionSequenceFile = new File("%s.txt".formatted(sessionSequenceFilename));
         sessionSequenceFile.getParentFile().mkdirs();
-
-        taskSequenceIdx.set(0);
-        
         int targetCount = socketToColumnMapping.size() * targetsPerConnection;
         
-        Pair<List<Target>, List<Stroop>> sequences = CommandSequenceGenerator.create(colour, subTargetCount, taskCount)
-            .generateSequence(targetType, targetStartDelayMilliSeconds, targetDurationMilliSeconds, stroopStartDelayMilliSeconds, stroopDurationMilliSeconds, jitterAmount, distractor, targetCount);
+        stagedSequences = CommandSequenceGenerator.create(colour, subTargetCount, taskCount)
+            .generateSequence(targetType, targetStartDelayMilliSeconds, targetDurationMilliSeconds, stroopStartDelayMilliSeconds, stroopDurationMilliSeconds, jitterAmount, distractor, targetCount, colourFilter);
 
-        targetSequence = sequences.getFirst();
+        resume(flash, flashRate, socketToColumnMapping);
+    }
 
-        long currentTime = System.currentTimeMillis();
-        IntStream.range(0, 6).forEach(i -> {
-            targetScheduler.schedule(() -> {
-                try {
-                    uiWebSocket.sendMessage(new TextMessage("{\"count\": %d, \"progress\": -1}".formatted(i)));
-                } catch (IOException ioex) {
-                    LOG.error("Unable to send instructions to screen", ioex);
-                }
-            }, 5-i, TimeUnit.SECONDS);
-        });
-
-        long delay = 5000 - (System.currentTimeMillis() - currentTime);
-        if (distractor) {
-            stroopController.start(sequences.getSecond(), currentTime, fileName);
-            delay += targetSequence.get(0).startDelayMilliseconds;
+     public void resume(boolean flash, int flashRate, Map<Integer, String> socketToColumnMapping) throws IndexOutOfBoundsException {
+        if (stagedSequences.size() < 1) {
+            throw new IndexOutOfBoundsException("There are no further target sequences to perform.");
         }
+        Pair<List<Target>, List<Stroop>> nextSequence = stagedSequences.remove(0);
+        activeTargetSequence = nextSequence.getFirst();
+        taskSequenceIdx.set(0);
 
         int flashCountDown = flash ? flashRate : -1;
         if (!flash) flashRate = -1;
-        LOG.info("Flash: %b, Flash Countdown: %d, Flash Rate: %d".formatted(flash, flashCountDown, flashRate));
 
-        scheduleTargetOn(delay, sessionSequenceFile, socketToColumnMapping, flashCountDown, flashRate);
-    }
-
-    private void scheduleTargetOn(long delay, File sessionSequenceFile, Map<Integer, String> socketToColumnMapping, int flash, int flashRate) {        
-        int idx = taskSequenceIdx.get();
-        if (idx < targetSequence.size()) {
-            LOG.info("Scheduling Sending Pointing Command: %d - delay: %d - %s".formatted(idx+1, delay, targetSequence.get(idx)));
+        long currentTime = System.currentTimeMillis();
+        IntStream.range(0, 5).forEach(i -> {
             targetScheduler.schedule(() -> {
-                Target target = targetSequence.get(idx);
+                try {
+                    uiWebSocket.sendMessage(new TextMessage("{\"count\": %d, \"progress\": -1}".formatted(5-i)));
+                } catch (IOException ioex) {
+                    LOG.error("Unable to send instructions to screen", ioex);
+                }
+            }, i, TimeUnit.SECONDS);
+        });
+
+        long delay = 5000 - (System.currentTimeMillis() - currentTime);
+        if (nextSequence.getSecond().size() > 0) {
+            stroopController.start(nextSequence.getSecond(), currentTime, sessionSequenceFilename);
+            delay += activeTargetSequence.get(0).startDelayMilliseconds;
+        }
+
+        scheduleTargetOn(delay, socketToColumnMapping, flashCountDown, flashRate);
+     }
+
+    private void scheduleTargetOn(long delay, Map<Integer, String> socketToColumnMapping, int flash, int flashRate) {        
+        int idx = taskSequenceIdx.get();
+        if (idx < activeTargetSequence.size()) {
+            LOG.info("Scheduling Sending Pointing Command: %d - delay: %d - %s".formatted(idx+1, delay, activeTargetSequence.get(idx)));
+            targetScheduler.schedule(() -> {
+                Target target = activeTargetSequence.get(idx);
                 try {
                     if (flash == flashRate) {
                         try {
+                            if (idx == 0) {
+                                // remove the 1 on screen (from countdown), if stroop not already done so. 
+                                // Ideally move this logic to UI, e.g. if target sent, then clear screen if 1 shown
+                                uiWebSocket.sendMessage(new TextMessage("{\"count\": 0, \"progress\": -1}"));
+                            }
                             uiWebSocket.sendMessage(new TextMessage("{\"count\": -1, \"progress\": -1, \"target\": %d, \"subTarget\": %d}".formatted(target.id, target.subTarget)));
                         } catch (IOException ioex) {
                             LOG.error("Unable to send current target for visual", ioex);
@@ -146,29 +163,29 @@ public class TargetSequenceController  implements WebSocketConnectionConsumer {
                             LOG.error("Unable to write to file: '/home/whiff/data/%s'".formatted(sessionSequenceFile.getName()), ioex);
                         }
                     }
-                    LOG.info("Sending Pointing Command: %d/%d - %s".formatted(idx+1, targetSequence.size(), target));
+                    LOG.info("Sending Pointing Command: %d/%d - %s".formatted(idx+1, activeTargetSequence.size(), target));
                     sendCommand(socketToColumnMapping, target, flash == flashRate);
                 } catch (Exception pkmn) {
                     LOG.error("Sometimes getting program silently crashing/stopping, hoping can be caught by this...", pkmn);
                 }
-                scheduleTargetOff(flashRate > 0 ? target.durationMilliseconds / (2 * flashRate) : target.durationMilliseconds, sessionSequenceFile, socketToColumnMapping, flash, flashRate);
+                scheduleTargetOff(flashRate > 0 ? target.durationMilliseconds / (2 * flashRate) : target.durationMilliseconds, socketToColumnMapping, flash, flashRate);
             }, delay, TimeUnit.MILLISECONDS);
         }
     }
 
-    private void scheduleTargetOff(int duration, File sessionSequenceFile, Map<Integer, String> socketToColumnMapping, int currentFlash, int flashRate) {
+    private void scheduleTargetOff(int duration, Map<Integer, String> socketToColumnMapping, int currentFlash, int flashRate) {
         int idx = flashRate > 0 && currentFlash > 1 ? taskSequenceIdx.get() : taskSequenceIdx.getAndIncrement();
         int flash = flashRate > 0 && currentFlash <= 1 ? flashRate : currentFlash-1; // if current flash is 1, then we've turned on the correct number of times.
-        if (idx < targetSequence.size()) {
+        if (idx < activeTargetSequence.size()) {
             LOG.info("Scheduling Ending Command: %d - delay: %d".formatted(idx+1, duration));
             targetScheduler.schedule(() -> {
-                Target target = targetSequence.get(idx);
+                Target target = activeTargetSequence.get(idx);
                 try {
-                    LOG.info("Ending Pointing Command: %d/%d - %s".formatted(idx+1, targetSequence.size(), target));
+                    LOG.info("Ending Pointing Command: %d/%d - %s".formatted(idx+1, activeTargetSequence.size(), target));
                     sendCommand(socketToColumnMapping, new ResetTarget(target.col), false);
                     if (flashRate == flash) {
                         try {
-                            float progress = (idx+1) / (float) targetSequence.size()*100;
+                            float progress = (idx+1) / (float) activeTargetSequence.size()*100;
                             LOG.info("Preparing to send progress %f/100: %s".formatted(progress, target));
                             uiWebSocket.sendMessage(new TextMessage("{\"count\": -1, \"progress\": %d, \"target\": -1, \"subTarget\": -1}".formatted(Math.round(progress))));
                         } catch (IOException ioex) {
@@ -183,7 +200,7 @@ public class TargetSequenceController  implements WebSocketConnectionConsumer {
                 } catch (Exception pkmn) {
                     LOG.error("Sometimes getting program silently crashing/stopping, hoping can be caught by this...", pkmn);
                 }
-                scheduleTargetOn(flashRate == flash ? targetSequence.get(idx).startDelayMilliseconds : target.durationMilliseconds / (2 * flashRate), sessionSequenceFile, socketToColumnMapping, flashRate > -1 ? flash : -1, flashRate);
+                scheduleTargetOn(flashRate == flash ? activeTargetSequence.get(idx).startDelayMilliseconds : target.durationMilliseconds / (2 * flashRate), socketToColumnMapping, flashRate > -1 ? flash : -1, flashRate);
             }, duration, TimeUnit.MILLISECONDS);
         }
     }
@@ -219,15 +236,6 @@ public class TargetSequenceController  implements WebSocketConnectionConsumer {
         for (int i=0; i<sockets.size(); i++) {
             sendCommand(sockets.get(i), new ResetTarget(i), false);
         }
-        // targetSockets.values().stream().forEach(socket -> {
-        //     // try {
-        //         // reset all targets
-        //         sendCommand(socket, Target.resetTarget(), false);
-        //         // socket.getOutputStream().write(Target.resetTarget().getCommandByte(TargetColour.OFF));
-        //     // } catch (IOException ioex) {
-        //     //     LOG.error("Unable to send command to socket: %s".formatted(socket.getInetAddress().getHostAddress()), ioex);
-        //     // }
-        // });
     }
 
 }

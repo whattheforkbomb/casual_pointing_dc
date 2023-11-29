@@ -56,15 +56,6 @@ public class StroopController implements WebSocketConnectionConsumer {
         sessionSequenceFile.getParentFile().mkdirs();
 
         scheduleStroopShow(5000 - (System.currentTimeMillis() - elapsed), sessionSequenceFile);
-
-        // stroopScheduler.schedule(() -> {
-        //     try {
-        //         uiWebSocket.sendMessage(Stroop.getResetMessage());
-        //     } catch(IOException ioex) {
-        //         LOG.error("Unable to send reset to stroop", ioex);
-        //     }
-        //     scheduleStroopShow(0, sessionSequenceFile);
-        // }, 3000 - (System.currentTimeMillis() - elapsed), TimeUnit.MILLISECONDS);
     }
 
     private void scheduleStroopShow(long delay, File sessionSequenceFile) {
@@ -94,11 +85,7 @@ public class StroopController implements WebSocketConnectionConsumer {
         stroopScheduler.schedule(() -> {
             if (idx < sequence.size()) {
                 Stroop stroopPayload = sequence.get(idx);
-                try {
-                    uiWebSocket.sendMessage(Stroop.getResetMessage());
-                } catch (IOException ioex) {
-                    LOG.error("Failed to send over stroop websocket", ioex);
-                }
+                clearStroop();
                 try (BufferedWriter bw = new BufferedWriter(new FileWriter(sessionSequenceFile, true))) {
                     bw.write("%s,CLEAR,%s,%s\n".formatted(Helpers.getCurrentDateTimeString(), stroopPayload.word, stroopPayload.colour.name()));
                 } catch (IOException ioex) {
@@ -112,12 +99,8 @@ public class StroopController implements WebSocketConnectionConsumer {
 
     public void scheduleStroop() {
         LOG.info("Sending next Stroop word");
-        try {
-            Stroop stroopPayload = sequence.get(taskSequenceIdx.get());
-            uiWebSocket.sendMessage(stroopPayload.getMessage());
-        } catch (IOException ioex) {
-            LOG.error("Failed to send over stroop websocket", ioex);
-        }
+        Stroop stroopPayload = sequence.get(taskSequenceIdx.get());
+        sendStroop(stroopPayload);
         stroopScheduler.schedule(() -> {
             try {
                 uiWebSocket.sendMessage(Stroop.getResetMessage());
@@ -126,6 +109,22 @@ public class StroopController implements WebSocketConnectionConsumer {
             }
         }, 2500, TimeUnit.MILLISECONDS);
         stroopFuture = stroopScheduler.schedule(() -> scheduleStroop(), rng.nextInt(3)+3, TimeUnit.SECONDS);
+    }
+
+    public void sendStroop(Stroop stroop) {
+        try {
+            uiWebSocket.sendMessage(stroop.getMessage());
+        } catch (IOException ioex) {
+            LOG.error("Failed to send over stroop websocket", ioex);
+        }
+    }
+
+    public void clearStroop() {
+        try {
+            uiWebSocket.sendMessage(Stroop.getResetMessage());
+        } catch (IOException ioex) {
+            LOG.error("Failed to send over stroop websocket", ioex);
+        }
     }
 
     public void stop() {

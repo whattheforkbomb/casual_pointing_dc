@@ -14,6 +14,7 @@ import java.net.Socket;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Collections;
 import java.util.UUID;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -25,6 +26,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.jw2304.pointing.casual.tasks.stroop.StroopController;
+import com.jw2304.pointing.casual.tasks.stroop.data.StroopColour;
+import com.jw2304.pointing.casual.tasks.stroop.data.Stroop;
 import com.jw2304.pointing.casual.tasks.targets.TargetSequenceController;
 import com.jw2304.pointing.casual.tasks.targets.data.ResetTarget;
 import com.jw2304.pointing.casual.tasks.targets.data.Target;
@@ -93,7 +96,7 @@ public class StudyRestController {
         File file = new File("%s/%s".formatted(rootFilePath, PID));
         file.mkdirs();
         String sessionFileName = "%s/%s/%s_%s_%s_%s".formatted(rootFilePath, PID, pointingBehaviour, targetType.name(), "Focussed", Helpers.getCurrentDateTimeString());
-        targetSequenceController.run(targetType, targetDelay, targetDuration, 0, 0, jitterAmount, false, flash, flashRate, PID, sessionFileName, targetConnectionToPhysicalColumnMapping);
+        targetSequenceController.run(targetType, targetDelay, targetDuration, 0, 0, jitterAmount, false, flash, flashRate, PID, sessionFileName, targetConnectionToPhysicalColumnMapping, Collections.emptySet());
     }
 
     @PostMapping("/start/stroop")
@@ -105,7 +108,8 @@ public class StudyRestController {
         @RequestParam(name = "targetDelay", defaultValue = "500") int targetDelay, 
         @RequestParam(name = "targetDuration", defaultValue = "3000") int targetDuration,
         @RequestParam(name = "stroopDelay", defaultValue = "100") int stroopDelay, 
-        @RequestParam(name = "stroopDuration", defaultValue = "1900") int stroopDuration
+        @RequestParam(name = "stroopDuration", defaultValue = "1900") int stroopDuration,
+        @RequestParam(name = "ColourFilter", defaultValue = "") List<String> colourFilterStr
     ) {
         LOG.info("Resetting targets");
         targetSequenceController.resetTargets();
@@ -127,7 +131,15 @@ public class StudyRestController {
         File file = new File("%s/%s".formatted(rootFilePath, PID));
         file.mkdirs();
         String sessionFileName = "%s/%s/%s_%s_%s_%s".formatted(rootFilePath, PID, pointingBehaviour, targetType.name(), "Distracted", Helpers.getCurrentDateTimeString());
-        targetSequenceController.run(targetType, targetDelay, targetDuration, stroopDelay, stroopDuration, 0, true, flash, flashRate, PID, sessionFileName, targetConnectionToPhysicalColumnMapping);
+        targetSequenceController.run(targetType, targetDelay, targetDuration, stroopDelay, stroopDuration, 0, true, flash, flashRate, PID, sessionFileName, targetConnectionToPhysicalColumnMapping, colourFilterStr.stream().map(StroopColour::valueOf).collect(Collectors.toSet()));
+    }
+
+    @PostMapping("/resume")
+    public void resume(
+        @RequestParam(name = "flash", defaultValue = "true") boolean flash, 
+        @RequestParam(name = "flashRate", defaultValue = "5") int flashRate
+    ) {
+        targetSequenceController.resume(flash, flashRate, targetConnectionToPhysicalColumnMapping);
     }
 
     @GetMapping("/pid")
@@ -139,6 +151,87 @@ public class StudyRestController {
     public String generatePID() {
         PID = UUID.randomUUID().toString();
         return PID;
+    }
+
+    @RestController
+    @RequestMapping(value = "/demo")
+    public class DemoRestController {
+        @PostMapping("/stroop/colours")
+        public void demoStroopColours(@RequestParam(name = "ColourFilter", defaultValue = "") List<String> colourFilterStr) {
+            IntStream.range(0, StroopColour.values().length).forEach(i -> {
+                targetScheduler.schedule(() -> {
+                    StroopColour colour = StroopColour.values()[i];
+                    stroophandler.sendStroop(new Stroop(colour.name(), colour, 0, 0));
+                }, (i*500) + (i*3000), TimeUnit.MILLISECONDS);
+                targetScheduler.schedule(() -> {
+                    stroophandler.clearStroop();
+                }, (i*500) + ((i+1) * 3000), TimeUnit.MILLISECONDS);
+            });
+        }
+
+        @PostMapping("/stroop/test")
+        public void demoStroopTest(@RequestParam(name = "ColourFilter", defaultValue = "") List<String> colourFilterStr) {
+            List<Stroop> testStroops = List.of(
+                new Stroop(StroopColour.RED.name(), StroopColour.BLUE, 0, 0),
+                new Stroop(StroopColour.BROWN.name(), StroopColour.PURPLE, 0, 0),
+                new Stroop(StroopColour.GREEN.name(), StroopColour.GREEN, 0, 0),
+                new Stroop(StroopColour.PURPLE.name(), StroopColour.RED, 0, 0),
+                new Stroop(StroopColour.BLUE.name(), StroopColour.BROWN, 0, 0)
+            );
+            IntStream.range(0, testStroops.size()).forEach(i -> {
+                targetScheduler.schedule(() -> {
+                    stroophandler.sendStroop(testStroops.get(i));
+                }, (i*500) + (i*2000), TimeUnit.MILLISECONDS);
+                targetScheduler.schedule(() -> {
+                    stroophandler.clearStroop();
+                }, (i*500) + ((i+1) * 2000), TimeUnit.MILLISECONDS);
+            });
+        }
+
+        @PostMapping("/target/muted")
+        public void demoTargetMuted() {
+            for (int i=0; i<5; i++) {
+                targetScheduler.schedule(() -> {
+                    targetSequenceController.sendCommand(targetConnectionToPhysicalColumnMapping, new Target(13, 8, 0, 0), false);
+                }, ((i*500) + (i*200)), TimeUnit.MILLISECONDS);
+                targetScheduler.schedule(() -> {
+                    stroophandler.clearStroop();
+                }, (i*500) + ((i+1) * 200), TimeUnit.MILLISECONDS);
+            }
+        }
+
+        @PostMapping("/target/buzzer")
+        public void demoTargetBuzzer() {
+            for (int i=0; i<5; i++) {
+                targetScheduler.schedule(() -> {
+                    targetSequenceController.sendCommand(targetConnectionToPhysicalColumnMapping, new Target(13, 8, 0, 0), true);
+                }, ((i*500) + (i*200)), TimeUnit.MILLISECONDS);
+                targetScheduler.schedule(() -> {
+                    stroophandler.clearStroop();
+                }, (i*500) + ((i+1) * 200), TimeUnit.MILLISECONDS);
+            }
+        }
+
+        @PostMapping("/target/sequence")
+        public void demoTargetSequence() {
+            List<Target> testTargets = List.of(
+                new Target(3, 0, 0, 0),
+                new Target(8, 5, 0, 0),
+                new Target(5, 7, 0, 0),
+                new Target(10, 2, 0, 0),
+                new Target(13, 8, 0, 0)
+            );
+            IntStream.range(0, testTargets.size()).forEach(i -> {
+                for (int j=0; j<5; j++) {
+                    targetScheduler.schedule(() -> {
+                        targetSequenceController.sendCommand(targetConnectionToPhysicalColumnMapping, testTargets.get(i), true);
+                    }, j * ((i*500) + (i*200)), TimeUnit.MILLISECONDS);
+                    targetScheduler.schedule(() -> {
+                        stroophandler.clearStroop();
+                    }, (j+1) * (i*500) + ((i+1) * 200), TimeUnit.MILLISECONDS);
+                }
+            });
+        }
     }
 
     @RestController
@@ -158,10 +251,10 @@ public class StudyRestController {
             targetSequenceController.resetTargets();
         }
 
-        @GetMapping("/count")
-        public @ResponseBody int count() {
-            return targetSockets.size();
-        }
+        // @GetMapping("/count")
+        // public @ResponseBody int count() {
+        //     return targetSockets.size();
+        // }
 
         @PostMapping("/identify/subtargets")
         public void identifySubTargets() {
@@ -197,7 +290,7 @@ public class StudyRestController {
             }
         }
 
-        @PostMapping("/identify/mapped")
+        // @PostMapping("/identify/mapped")
         public void identifyMapping() {
             targetSequenceController.resetTargets();
             for (int i=0; i<targetSockets.size(); i++) {

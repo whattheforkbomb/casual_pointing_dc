@@ -1,0 +1,187 @@
+@@startuml Data Analysis Pipeline
+
+skinparam componentStyle rectangle
+top to bottom direction
+
+frame "Data Generation" as gen {
+    [ Mocap (QTM) ] as qtm
+    folder "Mocap Export" as mocap {
+        file "Marker Labels" as labels
+        file "Hand Skeletons" as skeleton
+        file "Tobii Glasses Rigid Body" as 6dof
+        file "Marker-less Skeleton" as fbx
+        file Gaze as gaze
+    }
+
+    [ Server ] as server
+    folder "Events" as events {
+        file "Stroop Events" as stroop
+        file "LED Events" as led
+        file "Questionnaire Results" as questResults
+    }
+}
+
+frame "Analysis Pipeline" as pipeline {
+    frame "Pre-Processing" as pre {
+        component "Synchronisation and Aggregation" as agg 
+        file "Target Positions" as targets
+        file "Aggregated Data" as data
+        component "Event Labelling" as labelling {
+            ' note as nLab 
+            '     Use the LED on/off events from server to define windows within which pointing occurs.
+            '     Slice aggregated data halfway through the 'off' sections, such that we have a bit before 
+            '      and after a gesture while knowing when the LED was actually on.
+            ' end note
+        }
+        component "Continuous Feature Extraction" as cfe {
+            ' note as nCFE 
+            '     Velocity and Acceleration (both linear and angular?) - Filtering?
+            '     Hand pose (finger extensions) - binning or map between 0-1?
+            '     Arm pose (arm body alignment, elbow flexion, finger arm alignment) - binning or map between 0-1?
+            '     gaze (alignment to target, alignment to rays, alignment to screen, eye closure (excluding blinking?))
+            ' end note
+            [ Velocity ]
+            [ Acceleration ] as acc
+            component Alignment as align {
+                [ IFRC Ray & Gaze ]
+                [ Gaze & Target ]
+                [ Gaze & Instructions Screen ]
+                [ Finger & Palm ]
+                [ Hand & Arm ]
+
+            }
+            component Pose as pose {
+                [ Elbow Flexion ]
+                [ Finger Extension ]
+                component handRelative [ 
+                    Hand Position Relative 
+                    to Body Features 
+                ]
+                component armRelative [ 
+                    Elbow Position Relative 
+                    to Body Features 
+                ]
+            }
+            component "Ray Casting" as ray {
+                [ Index Finger (IFRC) ] as ifrc
+                [  Eye Finger (EFRC)  ] as efrc
+
+                [ Ray Accuracy ] as rayAcc
+                ' note as nRC
+                '     Calculate using the estimated skeleton, 
+                '     rather than the markers.
+                ' end note
+            }
+            ' align -[hidden]u-> ray
+        }
+        file "Pre-Processed Data" as preprocData
+    }
+    frame "Gesture Encoding" as encoding {
+        component "Gesture Segmentation" as segmentation {
+            ' note as nSeg
+            '     Split pointing gesture into rest, ballistic, pin-pointing sections 
+            '     (there may be multiple, based on thresholds).
+            ' end note
+        }
+        component "Pointing Window Estimation" as pwe {
+            ' note as nPWE
+            '     Determine which frames of the gesture should be used for measuring accuracy
+            ' end note
+        }
+        component "Discrete Feature Extraction" as dfe {
+            ' note as nDFE
+            '     Extract change in features and features for the gesture as a whole,
+            '      encode gesture using these features,
+            '      drop and log gestures that cannot be processed (missing data)
+            '     (do for both pointing windows (if multiple) and whole event window?)
+            ' end note
+            component "Exertion Modelling" as exertion {
+                ' note as nExertion
+                '     Using the models used in XRgonomics, estimate the exertion during the pointing gesture
+                ' end note
+            }
+            [ Gesture Eye Data ]
+            [ Gesture Hand Data ]
+            [ Gesture Segment Movement & Duration ]
+            [ Hand-Body Alignments ]
+            [ Accuracy at Point of Pointing Gesture ]
+        }
+        file "Encoded and Raw Gesture Data" as encoded
+    }
+}
+frame Analysis as analysis {
+    component "Clustering" as clustering {
+        ' note as nClustering
+
+        ' end note
+    }
+
+    [ Gesture Metrics ] as metrics
+
+    component "Questionnaire Plotting" as questStatsBetween {
+        ' note as nQuestStats
+        '     How did perceived effort, performance, and enjoyment change between conditions 
+        '     Get box plot values for across participants
+        ' end note
+    }
+}
+file "Processed Data" as procData
+
+' layout Tweaking
+fbx -[hidden]u-> labels
+gaze -[hidden]u-> labels
+pose -[hidden]u-> rayAcc
+align -[hidden]u-> rayAcc
+' preprocData -[hidden]u-> handRelative
+
+' Data generation
+server --> events
+qtm --> mocap
+
+' Data analysis
+' aggregation
+labels --> agg
+skeleton --> agg
+6dof --> agg
+fbx --> agg
+gaze --> agg
+
+agg --> data
+agg --> targets
+
+' event labelling
+data --> labelling
+led --> labelling
+stroop --> labelling
+
+' get rays
+labelling --> cfe
+
+' accuracy
+ifrc --> rayAcc
+efrc --> rayAcc
+targets --> rayAcc
+
+' rayAcc --> cfe
+
+cfe --> preprocData
+
+preprocData --> segmentation
+
+segmentation --> pwe
+
+pwe --> dfe
+
+dfe --> encoded
+
+
+encoded --> clustering
+encoded --> metrics
+encoded --> questStatsBetween
+questResults --> questStatsBetween
+
+clustering -> procData
+metrics -> procData
+questStatsBetween -> procData
+
+@@enduml

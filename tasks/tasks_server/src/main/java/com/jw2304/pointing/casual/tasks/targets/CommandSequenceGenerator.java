@@ -4,8 +4,11 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.function.Predicate;
+import java.util.Set;
 import java.util.Random;
 import java.util.stream.IntStream;
+import java.util.stream.Stream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.util.Pair;
@@ -36,10 +39,10 @@ public class CommandSequenceGenerator {
     private final Random rng = new Random(System.currentTimeMillis());    
     private final Random sequenceRNG = new Random(123456789); // Inventive, I know
 
-    public Pair<List<Target>, List<Stroop>> generateSequence(
+    public List<Pair<List<Target>, List<Stroop>>> generateSequence(
         TargetType targetType , int targetStartDelayMilliseconds, int targetDurationMilliseconds, 
         int stroopStartDelayMilliseconds, int stroopDurationMilliseconds, int jitterAmount, 
-        boolean distractor, int targetCount
+        boolean distractor, int targetCount, Set<StroopColour> colourFilter
     ) {
         boolean isCluster = targetType.equals(TargetType.CLUSTER);
         int totalTargetCount = isCluster ? taskCount * targetCount : taskCount * (targetCount * 3);
@@ -51,8 +54,6 @@ public class CommandSequenceGenerator {
             for (int i=0; i<targetCount; i++) { // this just looks stupid...
                 Collections.addAll(
                     possibleTargets, 
-                    new Target(i, -1, targetStartDelayMilliseconds, targetDurationMilliseconds),
-                    new Target(i, -1, targetStartDelayMilliseconds, targetDurationMilliseconds),
                     new Target(i, -1, targetStartDelayMilliseconds, targetDurationMilliseconds)
                 );
             }
@@ -69,151 +70,111 @@ public class CommandSequenceGenerator {
                 for (int j=0; j<2; j++) {
                     int subTarget = subTargetIndexes[sequenceRNG.nextInt(subTargetIndexes.length)];
                     LOG.info("Repeating Individual LEDs - LED[%d]".formatted(subTarget));
-                    Collections.addAll(
-                        possibleTargets, 
-                        new Target(i, subTarget, targetStartDelayMilliseconds, targetDurationMilliseconds)//,
-                        // new Target(i, subTarget, targetStartDelayMilliseconds, targetDurationMilliseconds),
-                        // new Target(i, subTarget, targetStartDelayMilliseconds, targetDurationMilliseconds)
-                    );
+                    possibleTargets.add(new Target(i, subTarget, targetStartDelayMilliseconds, targetDurationMilliseconds));
                     subTargetIndexes = IntStream.of(subTargetIndexes)
                         .filter((idx) -> !(idx / 3 == subTarget / 3 || idx % 3 == subTarget % 3))
                         .toArray();
                     
                     LOG.info("Repeating Individual LEDs - Remaining LEDs: %s".formatted(Arrays.toString(subTargetIndexes)));
                 }
-                // after final filter, should only be one option
-                Collections.addAll(
-                    possibleTargets, 
-                    new Target(i, subTargetIndexes[0], targetStartDelayMilliseconds, targetDurationMilliseconds)//,
-                    // new Target(i, subTargetIndexes[0], targetStartDelayMilliseconds, targetDurationMilliseconds),
-                    // new Target(i, subTargetIndexes[0], targetStartDelayMilliseconds, targetDurationMilliseconds)
+                possibleTargets.add(new Target(i, subTargetIndexes[0], targetStartDelayMilliseconds, targetDurationMilliseconds));
+            }
+        }
+
+        List<Pair<List<Target>, List<Stroop>>> finalSequence = new ArrayList();
+
+        for (int i=0; i<taskCount; i++) {
+            Collections.shuffle(possibleTargets);
+            // Pair<List<Targets>, 
+            if (distractor) {
+                finalSequence.add(
+                    generateStroopSequence(possibleTargets, totalTargetCount, stroopStartDelayMilliseconds, stroopDurationMilliseconds, targetStartDelayMilliseconds, targetDurationMilliseconds, colourFilter)
                 );
-            }
-        }
-        LOG.info("Shuffling possible targets");
-        
-        Collections.shuffle(possibleTargets, sequenceRNG);
-        List<Target> copy = new ArrayList<Target>(possibleTargets.size());
-        Collections.copy(copy, possibleTargets);
-
-        // repeat the LEDs but reordered.
-        for (int i=0; i<taskCount-1; i++) {
-            Collections.shuffle(copy);
-            for (Target target : copy) {
-                possibleTargets.add(new Target(target.id, target.subTarget, targetStartDelayMilliseconds, targetDurationMilliseconds));
+            } else {
+                List<Target> targetSequence = new ArrayList();
+                for (Target target : possibleTargets) {
+                    // target.startDelayMilliseconds += rng.nextInt(jitterAmount*2) - jitterAmount;
+                    targetSequence.add(new Target(target.id, target.subTarget, target.startDelayMilliseconds, target.durationMilliseconds));
+                }
+                finalSequence.add(Pair.of(targetSequence, Collections.emptyList()));
             }
         }
 
-        List<Target> finalTargets = new ArrayList<Target>(totalTargetCount);
-        List<Stroop> stroopMessages;
+        return finalSequence;
+    }
 
-        if (distractor) {
-            // need to insert stroop tasks (will be more than task count), and adjust the target delays (distributed between ahead or behind)
-            int preStroop = totalTargetCount / 2;
-            int postStroop = totalTargetCount / 2;
-            if (totalTargetCount % 2 != 0) {
-                if (rng.nextBoolean()) {
-                    preStroop++;
+    private Pair<List<Target>, List<Stroop>> generateStroopSequence(
+        List<Target> possibleTargets,
+        int totalTargetCount,
+        int stroopStartDelayMilliseconds, 
+        int stroopDurationMilliseconds, 
+        int targetStartDelayMilliseconds, 
+        int targetDurationMilliseconds, 
+        Set<StroopColour> colourFilter
+    ) {
+        List<Target> finalTargets = new ArrayList();
+        int preStroop = totalTargetCount / 2;
+        int postStroop = totalTargetCount / 2;
+        if (totalTargetCount % 2 != 0) {
+            if (rng.nextBoolean()) {
+                preStroop++;
+            } else {
+                postStroop++;
+            }
+        }
+        List<Stroop> stroopMessages = new ArrayList<Stroop>();
+        stroopMessages.add(getStroop(stroopStartDelayMilliseconds, stroopDurationMilliseconds, colourFilter));
+        stroopMessages.add(getStroop(stroopStartDelayMilliseconds, stroopDurationMilliseconds, colourFilter));
+        stroopMessages.add(getStroop(stroopStartDelayMilliseconds, stroopDurationMilliseconds, colourFilter));
+        stroopMessages.add(getStroop(stroopStartDelayMilliseconds, stroopDurationMilliseconds, colourFilter));
+
+        int initialDelay = (stroopStartDelayMilliseconds + stroopDurationMilliseconds) * 3;
+        // Need to check if current stroop duration will elapse current target, if not need another stroop
+
+        long stroopElapsed = initialDelay;
+        long targetElapsed = initialDelay; // by default will have same delay at start.
+
+        for (Target target : possibleTargets) {
+            boolean targetPreStroop = rng.nextBoolean();
+            if (preStroop < 1) { // No more preStroops, so do post
+                targetPreStroop = false;
+            } else if (postStroop < 1) { // No more postStroops, so do pre
+                targetPreStroop = true;
+            } else {
+                if (targetPreStroop) {
+                    --preStroop;
                 } else {
-                    postStroop++;
+                    --postStroop;
                 }
             }
-            stroopMessages = new ArrayList<Stroop>();
-            stroopMessages.add(getStroop(stroopStartDelayMilliseconds, stroopDurationMilliseconds));
-            stroopMessages.add(getStroop(stroopStartDelayMilliseconds, stroopDurationMilliseconds));
-            stroopMessages.add(getStroop(stroopStartDelayMilliseconds, stroopDurationMilliseconds));
-            stroopMessages.add(getStroop(stroopStartDelayMilliseconds, stroopDurationMilliseconds));
-            stroopMessages.add(getStroop(stroopStartDelayMilliseconds, stroopDurationMilliseconds));
 
-            // int initialDelay = (stroopStartDelayMilliseconds * 3) + (stroopDurationMilliseconds * 4);
-            int initialDelay = (stroopStartDelayMilliseconds + stroopDurationMilliseconds) * 4;
-            // Need to check if current stroop duration will elapse current target, if not need another stroop
+            // step 3, calc offset
+            //  need to be based on the start of the latest stroop (are we early or late), this needs to be adjusted by the diff between the target elapsed.
+            int offset = (targetPreStroop ? -targetStartDelayMilliseconds : targetStartDelayMilliseconds);
+            offset += stroopElapsed - targetElapsed;
 
-            boolean previousTargetPostStroop = false;
-            long stroopElapsed = initialDelay;
-            long targetElapsed = initialDelay; // by default will have same delay at start.
-
-            for (Target target : possibleTargets) {
-                boolean targetPreStroop = rng.nextBoolean();
-                if (preStroop < 1) { // No more preStroops, so do post
-                    targetPreStroop = false;
-                } else if (postStroop < 1) { // No more postStroops, so do pre
-                    targetPreStroop = true;
-                } else {
-                    if (targetPreStroop) {
-                        --preStroop;
-                    } else {
-                        --preStroop;
-                    }
-                }
-                
-                // int currentStroopDelay = (int)((stroopMessages.size() * (stroopStartDelayMilliseconds + stroopDurationMilliseconds)) - stroopElapsed);
-
-                // step 1, ensure that the elapsed target time is greater than the stroop by adding stroops.
-                while(targetElapsed > stroopElapsed) {
-                    stroopMessages.add(getStroop(stroopStartDelayMilliseconds, stroopDurationMilliseconds));
-                    stroopElapsed += stroopStartDelayMilliseconds + stroopDurationMilliseconds;
-                }
-
-                // step 2, inject an additional stroop if a post and pre stroop test are B2B
-                if (previousTargetPostStroop && targetPreStroop) { // need to add a stroop test between these 2 cases
-                    stroopMessages.add(getStroop(stroopStartDelayMilliseconds, stroopDurationMilliseconds));
-                    stroopElapsed += stroopStartDelayMilliseconds + stroopDurationMilliseconds;
-                }
-                
-                stroopMessages.add(getStroop(stroopStartDelayMilliseconds, stroopDurationMilliseconds));
-                stroopElapsed += stroopStartDelayMilliseconds + stroopDurationMilliseconds;
-
-                // step 3, calc offset
-                //  need to be based on the start of the latest stroop (are we early or late), this needs to be adjusted by the diff between the target elapsed.
-
-                int offset = (targetPreStroop ? -targetStartDelayMilliseconds : targetStartDelayMilliseconds);
-                offset += stroopElapsed - targetElapsed;
-
-                // if (offset < 0) {
-                //     stroopMessages.add(getStroop(stroopStartDelayMilliseconds, stroopDurationMilliseconds));
-                //     stroopElapsed += stroopStartDelayMilliseconds + stroopDurationMilliseconds;
-                //     offset += stroopStartDelayMilliseconds + stroopDurationMilliseconds;
-                // }
-
-                // add target with offset relative to the stroop.
-                target.startDelayMilliseconds = (offset);
-                finalTargets.add(target);
-                targetElapsed += offset + target.durationMilliseconds;
-
-                // Need to now add additional stroop to cover the duration of the target;
-                // int targetDurationStroopOverlap = target.durationMilliseconds + offset;
-                // while(targetDurationStroopOverlap > stroopStartDelayMilliseconds + stroopDurationMilliseconds) {
-                //     stroopMessages.add(getStroop(stroopStartDelayMilliseconds, stroopDurationMilliseconds));
-                //     stroopElapsed += stroopStartDelayMilliseconds + stroopDurationMilliseconds;
-                //     targetDurationStroopOverlap -= stroopStartDelayMilliseconds + stroopDurationMilliseconds;
-                // }
-                // stroopMessages.add(getStroop(stroopStartDelayMilliseconds, stroopDurationMilliseconds));
-                // stroopElapsed += stroopStartDelayMilliseconds + stroopDurationMilliseconds;
-            }
-
-            // remove dead-space at the end
-            while(targetElapsed-stroopDurationMilliseconds > stroopElapsed) {
-                stroopMessages.add(getStroop(stroopStartDelayMilliseconds, stroopDurationMilliseconds));
-                stroopElapsed += stroopStartDelayMilliseconds + stroopDurationMilliseconds;
-            }
+            finalTargets.add(new Target(target.id, target.subTarget, offset, targetDurationMilliseconds));
+            targetElapsed += offset + targetDurationMilliseconds;
             
-            finalTargets.get(0).startDelayMilliseconds += initialDelay;
-        } else {
-            // finalTargets = possibleTargets;
-            // add some jitter across target delays (e.g. +/-(0 - jitterAmount))
-            for (Target target : possibleTargets) {
-                // target.startDelayMilliseconds += rng.nextInt(jitterAmount*2) - jitterAmount;
-                finalTargets.add(target);
+            // step 1, ensure that the elapsed target time is greater than the stroop by adding stroops.
+            while(targetElapsed+1500 > stroopElapsed) {
+                stroopMessages.add(getStroop(stroopStartDelayMilliseconds, stroopDurationMilliseconds, colourFilter));
+                stroopElapsed += stroopStartDelayMilliseconds + stroopDurationMilliseconds;
             }
-            stroopMessages = Collections.emptyList();
+
         }
 
+        finalTargets.get(0).startDelayMilliseconds += initialDelay;
         return Pair.of(finalTargets, stroopMessages);
     }
 
-    private Stroop getStroop(int delay, int duration) {
-        return new Stroop(StroopColour.values()[rng.nextInt(StroopColour.values().length)].name(), StroopColour.values()[rng.nextInt(StroopColour.values().length)], delay, duration);
+    private Stroop getStroop(int delay, int duration, Set<StroopColour> colourFilter) {
+        return new Stroop(
+            StroopColour.values()[rng.nextInt(StroopColour.values().length)].name(), 
+            Stream.of(StroopColour.values()).filter(Predicate.not(colourFilter::contains)).toArray(StroopColour[]::new)[rng.nextInt(StroopColour.values().length - colourFilter.size())], 
+            delay, 
+            duration
+        );
     }
 
     public static CommandSequenceGenerator create(TargetColour colour, int subTargetCount, int taskCount) {
