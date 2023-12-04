@@ -20,13 +20,13 @@ public class QuestionnaireRestController {
 
     public static Logger LOG = LoggerFactory.getLogger(QuestionnaireRestController.class);
 
-    @Value("data.filepath")
+    @Value("${data.filepath}")
     String rootFilePath;
 
-    @PostMapping("/save/{pid}")
-    public void save(@PathVariable(name="pid") String participantId, @RequestBody String surveyJson) {
-        LOG.info("Payload Received: %s".formatted(surveyJson));
-        String sessionFileName = "%s/%s/surveyResults.json".formatted(rootFilePath, participantId);
+    @PostMapping("/save/{pid}/{section}")
+    public void save(@PathVariable(name="pid") String participantId, @PathVariable(name="section") String section, @RequestBody String surveyJson) {
+        String sessionFileName = "%s/%s/%s_surveyResults.json".formatted(rootFilePath, participantId, section);
+        LOG.info("Payload Received: %s, saving to: %s".formatted(surveyJson, sessionFileName));
         File sessionSequenceFile = new File("%s".formatted(sessionFileName));
         sessionSequenceFile.getParentFile().mkdirs();
         try (BufferedWriter bw = new BufferedWriter(new FileWriter(sessionSequenceFile, true))) {

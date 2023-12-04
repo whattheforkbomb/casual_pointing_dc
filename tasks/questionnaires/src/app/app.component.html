@@ -1,5 +1,37 @@
-<div style="width: 80vw; min-width: 900px; margin-left: auto; margin-right: auto;">
-    <survey [model]="surveyModel" width="400px"></survey>
+<div>
+    <div *ngIf="!showSurvey">
+        <div>
+            <input #pIdx type="number" placeholder="Please enter participant number"/>
+
+            <button (click)="generateParticipantDetails(pIdx.value)">Generate</button>
+            <button (click)="fetchParticipantDetails()">Fetch</button>
+        </div>
+
+        <p>{{PID}}</p>
+        <table>
+            <tr>
+                <td>Order</td><td>Condition</td>
+            </tr>
+            <tr>
+                <td>1</td><td>{{condition[0]}}_FOCUSED</td>
+            </tr>
+            <tr>
+                <td>2</td><td>{{condition[0]}}_DISTRACTOR</td>
+            </tr>
+            <tr>
+                <td>3</td><td>{{condition[1]}}_FOCUSED</td>
+            </tr>
+            <tr>
+                <td>4</td><td>{{condition[1]}}_DISTRACTOR</td>
+            </tr>
+        </table>
+
+        <button (click)="startSurvey()">Start</button>
+    </div>
+
+    <div *ngIf="showSurvey" style="width: 80vw; min-width: 900px; margin-left: auto; margin-right: auto;">
+        <survey [model]="surveyModel" width="400px"></survey>
+    </div>
 </div>
 
 <router-outlet></router-outlet>

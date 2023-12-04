@@ -1,9 +1,9 @@
-<table style="height: 100%; aspect-ratio: 16/11; padding: 2%; margin-top: -2%; margin-left: auto; margin-right: auto;">
+<table style="height: 100%; max-height: 600px; max-width: 1000px; width:80%; margin-left: auto; margin-right: auto; table-layout: fixed">
     <tr style="width: 90%" *ngFor="let _ of [].constructor(3), index as i">
-        <td *ngFor="let _ of [].constructor(5), index as j">
+        <td *ngFor="let _ of [].constructor(5), index as j" >
             <!-- [class.active]="(j*5) + i == activeIdx" -->
             <!-- ((b*3) + a == activeLED -->
-            <div class="target" [style.transform]="getTransform(i, j)">
+            <div class="target" style="margin-left: auto; margin-right: auto">
                 <app-led-array [activeLED]="activeLED" [clusterActive]="isActive(i, j)"></app-led-array>
             </div>
         </td>

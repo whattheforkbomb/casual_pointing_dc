@@ -146,14 +146,14 @@ public class TargetSequenceController  implements WebSocketConnectionConsumer {
             targetScheduler.schedule(() -> {
                 Target target = activeTargetSequence.get(idx);
                 try {
-                    if (flash == flashRate) {
+                    boolean firstFlash = flash == flashRate;
+                    if (firstFlash) {
                         try {
                             if (idx == 0) {
                                 // remove the 1 on screen (from countdown), if stroop not already done so. 
                                 // Ideally move this logic to UI, e.g. if target sent, then clear screen if 1 shown
                                 uiWebSocket.sendMessage(new TextMessage("{\"count\": 0, \"progress\": -1}"));
                             }
-                            uiWebSocket.sendMessage(new TextMessage("{\"count\": -1, \"progress\": -1, \"target\": %d, \"subTarget\": %d}".formatted(target.id, target.subTarget)));
                         } catch (IOException ioex) {
                             LOG.error("Unable to send current target for visual", ioex);
                         }
@@ -164,7 +164,7 @@ public class TargetSequenceController  implements WebSocketConnectionConsumer {
                         }
                     }
                     LOG.info("Sending Pointing Command: %d/%d - %s".formatted(idx+1, activeTargetSequence.size(), target));
-                    sendCommand(socketToColumnMapping, target, flash == flashRate);
+                    sendCommand(socketToColumnMapping, target, firstFlash);
                 } catch (Exception pkmn) {
                     LOG.error("Sometimes getting program silently crashing/stopping, hoping can be caught by this...", pkmn);
                 }
@@ -180,17 +180,12 @@ public class TargetSequenceController  implements WebSocketConnectionConsumer {
             LOG.info("Scheduling Ending Command: %d - delay: %d".formatted(idx+1, duration));
             targetScheduler.schedule(() -> {
                 Target target = activeTargetSequence.get(idx);
+                boolean lastFlash = flash == flashRate;
                 try {
                     LOG.info("Ending Pointing Command: %d/%d - %s".formatted(idx+1, activeTargetSequence.size(), target));
-                    sendCommand(socketToColumnMapping, new ResetTarget(target.col), false);
-                    if (flashRate == flash) {
-                        try {
-                            float progress = (idx+1) / (float) activeTargetSequence.size()*100;
-                            LOG.info("Preparing to send progress %f/100: %s".formatted(progress, target));
-                            uiWebSocket.sendMessage(new TextMessage("{\"count\": -1, \"progress\": %d, \"target\": -1, \"subTarget\": -1}".formatted(Math.round(progress))));
-                        } catch (IOException ioex) {
-                            LOG.error("Unable to send progress update...", ioex);
-                        }
+                    double progress = lastFlash ? (idx+1) / (float) activeTargetSequence.size()*100 : -1;
+                    sendCommand(socketToColumnMapping, new ResetTarget(target.col), false, progress);
+                    if (lastFlash) {
                         try (BufferedWriter bw = new BufferedWriter(new FileWriter(sessionSequenceFile, true))) {
                             bw.write("%s,OFF,%d,%d,%d,%d,%s\n".formatted(Helpers.getCurrentDateTimeString(), target.id, target.row, target.col, target.subTarget, Integer.toBinaryString(new ResetTarget(target.col).getCommandByte(TargetColour.OFF))));
                         } catch (IOException ioex) {
@@ -200,27 +195,46 @@ public class TargetSequenceController  implements WebSocketConnectionConsumer {
                 } catch (Exception pkmn) {
                     LOG.error("Sometimes getting program silently crashing/stopping, hoping can be caught by this...", pkmn);
                 }
-                scheduleTargetOn(flashRate == flash ? activeTargetSequence.get(idx).startDelayMilliseconds : target.durationMilliseconds / (2 * flashRate), socketToColumnMapping, flashRate > -1 ? flash : -1, flashRate);
+                scheduleTargetOn(lastFlash ? activeTargetSequence.get(idx).startDelayMilliseconds : target.durationMilliseconds / (2 * flashRate), socketToColumnMapping, flashRate > -1 ? flash : -1, flashRate);
             }, duration, TimeUnit.MILLISECONDS);
         }
     }
 
     public void sendCommand(Map<Integer, String> socketToColumnMapping, Target target, boolean tone) {
+        sendCommand(socketToColumnMapping, target, tone, -1);
+    }
+
+    public void sendCommand(Map<Integer, String> socketToColumnMapping, Target target, boolean tone, double progress) {
         LOG.info("Sending Tone Request: %s".formatted(Integer.toBinaryString(target.getToneCommandByte())));
         try {
             String socketId = socketToColumnMapping.get(target.col);
-            sendCommand(targetSockets.get(socketId), target, tone);
+            sendCommand(targetSockets.get(socketId), target, tone, progress);
         } catch  (NullPointerException npex) {
             LOG.error("Unable to retrieve socket for target column: %s".formatted(target.col), npex);
         }
     }
 
-    public void sendCommand(Socket socket, Target target, boolean tone) {
+    public void sendCommand(Socket socket, Target target, boolean tone, double progress) {
         try {
             OutputStream stream = socket.getOutputStream();
             if (tone) {
                 LOG.info("Sending Tone Request: %s".formatted(Integer.toBinaryString(target.getToneCommandByte())));
                 stream.write(target.getToneCommandByte());
+                try {
+                    uiWebSocket.sendMessage(
+                        new TextMessage("{\"count\": -1, \"progress\": -1, \"target\": %d, \"subTarget\": %d}".formatted(target.id, target.subTarget))
+                    );
+                } catch (IOException ioex) {
+                    LOG.error("Unable to send message to update diagram", ioex);
+                }
+            } else if (progress > -1) {
+                try {
+                    uiWebSocket.sendMessage(
+                        new TextMessage("{\"count\": -1, \"progress\": %f, \"target\": -1, \"subTarget\": -1}".formatted(progress))
+                    );
+                } catch (IOException ioex) {
+                    LOG.error("Unable to send progress update...", ioex);
+                }
             }
             stream.write(target.getCommandByte(colour));
         } catch (IOException ioex) {
@@ -234,7 +248,7 @@ public class TargetSequenceController  implements WebSocketConnectionConsumer {
     public void resetTargets() {
         List<Socket> sockets = new ArrayList<>(targetSockets.values());
         for (int i=0; i<sockets.size(); i++) {
-            sendCommand(sockets.get(i), new ResetTarget(i), false);
+            sendCommand(sockets.get(i), new ResetTarget(i), false, 100);
         }
     }
 

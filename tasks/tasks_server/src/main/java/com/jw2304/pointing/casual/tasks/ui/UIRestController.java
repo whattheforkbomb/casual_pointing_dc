@@ -32,6 +32,11 @@ public class UIRestController {
         return "redirect:/app/" + site + "/index.html";
     }
 
+    @GetMapping("/app/{site}/")
+    public String redirectSlash(@PathVariable("site") String site) {
+        return "redirect:/app/" + site + "/index.html";
+    }
+
     @GetMapping("favicon.ico")
     @ResponseBody
     public void returnNoFavicon() {}

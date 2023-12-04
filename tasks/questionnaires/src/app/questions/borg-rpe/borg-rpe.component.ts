@@ -13,7 +13,7 @@ export class BorgRPEComponent extends QuestionAngular<BorgRPEModel> {
     this.model.value = newValue;
   }
 }
-export const CUSTOM_TYPE = "BorgRPE"
+export const CUSTOM_TYPE = "borgrpe"
 
 AngularComponentFactory.Instance.registerComponent(CUSTOM_TYPE + "-question", BorgRPEComponent);
 

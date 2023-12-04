@@ -8,7 +8,9 @@ import { HttpClientModule } from '@angular/common/http';
 import { NasaTLXComponent } from './questions/nasa-tlx/nasa-tlx.component';
 import { BorgRPEComponent } from './questions/borg-rpe/borg-rpe.component';
 import { ImiComponent } from './questions/imi/imi.component';
-import { LikertComponent } from './questions/likert/likert.component'
+import { LikertComponent } from './questions/likert/likert.component';
+import { HomePageComponent } from './home-page/home-page.component';
+import { DemoComponent } from './questions/demo/demo.component'
 
 @NgModule({
   declarations: [
@@ -16,7 +18,9 @@ import { LikertComponent } from './questions/likert/likert.component'
     NasaTLXComponent,
     BorgRPEComponent,
     ImiComponent,
-    LikertComponent
+    LikertComponent,
+    HomePageComponent,
+    DemoComponent
   ],
   imports: [
     BrowserModule,

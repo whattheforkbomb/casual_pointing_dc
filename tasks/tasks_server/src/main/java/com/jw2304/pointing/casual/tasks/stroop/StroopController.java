@@ -97,20 +97,6 @@ public class StroopController implements WebSocketConnectionConsumer {
         }, duration, TimeUnit.MILLISECONDS);
     }
 
-    public void scheduleStroop() {
-        LOG.info("Sending next Stroop word");
-        Stroop stroopPayload = sequence.get(taskSequenceIdx.get());
-        sendStroop(stroopPayload);
-        stroopScheduler.schedule(() -> {
-            try {
-                uiWebSocket.sendMessage(Stroop.getResetMessage());
-            } catch (IOException ioex) {
-                LOG.error("Failed to send over stroop websocket", ioex);
-            }
-        }, 2500, TimeUnit.MILLISECONDS);
-        stroopFuture = stroopScheduler.schedule(() -> scheduleStroop(), rng.nextInt(3)+3, TimeUnit.SECONDS);
-    }
-
     public void sendStroop(Stroop stroop) {
         try {
             uiWebSocket.sendMessage(stroop.getMessage());
@@ -124,12 +110,6 @@ public class StroopController implements WebSocketConnectionConsumer {
             uiWebSocket.sendMessage(Stroop.getResetMessage());
         } catch (IOException ioex) {
             LOG.error("Failed to send over stroop websocket", ioex);
-        }
-    }
-
-    public void stop() {
-        if (stroopFuture != null) {
-            stroopFuture.cancel(true);
         }
     }
 

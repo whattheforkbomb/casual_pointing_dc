@@ -1,0 +1,32 @@
+<!-- Field to enter participant index -->
+<!-- Button to fetch PID and condition order -->
+<!-- Button to fetch existing PID -->
+<!-- Given condition order, change order of surveys -->
+<!-- Option to skip to survey section (e.g. already done some pages, but needed to reload) -->
+<!-- Need to have  -->
+
+<div>
+    <input #pIdx type="number" placeholder="Please enter participant number"/>
+
+    <button (click)="generateParticipantDetails(pIdx.value)">Generate</button>
+    <button (click)="fetchParticipantDetails()">Fetch</button>
+</div>
+
+<p>{{PID}}</p>
+<table>
+    <tr>
+        <td>Order</td><td>Condition</td>
+    </tr>
+    <tr>
+        <td>1</td><td>{{condition[0]}}_FOCUSSED</td>
+    </tr>
+    <tr>
+        <td>2</td><td>{{condition[0]}}_DISTRACTOR</td>
+    </tr>
+    <tr>
+        <td>3</td><td>{{condition[1]}}_FOCUSSED</td>
+    </tr>
+    <tr>
+        <td>4</td><td>{{condition[1]}}_DISTRACTOR</td>
+    </tr>
+</table>

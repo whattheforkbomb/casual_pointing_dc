@@ -128,8 +128,7 @@ public class CommandSequenceGenerator {
         stroopMessages.add(getStroop(stroopStartDelayMilliseconds, stroopDurationMilliseconds, colourFilter));
         stroopMessages.add(getStroop(stroopStartDelayMilliseconds, stroopDurationMilliseconds, colourFilter));
 
-        int initialDelay = (stroopStartDelayMilliseconds + stroopDurationMilliseconds) * 3;
-        // Need to check if current stroop duration will elapse current target, if not need another stroop
+        int initialDelay = (stroopStartDelayMilliseconds*2) + (stroopDurationMilliseconds * 3); // first delay skipped
 
         long stroopElapsed = initialDelay;
         long targetElapsed = initialDelay; // by default will have same delay at start.
@@ -150,14 +149,14 @@ public class CommandSequenceGenerator {
 
             // step 3, calc offset
             //  need to be based on the start of the latest stroop (are we early or late), this needs to be adjusted by the diff between the target elapsed.
-            int offset = (targetPreStroop ? -targetStartDelayMilliseconds : targetStartDelayMilliseconds);
+            int offset = (targetPreStroop ? -targetStartDelayMilliseconds : targetStartDelayMilliseconds+stroopStartDelayMilliseconds);
             offset += stroopElapsed - targetElapsed;
 
             finalTargets.add(new Target(target.id, target.subTarget, offset, targetDurationMilliseconds));
             targetElapsed += offset + targetDurationMilliseconds;
             
             // step 1, ensure that the elapsed target time is greater than the stroop by adding stroops.
-            while(targetElapsed+1500 > stroopElapsed) {
+            while(targetElapsed+2500 > stroopElapsed) {
                 stroopMessages.add(getStroop(stroopStartDelayMilliseconds, stroopDurationMilliseconds, colourFilter));
                 stroopElapsed += stroopStartDelayMilliseconds + stroopDurationMilliseconds;
             }
