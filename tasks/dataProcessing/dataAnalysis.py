@@ -1,5 +1,3 @@
-import numpy as np
-
 ''' TODO:
 - Iterate through participants in processing directory
     - Each participant directory will contain 4 sub-directories (one for each recording, maybe couple exploration ones also)
@@ -10,8 +8,8 @@ import numpy as np
 '''
 
 ''' File notes
-- Hand Markers (AIM MODELS)
-    - Lines 0-10 are meta data, 11 is Headings
+- Markers 3D data (not 6DoF stuff)
+    - Lines 0-10 are meta data, 11 is Headings - THIS WILL CHANGE BASED ON IF EVENTS ARE LOGGED WILL BE UNDER EVENTS HEADER
         - Timestamp is line 7(8) (column 1(2) is Date, ISO-like formatted down to ms (3dp), column 2(3) is Unix timestamp?)
         - Data does not contain timestamp on each line, however timestamp for 1st line is provided (as above), and frequency is given (100Hz)
     - Data contains frame number (column 0(1)), Time (seconds from start, column 1(2)), then data for each marker.
@@ -77,6 +75,7 @@ import numpy as np
 
 import numpy as np
 import pandas as pd
+import matplotlib.pyplot as plt
 
 data = pd.read_csv('/mnt/c/temp/pilot_data/CC/mocap/Task 2.tsv', sep="\t", skiprows=11)
 
@@ -85,7 +84,8 @@ rays = {
     "EFRC": [["LH_LIndexTip", ["Tobii3-Set-L2-R2 - 1 X", "Tobii3-Set-L2-R2 - 1 Y", "Tobii3-Set-L2-R2 - 1 Z", "Tobii3-Set-L2-R2 - 2 X", "Tobii3-Set-L2-R2 - 2 Y", "Tobii3-Set-L2-R2 - 2 Z", "Tobii3-Set-L2-R2 - 3 X", "Tobii3-Set-L2-R2 - 3 Y", "Tobii3-Set-L2-R2 - 3 Z", "Tobii3-Set-L2-R2 - 4 X", "Tobii3-Set-L2-R2 - 4 Y", "Tobii3-Set-L2-R2 - 4 Z", "Tobii3-Set-L2-R2 - 5 X", "Tobii3-Set-L2-R2 - 5 Y", "Tobii3-Set-L2-R2 - 5 Z", "Tobii3-Set-L2-R2 - 6 X", "Tobii3-Set-L2-R2 - 6 Y", "Tobii3-Set-L2-R2 - 6 Z"]], ["RH_RIndexTip", ["Tobii3-Set-L2-R2 - 1 X", "Tobii3-Set-L2-R2 - 1 Y", "Tobii3-Set-L2-R2 - 1 Z", "Tobii3-Set-L2-R2 - 2 X", "Tobii3-Set-L2-R2 - 2 Y", "Tobii3-Set-L2-R2 - 2 Z", "Tobii3-Set-L2-R2 - 3 X", "Tobii3-Set-L2-R2 - 3 Y", "Tobii3-Set-L2-R2 - 3 Z", "Tobii3-Set-L2-R2 - 4 X", "Tobii3-Set-L2-R2 - 4 Y", "Tobii3-Set-L2-R2 - 4 Z", "Tobii3-Set-L2-R2 - 5 X", "Tobii3-Set-L2-R2 - 5 Y", "Tobii3-Set-L2-R2 - 5 Z", "Tobii3-Set-L2-R2 - 6 X", "Tobii3-Set-L2-R2 - 6 Y", "Tobii3-Set-L2-R2 - 6 Z"]]]
 }
 
-# def get_centre(tobii_array):
+def get_centre(tobii_array):
+    raise NotImplementedError 
 
 def get_hand_rays(row):
     #"LH_LIndexTip", "LH_LHandIn" | "RH_RIndexTip", "RH_RHandIn"
@@ -126,7 +126,6 @@ def get_hand_rays(row):
 
     print(left_magnitude, left_direction, "|", right_magnitude, right_direction)
 
-
     # get points (In and Tip)
     # get unit/magnitude? - needed for rotation calc, as only need origin (base), and rotation, for the line
     #   Realistically we don't need the origin, just the line that passes through two points, and then checking intersection on cluster's plane, closest to the second point (tip)
@@ -134,6 +133,64 @@ def get_hand_rays(row):
     # 
 
 # print(data)
+rays = [
+    [
+        (0,0,0), # Origin
+        (1,1,1)  # Dest
+    ],
+    [
+        (0,0,0), # Origin
+        (1.5,1,1)  # Dest
+    ],
+    [
+        (0,0,0), # Origin
+        (1,1.2,1.1)  # Dest
+    ],
+    [
+        (0,0,0), # Origin
+        (-1,1,1)  # Dest
+    ],
+    [
+        (0,0.2,0), # Origin
+        (1.1,1,1)  # Dest
+    ],
+    [
+        (0,0,0), # Origin
+        (1.4,-1,1)  # Dest
+    ]
+]
+# for i in range(10):
+    # rays.push(get_hand_rays(data.loc[i,:]))
 
-for i in range(10):
-    get_hand_rays(data.loc[i,:])
+
+from matplotlib.widgets import Button, Slider
+
+fig, ax = plt.subplots(subplot_kw=dict(projection="3d"))
+ax.view_init(elev=45, azim=45)
+
+lines = []
+
+for data in rays:
+    xData, yData, zData = list(zip(*data))
+    lines.append(ax.plot3D(xData, yData, zData, color="black"))
+
+def update(i):
+    for idx in range(len(lines)):
+        colour = "red" if (idx == i) else "black" 
+        # print(colour, idx, lines[idx])
+        lines[idx][0].set_color(colour)
+
+fig.subplots_adjust(bottom=0.25)
+axfreq = fig.add_axes([0.25, 0.1, 0.8, 0.03])
+freq_slider = Slider(
+    ax=axfreq,
+    label='trial',
+    valmin=0,
+    valmax=len(lines)-1,
+    valstep=range(len(lines)),
+    valinit=0,
+)
+
+freq_slider.on_changed(update)
+
+plt.show()

@@ -177,6 +177,10 @@ function getSurvey(conditionOrder: string[]) {
           }]
         }]
       },
+      {
+        title: "Stroop Introduction", 
+        elements: [QuestionModels.stroopFamiliarity]
+      },
       QuestionModels.getInstructions(conditionOrder[0], true),
       {
         "title": "Session 2.1 - Borg RPE",
@@ -282,6 +286,10 @@ function getSurvey(conditionOrder: string[]) {
             </p>`
             }]
           }]
+      },
+      {
+        title: "Interview 1",
+        elements: QuestionModels.interviewQuestions(conditionOrder[0], false)
       },
       QuestionModels.getInstructions(conditionOrder[1], false),
       {
@@ -447,10 +455,10 @@ function getSurvey(conditionOrder: string[]) {
           elements: [{
               "type": "html",
               "html": `<p>
-              Thank you for completing this section of the questionnaire.
-            </p><p>
-                Please hand the tablet back to the researcher. <em>Do not proceed.</em>
-            </p>`
+                Thank you for completing this section of the questionnaire.
+              </p><p>
+                  Please hand the tablet back to the researcher. <em>Do not proceed.</em>
+              </p>`
             }]
           }]
       },
@@ -479,9 +487,27 @@ function getSurvey(conditionOrder: string[]) {
       {
         title: "Session 4.3 - IMI",
         elements: QuestionModels.imi("4_3")
+      },
+      {
+        name: "complete4_3",
+        title: "Session 4.3 Complete",
+        elements: [{
+          type: "panel",
+          elements: [{
+              "type": "html",
+              "html": `<p>
+              Thank you for completing this section of the questionnaire. </br> You have now completed the final questionnaire. Please let the researcher know to perform the final interview.
+            </p><p>
+                Please hand the tablet back to the researcher. <em>Do not proceed.</em>
+            </p>`
+          }]
+        }]
+      },
+      {
+        title: "Interview 2",
+        elements: QuestionModels.interviewQuestions(conditionOrder[1], true)
       }
-    ],
-    completedHtml: "You have now completed the final questionnaire. Please let the researcher know to perform the final interview."
+    ]
   };
 }
 

@@ -91,6 +91,18 @@ public class TargetSequenceController  implements WebSocketConnectionConsumer {
         uiWebSocket = session;
     }
     
+    public void countdown(int count) {
+        IntStream.range(0, count).forEach(i -> {
+            targetScheduler.schedule(() -> {
+                try {
+                    uiWebSocket.sendMessage(new TextMessage("{\"count\": %d, \"progress\": -1}".formatted(count-i)));
+                } catch (IOException ioex) {
+                    LOG.error("Unable to send instructions to screen", ioex);
+                }
+            }, i, TimeUnit.SECONDS);
+        });
+    }
+
     public void run(
         TargetType targetType, int targetStartDelayMilliSeconds, int targetDurationMilliSeconds, 
         int stroopStartDelayMilliSeconds, int stroopDurationMilliSeconds, int jitterAmount, 
@@ -108,7 +120,7 @@ public class TargetSequenceController  implements WebSocketConnectionConsumer {
         resume(flash, flashRate, socketToColumnMapping);
     }
 
-     public void resume(boolean flash, int flashRate, Map<Integer, String> socketToColumnMapping) throws IndexOutOfBoundsException {
+    public void resume(boolean flash, int flashRate, Map<Integer, String> socketToColumnMapping) throws IndexOutOfBoundsException {
         if (stagedSequences.size() < 1) {
             throw new IndexOutOfBoundsException("There are no further target sequences to perform.");
         }
@@ -120,15 +132,7 @@ public class TargetSequenceController  implements WebSocketConnectionConsumer {
         if (!flash) flashRate = -1;
 
         long currentTime = System.currentTimeMillis();
-        IntStream.range(0, 5).forEach(i -> {
-            targetScheduler.schedule(() -> {
-                try {
-                    uiWebSocket.sendMessage(new TextMessage("{\"count\": %d, \"progress\": -1}".formatted(5-i)));
-                } catch (IOException ioex) {
-                    LOG.error("Unable to send instructions to screen", ioex);
-                }
-            }, i, TimeUnit.SECONDS);
-        });
+        countdown(5);
 
         long delay = 5000 - (System.currentTimeMillis() - currentTime);
         if (nextSequence.getSecond().size() > 0) {
@@ -137,7 +141,7 @@ public class TargetSequenceController  implements WebSocketConnectionConsumer {
         }
 
         scheduleTargetOn(delay, socketToColumnMapping, flashCountDown, flashRate);
-     }
+    }
 
     private void scheduleTargetOn(long delay, Map<Integer, String> socketToColumnMapping, int flash, int flashRate) {        
         int idx = taskSequenceIdx.get();

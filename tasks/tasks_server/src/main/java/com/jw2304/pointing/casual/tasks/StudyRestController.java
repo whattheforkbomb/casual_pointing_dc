@@ -9,8 +9,10 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.socket.TextMessage;
 
 import java.io.File;
+import java.io.IOException;
 import java.net.Socket;
 import java.util.HashMap;
 import java.util.List;
@@ -134,7 +136,7 @@ public class StudyRestController {
         // }
         File file = new File("%s/%s".formatted(rootFilePath, PID));
         file.mkdirs();
-        String sessionFileName = "%s/%s/%s_%s_%s_%s".formatted(rootFilePath, PID, pointingBehaviour, targetType.name(), "FOCUSSED", Helpers.getCurrentDateTimeString());
+        String sessionFileName = "%s/%s/%s_%s_%s_%s".formatted(rootFilePath, PID, pointingBehaviour, targetType.name(), "FOCUSED", Helpers.getCurrentDateTimeString());
         targetSequenceController.run(targetType, targetDelay, targetDuration, 0, 0, jitterAmount, false, flash, flashRate, PID, sessionFileName, targetConnectionToPhysicalColumnMapping, Collections.emptySet());
     }
 
@@ -195,10 +197,10 @@ public class StudyRestController {
                 targetScheduler.schedule(() -> {
                     StroopColour colour = StroopColour.values()[i];
                     stroopHandler.sendStroop(new Stroop(colour.name(), colour, 0, 0));
-                }, (i*500) + (i*3000), TimeUnit.MILLISECONDS);
+                }, (i*500) + (i*2000), TimeUnit.MILLISECONDS);
                 targetScheduler.schedule(() -> {
                     stroopHandler.clearStroop();
-                }, (i*500) + ((i+1) * 3000), TimeUnit.MILLISECONDS);
+                }, (i*500) + ((i+1) * 2000), TimeUnit.MILLISECONDS);
             });
         }
 
@@ -242,20 +244,27 @@ public class StudyRestController {
                 new Stroop(StroopColour.GREEN.name(), StroopColour.BLUE, 0, 0),
                 new Stroop(StroopColour.BLUE.name(), StroopColour.GREEN, 0, 0)
             );
+            targetSequenceController.countdown(3);
             IntStream.range(0, testStroops.size()).forEach(i -> {
                 targetScheduler.schedule(() -> {
                     stroopHandler.sendStroop(testStroops.get(i));
-                }, (i*500) + (i*2000), TimeUnit.MILLISECONDS);
+                }, 3000 + (i*500) + (i*2000), TimeUnit.MILLISECONDS);
                 targetScheduler.schedule(() -> {
                     stroopHandler.clearStroop();
-                }, (i*500) + ((i+1) * 2000), TimeUnit.MILLISECONDS);
+                }, 3000 + (i*500) + ((i+1) * 2000), TimeUnit.MILLISECONDS);
             });
-            targetScheduler.schedule(this::demoTargetSequence, 5000, TimeUnit.MILLISECONDS);
+            demoTargetSequence(8000);
+        }
+
+        // Can the participant read the word shown?
+        @PostMapping("/stroop/visibility")
+        public void demoStroopVisibility() {
+            stroopHandler.sendStroop(new Stroop("TEST", StroopColour.RED, 0, 0));
         }
 
         @PostMapping("/target/muted")
         public void demoTargetMuted() {
-            Target target = new Target(13, 8, 0, 0);
+            Target target = new Target(7, 5, 0, 0);
             IntStream.range(0, 5).forEach(i -> {
                 targetScheduler.schedule(() -> {
                     targetSequenceController.sendCommand(targetConnectionToPhysicalColumnMapping, target, false) ;
@@ -278,7 +287,7 @@ public class StudyRestController {
                 boolean flash = i==0;
                 targetScheduler.schedule(() -> {
                     targetSequenceController.sendCommand(targetConnectionToPhysicalColumnMapping, target, flash);
-                }, (i*1200), TimeUnit.MILLISECONDS);
+                }, (i*600), TimeUnit.MILLISECONDS);
                 targetScheduler.schedule(() -> {
                     targetSequenceController.sendCommand(
                         targetConnectionToPhysicalColumnMapping, 
@@ -286,12 +295,11 @@ public class StudyRestController {
                         false,
                         i==4 ? 100 : -1
                     );
-                }, (i*600) + ((i+1) * 600), TimeUnit.MILLISECONDS);
+                }, (i*300) + ((i+1) * 300), TimeUnit.MILLISECONDS);
             });
         }
 
-        @PostMapping("/target/sequence")
-        public void demoTargetSequence() {
+        private void demoTargetSequence(int delay) {
             List<Target> testTargets = List.of(
                 new Target(3, 0, 0, 0),
                 new Target(8, 5, 0, 0),
@@ -305,7 +313,7 @@ public class StudyRestController {
                     boolean flash = i==0;
                     targetScheduler.schedule(() -> {
                         targetSequenceController.sendCommand(targetConnectionToPhysicalColumnMapping, target, flash);
-                    }, (j * 4000) + (i*1200), TimeUnit.MILLISECONDS);
+                    }, delay + (j * 4000) + (i*600), TimeUnit.MILLISECONDS);
                     targetScheduler.schedule(() -> {
                         targetSequenceController.sendCommand(
                             targetConnectionToPhysicalColumnMapping, 
@@ -313,9 +321,15 @@ public class StudyRestController {
                             false, 
                             i==4 ? (j+1) / (double)testTargets.size() : -1
                         );
-                    }, (j * 4000) + (i*600) + ((i+1) * 600), TimeUnit.MILLISECONDS);
+                    }, delay + (j * 4000) + (i*300) + ((i+1) * 300), TimeUnit.MILLISECONDS);
                 });
             });
+        }
+
+        @PostMapping("/target/sequence")
+        public void demoTargetSequence() {
+            targetSequenceController.countdown(3);
+            demoTargetSequence(3*1000);
         }
     }
 
@@ -334,6 +348,7 @@ public class StudyRestController {
         @PostMapping("/reset")
         public void reset() {
             targetSequenceController.resetTargets();
+            stroopHandler.clearStroop();
         }
 
         // @GetMapping("/count")

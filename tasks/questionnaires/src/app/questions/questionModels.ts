@@ -65,7 +65,7 @@ export const researcherDemographics = {
                         <p>
                             With this data we hope to develop a system that can adapt to your pointing behaviour, able to predict where you may be pointing, regardless of the pointing gesture performed.
                         </p>
-                        <br>
+                        </ br>
                         <h2>What Do we mean by pointing?</h2>
                         <p>
                           In this study, we use the term pointing to refer to the action of indicating a specific target in space. 
@@ -87,9 +87,6 @@ export const researcherDemographics = {
                 questionText: "This is what they will look like.",
                 demoPath: "demo/target/muted"
               }, {
-                type: "html",
-                html: `A sound will be emitted from the target when it is turned-on to help you localise where the target is.`
-              },{
                 type: "demo",
                 name: "targetSound",
                 title: "Sound Demo",
@@ -117,14 +114,12 @@ export const researcherDemographics = {
                         You should point in such a way that you are very confident that the system system we're developing would recognise exactly where you are pointing at.
                     </p><p>
                         Please do not overexert yourself, or perform a gesture that you find uncomfortable. There are no further limitations.
-                    </p></ br><p>
-                        Please remember that we are developing a system that is going to be personalised to the way you point
+                    </p></br><p>
+                        We believe everyone points in their own unique way, and we want to capture this to allow you to interact as you want.
                     </p><p>
                         In that respect please do not do what you think we want to do, do whatever you find most comfortable and intuitive - there is no wrong way of pointing.
                     </p><p>
-                        Please give it a go. I'll run a short sequence of targets to give you something to point at.
-                    </p><p>
-                        <em>If Wearing glasses: </em> Please could you remove you glasses? We need to use special eye-tracking glasses to track your gaze during the study, and unfortunately they cannot be worn over you glasses. As such we will need to check you can still perform the study without your corrective lenses.
+                        Please remember that we are developing a system that is going to be personalised to the way you point.
                     </p>
                 `
                 },{
@@ -164,10 +159,12 @@ export const researcherDemographics = {
                     </p><p>
                         Please ensure you are more physically relaxed, exerting less effort, than you were for the accurate pointing you did. There are no further limitations.
                     </p></br><p>
-                        Please remember that we are developing a system that is going to be personalised to the way you point.
-                    </p><p> 
+                        We believe everyone points in their own unique way, and we want to capture this to allow you to interact as you want.
+                    </p><p>
                         In that respect please do not do what you think we want to do, do whatever you find most comfortable and intuitive - there is no wrong way of pointing.
-                    </p>    
+                    </p><p>
+                        Please remember that we are developing a system that is going to be personalised to the way you point.
+                    </p>
                 `
                 },{
                     type: "demo",
@@ -188,79 +185,6 @@ export const researcherDemographics = {
                     html: `
                         <p>
                             That's great thank you. 
-                        </p><p>
-                            You don't have to do that exactly each time, please feel free to change hands or pose throughout the set of trials.
-                        </p>
-                    `
-        }]},{
-            type: "panel",
-            name: "stroop",
-            elements: [{
-                type: "html",
-                html: `
-                    <h2>Distractor Task</h2>
-                    <p>
-                        Now, if you're comfortable with the pointing aspect of this study, we'll walkthrough the distractor task that you will be asked to do for half of the study.
-                    </p><p>
-                        To better understand how people's pointing is impacted by focus on another task, we'd also like to get you to point while focusing on a different task.
-                    </p><p>
-                        This task is called the Stroop test and involves reading aloud the colour of the word shown on screen. The twist is that the word itself will be the name of a colour, and it may not match the colour of the word.
-                    </p></br><p>
-                        During the sessions where you'll be asked to perform the Stroop test you'll also still be required to point at LEDs as an when they appear. However we will ask that you prioritise reading aloud the colour of the word as fast as possible once the word appears.
-                    </p><p>
-                        The words will only be present for a couple seconds. For each correct colour, you will gain one point, for each incorrect or missed colour, you will lose a point. Please try to get as many points as possible.
-                    </p><p>
-                        To let you know when a word is shown (in the event you aren't looking at the screen, a tone will be played by the screen. Pointing tasks will be much the same, however they may appear slightly before or slightly after a new word appears on screen, and they will not appear for every word. The targets will remain on for 3 seconds, as they did previously.
-                    </p><p>
-                        Given we're asking you to read aloud the colour as fast as possible, please ensure you are looking at the screen whenever you can, though you are still permitted to look at targets if you need to.
-                    </p>
-                `
-                },{
-                    type: "demo",
-                    name: "stroopColours",
-                    title: "Stroop Colour",
-                    titleLocation: "hidden",
-                    questionText: "Let's just go through the colours in the Stroop test, these will cycle through on-screen now.",
-                    demoPath: "demo/stroop/colours"
-                },{
-                    type: "html",
-                    html: `
-                        <p>
-                            Could you clearly make-out the words?
-                        </p></br><p>
-                            Were there any colours that you think you might mix-up?
-                        </p>
-                    `
-                },{
-                    "type": "tagbox",
-                    titleLocation: "hidden",
-                    "name": "0_1_colour-blindness",
-                    "choices": [
-                        "RED",
-                        "BROWN",
-                        "BLUE",
-                        "GREEN",
-                        "PURPLE",
-                    ]
-                },{
-                    type: "demo",
-                    name: "stroopTest",
-                    title: "Stroop Test",
-                    titleLocation: "hidden",
-                    questionText: "Here is an actual example of a Stroop test where the words might not match the colours.",
-                    demoPath: "demo/stroop/test"
-                },{
-                    type: "demo",
-                    name: "stroopTestFull",
-                    title: "Stroop Test Full",
-                    titleLocation: "hidden",
-                    questionText: "That's great thank you. Would you like to try while also pointing?",
-                    demoPath: "demo/stroop/point"
-                },{
-                    type: "html",
-                    html: `
-                        <p>
-                            That's great thank you.
                         </p><p>
                             You don't have to do that exactly each time, please feel free to change hands or pose throughout the set of trials.
                         </p>
@@ -388,6 +312,237 @@ export const distractorInstructions = {
     `
 }
 
+export function interviewQuestions(behaviour: string, finalRound: boolean) {
+    let elements = [
+        { 
+            type: "panel",
+            elements: [
+                {
+                    type: "html",
+                    html: `
+                        <p>
+                            <em>Please ensure the Teams Meeting is running and being recorded (with Transcription enabled.)</em>
+                        </p><p>
+                            We're now going to perform a short interview to get your thoughts on the approach you took to pointing in ${behaviour == "ACCURATE" ? "an accurate" : "a casual"} manner, as you just performed in the previous 3 sessions.
+                        </p>
+                    `
+                }
+            ]
+        }, {
+            type: "panel",
+            elements: [
+                {
+                    type: "html",
+                    html: `
+                        <h3>Social</h3>
+                        <p>
+                            The first 3 questions will be regarding performing this pointing (${behaviour == "ACCURATE" ? "accurate" : "casual"} in this case) in social settings.
+                        </p><p>
+                            1. How comfortable would you feel pointing in this manner in public?
+                        </p><p>
+                            2. How comfortable would you feel pointing in this manner while among friends?
+                        </p><p>
+                            3. Would someone pointing in this manner draw your attention?
+                        </p>
+                    `
+                }, {
+                    type: "html",
+                    html: `
+                        <h3>Effort</h3>
+                        <p>
+                            These next 4 questions will be regarding the effort you exerted, both mental and physical, during the last 3 pointing tasks.
+                        </p><p>
+                            1. Which areas/targets were harder to point to?
+                        </p><p>
+                            2. Which areas/targets were the easiest to point to?
+                        </p><p>
+                            3. Was the pointing overall comfortable to use?
+                        </p><p>
+                            4. Could you see yourself using this technique for extended periods of time?
+                        </p>
+                    `
+                }, {
+                    type: "html",
+                    html: `
+                        <h3>Accuracy and Precision</h3>
+                        <p>
+                            These 3 questions will be asking about the accuracy and precision you felt you exhibited during the last 3 pointing tasks.
+                        </p><p>
+                            1. Which targets did you feel like you could most accurately point at?
+                        </p><p>
+                            2. Did you think that the pointing you performed, across all the targets, was accurate?
+                        </p><p>
+                            3. Do you think it likely that someone could have misinterpreted which targets you were pointing at?
+                        </p>
+                    `
+                }
+            ]
+        }
+    ]
+
+    if (finalRound) {
+        elements.concat({
+            type: "panel",
+            elements: [
+                {
+                    type: "html",
+                    html: `
+                        <p>
+                        As this is the final round of tasks, we're going ask 7 questions comparing the different pointing styles you've done, followed by some questions about the pointing styles more generally.
+                        </p>
+                    `
+                }, {
+                    type: "html",
+                    html: `
+                        <h3>Social</h3>
+                        <p>
+                            1. Which style of pointing, accurate and precise, or casual and relaxed, would you feel more comfortable using in public?
+                        </p><p>
+                            2. Which style would you feel more comfortable using among friends? This is both for pointing something out for them, and for pointing at something to interact with it (such as a smart light bulb).
+                        </p>
+                    `
+                }, {
+                    type: "html",
+                    html: `
+                        <h3>Effort</h3>
+                        <p>
+                            1. Which of the 2 pointing styles, accurate or casual, did you find most comfortable to use overall?
+                        </p><p>
+                            2. Were different targets more comfortable to point at with different styles?
+                        </p>
+                    `
+                }, {
+                    type: "html",
+                    html: `
+                        <h3>Accuracy and Precision</h3>
+                        <p>
+                            1. Which style of pointing would you prefer to use if clarity in communicating the target was your objective?
+                        </p><p>
+                            2. Which style of pointing would you prefer to use if accuracy was your main objective?
+                        </p><p>
+                            3. Which style of pointing would you prefer to use for your own benefit, day-to-day?
+                        </p>
+                    `
+                }
+            ]
+        }, {
+            type: "panel",
+            elements: [
+                {
+                    type: "html",
+                    html: `
+                        <h2>General</h2>
+                    `
+                }, {
+                    type: "html",
+                    html: `
+                        <p>
+                            1. If you needed to point at something while focused on another task, would you prefer to pause the current task temporarily to perform the pointing gesture, or would you try pointing while remaining focused on the task at hand?
+                        </p>
+                        <p class="margin-left: 4em; display: inline-block">1.1 Why or when would this change?</p>
+                        <p>
+                            2.  If you had a smart home where you could interact with devices by pointing at them, would you rather you spent more effort to ensure it was correct every time, or to use less effort knowing that the wrong device might be picked?
+                        </p>
+                        <p class="margin-left: 4em; display: inline-block">2.1 Would the device you want to interact with change this?</p>
+                        <p class="margin-left: 4em; display: inline-block">2.2 Would you rearrange devices to better support pointing with less effort?</p>
+                        <p class="margin-left: 4em; display: inline-block">2.3 Could you see yourself alternating between pointing styles?</p>
+                        <p> 3. Do you have a preference to any of the pointing styles you performed today?</p>
+                        <p class="margin-left: 4em; display: inline-block">3.1 Would you have a preference for either style in different situations?</p>
+                    `
+                }
+            ]
+        }, {
+            type: "panel",
+            elements: [
+                {
+                    type: "html",
+                    html: `
+                        <p>Thank you very much for taking part, You involvement with this study is now complete.</p>
+                        <p>Please feel free to sign for and collect your compensation, and feel free to leave when ready.</p>
+                    `
+                }
+            ]
+        })
+    }
+
+    return elements;
+}
+
+export const stroopFamiliarity = {
+    type: "panel",
+    name: "stroop",
+    elements: [{
+        type: "html",
+        html: `
+            <h2>Distractor Task</h2>
+            <p>
+                Now, if you're comfortable with the pointing aspect of this study, we'll walkthrough the distractor task that you will be asked to do for half of the study.
+            </p><p>
+                To better understand how people's pointing is impacted by focus on another task, we'd also like to get you to point while focusing on a different task.
+            </p><p>
+                This task is called the Stroop test and involves reading aloud the colour of the word shown on screen. The twist is that the word itself will be the name of a colour, and it may not match the colour of the word.
+            </p></br><p>
+                During the sessions where you'll be asked to perform the Stroop test you'll also still be required to point at LEDs as an when they appear. However we will ask that you prioritise reading aloud the colour of the word as fast as possible once the word appears.
+            </p><p>
+                The words will only be present for a couple seconds. For each correct colour, you will gain one point, for each incorrect or missed colour, you will lose a point. Please try to get as many points as possible.
+            </p><p>
+                To let you know when a word is shown (in the event you aren't looking at the screen, a tone will be played by the screen. Pointing tasks will be much the same, however they may appear slightly before or slightly after a new word appears on screen, and they will not appear for every word. The targets will remain on for 3 seconds, as they did previously.
+            </p><p>
+                Given we're asking you to read aloud the colour as fast as possible, please ensure you are looking at the screen whenever you can, though you are still permitted to look at targets if you need to.
+            </p>
+        `
+        },{
+            type: "demo",
+            name: "stroopColours",
+            title: "Stroop Colour",
+            titleLocation: "hidden",
+            questionText: "Let's just go through the colours in the Stroop test, these will cycle through on-screen now.",
+            demoPath: "demo/stroop/colours"
+        },{
+            type: "html",
+            html: `
+                <p>
+                    Could you clearly make-out the words?
+                </p></br><p>
+                    Were there any colours that you think you might mix-up?
+                </p>
+            `
+        },{
+            "type": "tagbox",
+            titleLocation: "hidden",
+            "name": "0_1_colour-blindness",
+            "choices": [
+                "RED",
+                "BROWN",
+                "BLUE",
+                "GREEN",
+                "PURPLE",
+            ]
+        },{
+            type: "demo",
+            name: "stroopTest",
+            title: "Stroop Test",
+            titleLocation: "hidden",
+            questionText: "Here is an actual example of a Stroop test where the words might not match the colours.",
+            demoPath: "demo/stroop/test"
+        },{
+            type: "demo",
+            name: "stroopTestFull",
+            title: "Stroop Test Full",
+            titleLocation: "hidden",
+            questionText: "That's great thank you. Would you like to try while also pointing?",
+            demoPath: "demo/stroop/point"
+        },{
+            type: "html",
+            html: `
+                <p>
+                    That's great thank you.
+                </p><p>
+                    You don't have to do that exactly each time, please feel free to change hands or pose throughout the set of trials.
+                </p>
+            `
+}]}
+
 export function getInstructions(behaviour: string, distractor: boolean): any {
     let instructions: any[] = [{
         type: "html",
@@ -439,10 +594,10 @@ export function borgQuestions(i: string) {
                         This section of questions is intended to provide us with information on how much effort you believe you exerted in performing pointing gestures in the previous task.
                     </ p><p>
                         The format of the questions will involve using the Borg RPE scale. The RPE is a scale of numbers, 6-20, which represent how much effort you believe you exerted.
-                        <br>6 represents minimal effort, should not cause any discomfort or raise your heart-rate.
-                        <br>9 would indicate the activity required effort, comparable to walking slowly for a few minutes.
-                        <br>13 indicates that the work performed was starting to become difficult, but you would still be comfortable to continue.
-                        <br>17 is feasible for a healthy person to perform, but would require pushing themselves beyond comfort to continue.<br>19 is extremely strenuous exercise that would likely be the hardest the average person would have experienced.
+                        </ br>6 represents minimal effort, should not cause any discomfort or raise your heart-rate.
+                        </ br>9 would indicate the activity required effort, comparable to walking slowly for a few minutes.
+                        </ br>13 indicates that the work performed was starting to become difficult, but you would still be comfortable to continue.
+                        </ br>17 is feasible for a healthy person to perform, but would require pushing themselves beyond comfort to continue.</ br>19 is extremely strenuous exercise that would likely be the hardest the average person would have experienced.
                     </ p><p>
                         If you have any questions regarding the scale, or would like some examples, please ask the researcher present.
                         </br>If you have any questions regarding the set of targets proposed in the question, please ask the researcher present to clarify.
