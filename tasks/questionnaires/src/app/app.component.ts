@@ -324,7 +324,7 @@ function getSurvey(conditionOrder: string[]) {
         "elements": [{
           type: "demo",
           titleLocation: "hidden",
-          condition: conditionOrder[0],
+          condition: conditionOrder[1],
           questionText: "Are you ready to continue?",
           demoPath: "study/resume"
         }]
@@ -361,7 +361,7 @@ function getSurvey(conditionOrder: string[]) {
         "elements": [{
           type: "demo",
           titleLocation: "hidden",
-          condition: conditionOrder[0],
+          condition: conditionOrder[1],
           questionText: "Are you ready to continue?",
           demoPath: "study/resume"
         }]
@@ -397,7 +397,7 @@ function getSurvey(conditionOrder: string[]) {
           }]
         }]
       },
-      QuestionModels.getInstructions(conditionOrder[0], true),
+      QuestionModels.getInstructions(conditionOrder[1], true),
       {
         "title": "Session 4.1 - Borg RPE",
         "elements": QuestionModels.borgQuestions("4_1")
@@ -430,7 +430,7 @@ function getSurvey(conditionOrder: string[]) {
         "elements": [{
           type: "demo",
           titleLocation: "hidden",
-          condition: conditionOrder[0],
+          condition: conditionOrder[1],
           questionText: "Are you ready to continue?",
           demoPath: "study/resume"
         }]
@@ -467,7 +467,7 @@ function getSurvey(conditionOrder: string[]) {
         "elements": [{
           type: "demo",
           titleLocation: "hidden",
-          condition: conditionOrder[0],
+          condition: conditionOrder[1],
           questionText: "Are you ready to continue?",
           demoPath: "study/resume"
         }]

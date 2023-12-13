@@ -194,3 +194,6 @@ freq_slider = Slider(
 freq_slider.on_changed(update)
 
 plt.show()
+
+# extract meta data based on a dictionary of metadata names to regex rules, with an unknown number of lines, then read the remaining lines into a numpy array. data is tab separated
+
