@@ -71,33 +71,70 @@ function getSurvey(conditionOrder: string[]) {
         }]
       },
       QuestionModels.getInstructions(conditionOrder[0], false),
+      // {
+      //   "title": "Session 1.1 - Borg RPE",
+      //   "elements": QuestionModels.borgQuestions("1_1")
+      // }, 
+      // {
+      //   "title": "Session 1.1 - NASA TLX",
+      //   "elements": QuestionModels.tlxQuestions("1_1")
+      // },
+      // {
+      //   title: "Session 1.1 - Perceived Accuracy and Precision",
+      //   elements: QuestionModels.perceivedAccuracyAndPrecision("1_1")
+      // },
+      // {
+      //   "title": "Session 1.1 Complete",
+      //   name: "complete1_1",
+      //   "elements": [{
+      //     type: "panel",
+      //     elements: [{
+      //       "type": "html",
+      //       "html": `<p>
+      //           Thank you for completing this section of the questionnaire.
+      //         </p><p>
+      //             Please hand the tablet back to the researcher. <em>Do not proceed.</em>
+      //         </p>`
+      //     }]
+      //   }]
+      // },
       {
-        "title": "Session 1.1 - Borg RPE",
-        "elements": QuestionModels.borgQuestions("1_1")
-      }, 
-      {
-        "title": "Session 1.1 - NASA TLX",
-        "elements": QuestionModels.tlxQuestions("1_1")
-      },
-      {
-        title: "Session 1.1 - Perceived Accuracy and Precision",
-        elements: QuestionModels.perceivedAccuracyAndPrecision("1_1")
-      },
-      {
-        "title": "Session 1.1 Complete",
-        name: "complete1_1",
+        title: "Resume",
         "elements": [{
-          type: "panel",
-          elements: [{
-            "type": "html",
-            "html": `<p>
-                Thank you for completing this section of the questionnaire.
-              </p><p>
-                  Please hand the tablet back to the researcher. <em>Do not proceed.</em>
-              </p>`
-          }]
+          type: "demo",
+          titleLocation: "hidden",
+          condition: conditionOrder[0],
+          questionText: "Are you ready to continue?",
+          demoPath: "study/resume"
         }]
       },
+      // {
+      //   "title": "Session 1.2 - Borg RPE",
+      //   "elements": QuestionModels.borgQuestions("1_2")
+      // }, 
+      // {
+      //   "title": "Session 1.2 - NASA TLX",
+      //   "elements": QuestionModels.tlxQuestions("1_2")
+      // },
+      // {
+      //   title: "Session 1.2 - Perceived Accuracy and Precision",
+      //   elements: QuestionModels.perceivedAccuracyAndPrecision("1_2")
+      // },      
+      // {
+      //   "title": "Session 1.2 Complete",
+      //   name: "complete1_2",
+      //   "elements": [{
+      //     type: "panel",
+      //     elements: [{
+      //       "type": "html",
+      //       "html": `<p>
+      //           Thank you for completing this section of the questionnaire.
+      //         </p><p>
+      //             Please hand the tablet back to the researcher. <em>Do not proceed.</em>
+      //         </p>`
+      //     }]
+      //   }]
+      // },
       {
         title: "Resume",
         "elements": [{
@@ -109,61 +146,24 @@ function getSurvey(conditionOrder: string[]) {
         }]
       },
       {
-        "title": "Session 1.2 - Borg RPE",
-        "elements": QuestionModels.borgQuestions("1_2")
-      }, 
-      {
-        "title": "Session 1.2 - NASA TLX",
-        "elements": QuestionModels.tlxQuestions("1_2")
-      },
-      {
-        title: "Session 1.2 - Perceived Accuracy and Precision",
-        elements: QuestionModels.perceivedAccuracyAndPrecision("1_2")
-      },      
-      {
-        "title": "Session 1.2 Complete",
-        name: "complete1_2",
-        "elements": [{
-          type: "panel",
-          elements: [{
-            "type": "html",
-            "html": `<p>
-                Thank you for completing this section of the questionnaire.
-              </p><p>
-                  Please hand the tablet back to the researcher. <em>Do not proceed.</em>
-              </p>`
-          }]
-        }]
-      },
-      {
-        title: "Resume",
-        "elements": [{
-          type: "demo",
-          titleLocation: "hidden",
-          condition: conditionOrder[0],
-          questionText: "Are you ready to continue?",
-          demoPath: "study/resume"
-        }]
-      },
-      {
-        "title": "Session 1.3 - Borg RPE",
+        "title": "Session 1 - Borg RPE",
         "elements": QuestionModels.borgQuestions("1_3")
       }, 
       {
-        "title": "Session 1.3 - NASA TLX",
+        "title": "Session 1 - NASA TLX",
         "elements": QuestionModels.tlxQuestions("1_3")
       },
       {
-        title: "Session 1.3 - Perceived Accuracy and Precision",
+        title: "Session 1 - Perceived Accuracy and Precision",
         elements: QuestionModels.perceivedAccuracyAndPrecision("1_3")
       },
       {
-        title: "Session 1.3 - IMI",
+        title: "Session 1 - IMI",
         elements: QuestionModels.imi("1_3")
       },
       
       {
-        "title": "Session 1.3 Complete",
+        "title": "Session 1 Complete",
         name: "complete1_3",
         "elements": [{
           type: "panel",
@@ -182,33 +182,70 @@ function getSurvey(conditionOrder: string[]) {
         elements: [QuestionModels.stroopFamiliarity]
       },
       QuestionModels.getInstructions(conditionOrder[0], true),
+      // {
+      //   "title": "Session 2.1 - Borg RPE",
+      //   "elements": QuestionModels.borgQuestions("2_1")
+      // }, 
+      // {
+      //   "title": "Session 2.1 - NASA TLX",
+      //   "elements": QuestionModels.tlxQuestions("2_1")
+      // },
+      // {
+      //   title: "Session 2.1 - Perceived Accuracy and Precision",
+      //   elements: QuestionModels.perceivedAccuracyAndPrecision("2_1")
+      // },
+      // {
+      //   "title": "Session 2.1 Complete",
+      //   name: "complete2_1",
+      //   "elements": [{
+      //     type: "panel",
+      //     elements: [{
+      //       "type": "html",
+      //       "html": `<p>
+      //           Thank you for completing this section of the questionnaire.
+      //         </p><p>
+      //             Please hand the tablet back to the researcher. <em>Do not proceed.</em>
+      //         </p>`
+      //     }]
+      //   }]
+      // },
       {
-        "title": "Session 2.1 - Borg RPE",
-        "elements": QuestionModels.borgQuestions("2_1")
-      }, 
-      {
-        "title": "Session 2.1 - NASA TLX",
-        "elements": QuestionModels.tlxQuestions("2_1")
-      },
-      {
-        title: "Session 2.1 - Perceived Accuracy and Precision",
-        elements: QuestionModels.perceivedAccuracyAndPrecision("2_1")
-      },
-      {
-        "title": "Session 2.1 Complete",
-        name: "complete2_1",
+        title: "Resume",
         "elements": [{
-          type: "panel",
-          elements: [{
-            "type": "html",
-            "html": `<p>
-                Thank you for completing this section of the questionnaire.
-              </p><p>
-                  Please hand the tablet back to the researcher. <em>Do not proceed.</em>
-              </p>`
-          }]
+          type: "demo",
+          titleLocation: "hidden",
+          condition: conditionOrder[0],
+          questionText: "Are you ready to continue?",
+          demoPath: "study/resume"
         }]
       },
+      // {
+      //   "title": "Session 2.2 - Borg RPE",
+      //   "elements": QuestionModels.borgQuestions("2_2")
+      // }, 
+      // {
+      //   "title": "Session 2.2 - NASA TLX",
+      //   "elements": QuestionModels.tlxQuestions("2_2")
+      // },
+      // {
+      //   title: "Session 2.2 - Perceived Accuracy and Precision",
+      //   elements: QuestionModels.perceivedAccuracyAndPrecision("2_2")
+      // },
+      // {
+      //   "title": "Session 2.2 Complete",
+      //   name: "complete2_2",
+      //   "elements": [{
+      //     type: "panel",
+      //     elements: [{
+      //       "type": "html",
+      //       "html": `<p>
+      //       Thank you for completing this section of the questionnaire.
+      //     </p><p>
+      //         Please hand the tablet back to the researcher. <em>Do not proceed.</em>
+      //     </p>`
+      //     }]
+      //   }]
+      // },
       {
         title: "Resume",
         "elements": [{
@@ -220,60 +257,23 @@ function getSurvey(conditionOrder: string[]) {
         }]
       },
       {
-        "title": "Session 2.2 - Borg RPE",
-        "elements": QuestionModels.borgQuestions("2_2")
-      }, 
-      {
-        "title": "Session 2.2 - NASA TLX",
-        "elements": QuestionModels.tlxQuestions("2_2")
-      },
-      {
-        title: "Session 2.2 - Perceived Accuracy and Precision",
-        elements: QuestionModels.perceivedAccuracyAndPrecision("2_2")
-      },
-      {
-        "title": "Session 2.2 Complete",
-        name: "complete2_2",
-        "elements": [{
-          type: "panel",
-          elements: [{
-            "type": "html",
-            "html": `<p>
-            Thank you for completing this section of the questionnaire.
-          </p><p>
-              Please hand the tablet back to the researcher. <em>Do not proceed.</em>
-          </p>`
-          }]
-        }]
-      },
-      {
-        title: "Resume",
-        "elements": [{
-          type: "demo",
-          titleLocation: "hidden",
-          condition: conditionOrder[0],
-          questionText: "Are you ready to continue?",
-          demoPath: "study/resume"
-        }]
-      },
-      {
-        "title": "Session 2.3 - Borg RPE",
+        "title": "Session 2 - Borg RPE",
         "elements": QuestionModels.borgQuestions("2_3")
       }, 
       {
-        "title": "Session 2.3 - NASA TLX",
+        "title": "Session 2 - NASA TLX",
         "elements": QuestionModels.tlxQuestions("2_3")
       },
       {
-        title: "Session 2.3 - Perceived Accuracy and Precision",
+        title: "Session 2 - Perceived Accuracy and Precision",
         elements: QuestionModels.perceivedAccuracyAndPrecision("2_3")
       },
       {
-        title: "Session 2.3 - IMI",
+        title: "Session 2 - IMI",
         elements: QuestionModels.imi("2_3")
       },
       {
-        "title": "Session 2.3 Complete",
+        "title": "Session 2 Complete",
         name: "complete2_3",
         "elements": [{
           type: "panel",
@@ -292,33 +292,70 @@ function getSurvey(conditionOrder: string[]) {
         elements: QuestionModels.interviewQuestions(conditionOrder[0], false)
       },
       QuestionModels.getInstructions(conditionOrder[1], false),
+      // {
+      //   "title": "Session 3.1 - Borg RPE",
+      //   "elements": QuestionModels.borgQuestions("3_1")
+      // }, 
+      // {
+      //   "title": "Session 3.1 - NASA TLX",
+      //   "elements": QuestionModels.tlxQuestions("3_1")
+      // },
+      // {
+      //   title: "Session 3.1 - Perceived Accuracy and Precision",
+      //   elements: QuestionModels.perceivedAccuracyAndPrecision("3_1")
+      // },
+      // {
+      //   name: "complete3_1",
+      //   title: "Session 3.1 Complete",
+      //   elements: [{
+      //     type: "panel",
+      //     elements: [{
+      //         "type": "html",
+      //         "html": `<p>
+      //         Thank you for completing this section of the questionnaire.
+      //       </p><p>
+      //           Please hand the tablet back to the researcher. <em>Do not proceed.</em>
+      //       </p>`
+      //       }]
+      //     }]
+      // },
       {
-        "title": "Session 3.1 - Borg RPE",
-        "elements": QuestionModels.borgQuestions("3_1")
-      }, 
-      {
-        "title": "Session 3.1 - NASA TLX",
-        "elements": QuestionModels.tlxQuestions("3_1")
+        title: "Resume",
+        "elements": [{
+          type: "demo",
+          titleLocation: "hidden",
+          condition: conditionOrder[1],
+          questionText: "Are you ready to continue?",
+          demoPath: "study/resume"
+        }]
       },
-      {
-        title: "Session 3.1 - Perceived Accuracy and Precision",
-        elements: QuestionModels.perceivedAccuracyAndPrecision("3_1")
-      },
-      {
-        name: "complete3_1",
-        title: "Session 3.1 Complete",
-        elements: [{
-          type: "panel",
-          elements: [{
-              "type": "html",
-              "html": `<p>
-              Thank you for completing this section of the questionnaire.
-            </p><p>
-                Please hand the tablet back to the researcher. <em>Do not proceed.</em>
-            </p>`
-            }]
-          }]
-      },
+      // {
+      //   "title": "Session 3.2 - Borg RPE",
+      //   "elements": QuestionModels.borgQuestions("3_2")
+      // }, 
+      // {
+      //   "title": "Session 3.2 - NASA TLX",
+      //   "elements": QuestionModels.tlxQuestions("3_2")
+      // },
+      // {
+      //   title: "Session 3.2 - Perceived Accuracy and Precision",
+      //   elements: QuestionModels.perceivedAccuracyAndPrecision("3_2")
+      // },
+      // {
+      //   name: "complete3_2",
+      //   title: "Session 3.2 Complete",
+      //   elements: [{
+      //     type: "panel",
+      //     elements: [{
+      //         "type": "html",
+      //         "html": `<p>
+      //         Thank you for completing this section of the questionnaire.
+      //       </p><p>
+      //           Please hand the tablet back to the researcher. <em>Do not proceed.</em>
+      //       </p>`
+      //       }]
+      //     }]
+      // },
       {
         title: "Resume",
         "elements": [{
@@ -330,61 +367,24 @@ function getSurvey(conditionOrder: string[]) {
         }]
       },
       {
-        "title": "Session 3.2 - Borg RPE",
-        "elements": QuestionModels.borgQuestions("3_2")
-      }, 
-      {
-        "title": "Session 3.2 - NASA TLX",
-        "elements": QuestionModels.tlxQuestions("3_2")
-      },
-      {
-        title: "Session 3.2 - Perceived Accuracy and Precision",
-        elements: QuestionModels.perceivedAccuracyAndPrecision("3_2")
-      },
-      {
-        name: "complete3_2",
-        title: "Session 3.2 Complete",
-        elements: [{
-          type: "panel",
-          elements: [{
-              "type": "html",
-              "html": `<p>
-              Thank you for completing this section of the questionnaire.
-            </p><p>
-                Please hand the tablet back to the researcher. <em>Do not proceed.</em>
-            </p>`
-            }]
-          }]
-      },
-      {
-        title: "Resume",
-        "elements": [{
-          type: "demo",
-          titleLocation: "hidden",
-          condition: conditionOrder[1],
-          questionText: "Are you ready to continue?",
-          demoPath: "study/resume"
-        }]
-      },
-      {
-        "title": "Session 3.3 - Borg RPE",
+        "title": "Session 3 - Borg RPE",
         "elements": QuestionModels.borgQuestions("3_3")
       }, 
       {
-        "title": "Session 3.3 - NASA TLX",
+        "title": "Session 3 - NASA TLX",
         "elements": QuestionModels.tlxQuestions("3_3")
       },
       {
-        title: "Session 3.3 - Perceived Accuracy and Precision",
+        title: "Session 3 - Perceived Accuracy and Precision",
         elements: QuestionModels.perceivedAccuracyAndPrecision("3_3")
       },
       {
-        title: "Session 3.3 - IMI",
+        title: "Session 3 - IMI",
         elements: QuestionModels.imi("3_3")
       },
       {
         name: "complete3_3",
-        title: "Session 3.3 Complete",
+        title: "Session 3 Complete",
         elements: [{
           type: "panel",
           elements: [{
@@ -398,33 +398,70 @@ function getSurvey(conditionOrder: string[]) {
         }]
       },
       QuestionModels.getInstructions(conditionOrder[1], true),
+      // {
+      //   "title": "Session 4.1 - Borg RPE",
+      //   "elements": QuestionModels.borgQuestions("4_1")
+      // }, 
+      // {
+      //   "title": "Session 4.1 - NASA TLX",
+      //   "elements": QuestionModels.tlxQuestions("4_1")
+      // },
+      // {
+      //   title: "Session 4.1 - Perceived Accuracy and Precision",
+      //   elements: QuestionModels.perceivedAccuracyAndPrecision("4_1")
+      // },
+      // {
+      //   name: "complete4_1",
+      //   title: "Session 4.1 Complete",
+      //   elements: [{
+      //     type: "panel",
+      //     elements: [{
+      //         "type": "html",
+      //         "html": `<p>
+      //         Thank you for completing this section of the questionnaire.
+      //       </p><p>
+      //           Please hand the tablet back to the researcher. <em>Do not proceed.</em>
+      //       </p>`
+      //       }]
+      //     }]
+      // },
       {
-        "title": "Session 4.1 - Borg RPE",
-        "elements": QuestionModels.borgQuestions("4_1")
-      }, 
-      {
-        "title": "Session 4.1 - NASA TLX",
-        "elements": QuestionModels.tlxQuestions("4_1")
+        title: "Resume",
+        "elements": [{
+          type: "demo",
+          titleLocation: "hidden",
+          condition: conditionOrder[1],
+          questionText: "Are you ready to continue?",
+          demoPath: "study/resume"
+        }]
       },
-      {
-        title: "Session 4.1 - Perceived Accuracy and Precision",
-        elements: QuestionModels.perceivedAccuracyAndPrecision("4_1")
-      },
-      {
-        name: "complete4_1",
-        title: "Session 4.1 Complete",
-        elements: [{
-          type: "panel",
-          elements: [{
-              "type": "html",
-              "html": `<p>
-              Thank you for completing this section of the questionnaire.
-            </p><p>
-                Please hand the tablet back to the researcher. <em>Do not proceed.</em>
-            </p>`
-            }]
-          }]
-      },
+      // {
+      //   "title": "Session 4.2 - Borg RPE",
+      //   "elements": QuestionModels.borgQuestions("4_2")
+      // }, 
+      // {
+      //   "title": "Session 4.2 - NASA TLX",
+      //   "elements": QuestionModels.tlxQuestions("4_2")
+      // },
+      // {
+      //   title: "Session 4.2 - Perceived Accuracy and Precision",
+      //   elements: QuestionModels.perceivedAccuracyAndPrecision("4_2")
+      // },
+      // {
+      //   name: "complete4_2",
+      //   title: "Session 4.2 Complete",
+      //   elements: [{
+      //     type: "panel",
+      //     elements: [{
+      //         "type": "html",
+      //         "html": `<p>
+      //           Thank you for completing this section of the questionnaire.
+      //         </p><p>
+      //             Please hand the tablet back to the researcher. <em>Do not proceed.</em>
+      //         </p>`
+      //       }]
+      //     }]
+      // },
       {
         title: "Resume",
         "elements": [{
@@ -436,61 +473,24 @@ function getSurvey(conditionOrder: string[]) {
         }]
       },
       {
-        "title": "Session 4.2 - Borg RPE",
-        "elements": QuestionModels.borgQuestions("4_2")
-      }, 
-      {
-        "title": "Session 4.2 - NASA TLX",
-        "elements": QuestionModels.tlxQuestions("4_2")
-      },
-      {
-        title: "Session 4.2 - Perceived Accuracy and Precision",
-        elements: QuestionModels.perceivedAccuracyAndPrecision("4_2")
-      },
-      {
-        name: "complete4_2",
-        title: "Session 4.2 Complete",
-        elements: [{
-          type: "panel",
-          elements: [{
-              "type": "html",
-              "html": `<p>
-                Thank you for completing this section of the questionnaire.
-              </p><p>
-                  Please hand the tablet back to the researcher. <em>Do not proceed.</em>
-              </p>`
-            }]
-          }]
-      },
-      {
-        title: "Resume",
-        "elements": [{
-          type: "demo",
-          titleLocation: "hidden",
-          condition: conditionOrder[1],
-          questionText: "Are you ready to continue?",
-          demoPath: "study/resume"
-        }]
-      },
-      {
-        "title": "Session 4.3 - Borg RPE",
+        "title": "Session 4 - Borg RPE",
         "elements": QuestionModels.borgQuestions("4_3")
       }, 
       {
-        "title": "Session 4.3 - NASA TLX",
+        "title": "Session 4 - NASA TLX",
         "elements": QuestionModels.tlxQuestions("4_3")
       },
       {
-        title: "Session 4.3 - Perceived Accuracy and Precision",
+        title: "Session 4 - Perceived Accuracy and Precision",
         elements: QuestionModels.perceivedAccuracyAndPrecision("4_3")
       },
       {
-        title: "Session 4.3 - IMI",
+        title: "Session 4 - IMI",
         elements: QuestionModels.imi("4_3")
       },
       {
         name: "complete4_3",
-        title: "Session 4.3 Complete",
+        title: "Session 4 Complete",
         elements: [{
           type: "panel",
           elements: [{

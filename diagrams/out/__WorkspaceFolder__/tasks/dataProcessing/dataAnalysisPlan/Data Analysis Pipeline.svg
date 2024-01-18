@@ -1,0 +1,424 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" contentStyleType="text/css" height="1645px" preserveAspectRatio="none" style="width:3185px;height:1645px;background:#FFFFFF;" version="1.1" viewBox="0 0 3185 1645" width="3185px" zoomAndPan="magnify"><defs/><g><!--MD5=[05a8c2a6982e1798c112589c315fda43]
+cluster gen--><g id="cluster_gen"><rect fill="none" height="326" rx="2.5" ry="2.5" style="stroke:#181818;stroke-width:1.0;" width="1202" x="657" y="7"/><path d="M795,7 L795,16.2969 L785,26.2969 L657,26.2969 " fill="none" style="stroke:#181818;stroke-width:1.0;"/><text fill="#000000" font-family="sans-serif" font-size="14" font-weight="bold" lengthAdjust="spacing" textLength="128" x="660" y="20.9951">Data Generation</text></g><!--MD5=[d475f889454d79ed3bbc1f892760bf8f]
+cluster mocap--><g id="cluster_mocap"><path d="M691.5,102 L799.5,102 A3.75,3.75 0 0 1 802,104.5 L809,124.2969 L1257.5,124.2969 A2.5,2.5 0 0 1 1260,126.7969 L1260,298.5 A2.5,2.5 0 0 1 1257.5,301 L691.5,301 A2.5,2.5 0 0 1 689,298.5 L689,104.5 A2.5,2.5 0 0 1 691.5,102 " fill="none" style="stroke:#000000;stroke-width:1.5;"/><line style="stroke:#000000;stroke-width:1.5;" x1="689" x2="809" y1="124.2969" y2="124.2969"/><text fill="#000000" font-family="sans-serif" font-size="14" font-weight="bold" lengthAdjust="spacing" textLength="107" x="693" y="116.9951">Mocap Export</text></g><!--MD5=[8d74b40516bd265adb19f202ab81f40d]
+cluster events--><g id="cluster_events"><path d="M1302.5,102 L1356.5,102 A3.75,3.75 0 0 1 1359,104.5 L1366,124.2969 L1824.5,124.2969 A2.5,2.5 0 0 1 1827,126.7969 L1827,202.5 A2.5,2.5 0 0 1 1824.5,205 L1302.5,205 A2.5,2.5 0 0 1 1300,202.5 L1300,104.5 A2.5,2.5 0 0 1 1302.5,102 " fill="none" style="stroke:#000000;stroke-width:1.5;"/><line style="stroke:#000000;stroke-width:1.5;" x1="1300" x2="1366" y1="124.2969" y2="124.2969"/><text fill="#000000" font-family="sans-serif" font-size="14" font-weight="bold" lengthAdjust="spacing" textLength="53" x="1304" y="116.9951">Events</text></g><!--MD5=[6328af41db0f7dbb733c9192827ed26b]
+cluster pipeline--><g id="cluster_pipeline"><rect fill="none" height="1171" rx="2.5" ry="2.5" style="stroke:#181818;stroke-width:1.0;" width="2899" x="7" y="357"/><path d="M149,357 L149,366.2969 L139,376.2969 L7,376.2969 " fill="none" style="stroke:#181818;stroke-width:1.0;"/><text fill="#000000" font-family="sans-serif" font-size="14" font-weight="bold" lengthAdjust="spacing" textLength="132" x="10" y="370.9951">Analysis Pipeline</text></g><!--MD5=[a39db9225bf6ba56ce70772e5d168424]
+cluster pre--><g id="cluster_pre"><rect fill="none" height="841" rx="2.5" ry="2.5" style="stroke:#181818;stroke-width:1.0;" width="1577" x="31" y="400"/><path d="M162,400 L162,409.2969 L152,419.2969 L31,419.2969 " fill="none" style="stroke:#181818;stroke-width:1.0;"/><text fill="#000000" font-family="sans-serif" font-size="14" font-weight="bold" lengthAdjust="spacing" textLength="121" x="34" y="413.9951">Pre-Processing</text></g><!--MD5=[7c4ad3ce28a293474b003cadb1384e66]
+cluster cfe--><g id="cluster_cfe"><rect fill="none" height="522" rx="2.5" ry="2.5" style="stroke:#181818;stroke-width:1.0;" width="1207" x="203" y="687"/><text fill="#000000" font-family="sans-serif" font-size="14" font-weight="bold" lengthAdjust="spacing" textLength="240" x="686.5" y="701.9951">Continuous Feature Extraction</text></g><!--MD5=[26038a8f5ec33a200132657bbb1a6068]
+cluster align--><g id="cluster_align"><rect fill="none" height="207.5" rx="2.5" ry="2.5" style="stroke:#181818;stroke-width:1.0;" width="629" x="243" y="953"/><text fill="#000000" font-family="sans-serif" font-size="14" font-weight="bold" lengthAdjust="spacing" textLength="79" x="518" y="967.9951">Alignment</text></g><!--MD5=[ddf93ff94434b6e7075782dca882caf4]
+cluster pose--><g id="cluster_pose"><rect fill="none" height="216" rx="2.5" ry="2.5" style="stroke:#181818;stroke-width:1.0;" width="450" x="912" y="953"/><text fill="#000000" font-family="sans-serif" font-size="14" font-weight="bold" lengthAdjust="spacing" textLength="39" x="1117.5" y="967.9951">Pose</text></g><!--MD5=[db6a06ac763fe78e02d339aeb342cdd6]
+cluster ray--><g id="cluster_ray"><rect fill="none" height="183" rx="2.5" ry="2.5" style="stroke:#181818;stroke-width:1.0;" width="383" x="476" y="738"/><text fill="#000000" font-family="sans-serif" font-size="14" font-weight="bold" lengthAdjust="spacing" textLength="92" x="621.5" y="752.9951">Ray Casting</text></g><!--MD5=[63f6e39f7fa6f7a4a1cf595b023e6646]
+cluster encoding--><g id="cluster_encoding"><rect fill="none" height="543" rx="2.5" ry="2.5" style="stroke:#181818;stroke-width:1.0;" width="1250" x="1632" y="961"/><path d="M1783,961 L1783,970.2969 L1773,980.2969 L1632,980.2969 " fill="none" style="stroke:#181818;stroke-width:1.0;"/><text fill="#000000" font-family="sans-serif" font-size="14" font-weight="bold" lengthAdjust="spacing" textLength="141" x="1635" y="974.9951">Gesture Encoding</text></g><!--MD5=[ae40a04c7c178645903aab26e9b989e0]
+cluster dfe--><g id="cluster_dfe"><rect fill="none" height="199" rx="2.5" ry="2.5" style="stroke:#181818;stroke-width:1.0;" width="936" x="1664" y="1273"/><text fill="#000000" font-family="sans-serif" font-size="14" font-weight="bold" lengthAdjust="spacing" textLength="216" x="2024" y="1287.9951">Discrete Feature Extraction</text></g><!--MD5=[64daa5a824998c700cfb188d1583c07e]
+cluster analysis--><g id="cluster_analysis"><rect fill="none" height="87" rx="2.5" ry="2.5" style="stroke:#181818;stroke-width:1.0;" width="504" x="2525" y="1552"/><path d="M2600,1552 L2600,1561.2969 L2590,1571.2969 L2525,1571.2969 " fill="none" style="stroke:#181818;stroke-width:1.0;"/><text fill="#000000" font-family="sans-serif" font-size="14" font-weight="bold" lengthAdjust="spacing" textLength="65" x="2528" y="1565.9951">Analysis</text></g><!--MD5=[9938a63ff95fc1a7172c7f22ad338052]
+entity qtm--><g id="elem_qtm"><rect fill="#F1F1F1" height="36.2969" rx="2.5" ry="2.5" style="stroke:#181818;stroke-width:0.5;" width="120" x="673" y="42"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="92" x="687" y="64.9951">Mocap (QTM)</text></g><!--MD5=[dd82451e1dd92fe3da01853750f49ff6]
+entity server--><g id="elem_server"><rect fill="#F1F1F1" height="36.2969" rx="2.5" ry="2.5" style="stroke:#181818;stroke-width:0.5;" width="72" x="1272" y="42"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="44" x="1286" y="64.9951">Server</text></g><!--MD5=[f64381fd01bac541e60eaa71b1a24d28]
+entity labels--><g id="elem_labels"><path d="M732.5,147.5 L732.5,178.7969 A2.5,2.5 0 0 0 735,181.2969 L845,181.2969 A2.5,2.5 0 0 0 847.5,178.7969 L847.5,155 L837.5,145 L735,145 A2.5,2.5 0 0 0 732.5,147.5 " fill="#F1F1F1" style="stroke:#181818;stroke-width:0.5;"/><path d="M837.5,145 L837.5,152.5 A2.5,2.5 0 0 0 840,155 L847.5,155 " fill="#F1F1F1" style="stroke:#181818;stroke-width:0.5;"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="95" x="742.5" y="167.9951">Marker Labels</text></g><!--MD5=[73c2d1971024433dfe9d07aa64effd3b]
+entity skeleton--><g id="elem_skeleton"><path d="M882.5,147.5 L882.5,178.7969 A2.5,2.5 0 0 0 885,181.2969 L1009,181.2969 A2.5,2.5 0 0 0 1011.5,178.7969 L1011.5,155 L1001.5,145 L885,145 A2.5,2.5 0 0 0 882.5,147.5 " fill="#F1F1F1" style="stroke:#181818;stroke-width:0.5;"/><path d="M1001.5,145 L1001.5,152.5 A2.5,2.5 0 0 0 1004,155 L1011.5,155 " fill="#F1F1F1" style="stroke:#181818;stroke-width:0.5;"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="109" x="892.5" y="167.9951">Hand Skeletons</text></g><!--MD5=[ae07dbbe2c2de50429c7a8a56cc27570]
+entity 6dof--><g id="elem_6dof"><path d="M1046.5,147.5 L1046.5,178.7969 A2.5,2.5 0 0 0 1049,181.2969 L1233,181.2969 A2.5,2.5 0 0 0 1235.5,178.7969 L1235.5,155 L1225.5,145 L1049,145 A2.5,2.5 0 0 0 1046.5,147.5 " fill="#F1F1F1" style="stroke:#181818;stroke-width:0.5;"/><path d="M1225.5,145 L1225.5,152.5 A2.5,2.5 0 0 0 1228,155 L1235.5,155 " fill="#F1F1F1" style="stroke:#181818;stroke-width:0.5;"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="169" x="1056.5" y="167.9951">Tobii Glasses Rigid Body</text></g><!--MD5=[5ed788bd190e43c711a7ce3af16edc17]
+entity fbx--><g id="elem_fbx"><path d="M732.5,243.5 L732.5,274.7969 A2.5,2.5 0 0 0 735,277.2969 L895,277.2969 A2.5,2.5 0 0 0 897.5,274.7969 L897.5,251 L887.5,241 L735,241 A2.5,2.5 0 0 0 732.5,243.5 " fill="#F1F1F1" style="stroke:#181818;stroke-width:0.5;"/><path d="M887.5,241 L887.5,248.5 A2.5,2.5 0 0 0 890,251 L897.5,251 " fill="#F1F1F1" style="stroke:#181818;stroke-width:0.5;"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="145" x="742.5" y="263.9951">Marker-less Skeleton</text></g><!--MD5=[74bc9dbd330216fbffac572e1cf69cac]
+entity gaze--><g id="elem_gaze"><path d="M933,243.5 L933,274.7969 A2.5,2.5 0 0 0 935.5,277.2969 L986.5,277.2969 A2.5,2.5 0 0 0 989,274.7969 L989,251 L979,241 L935.5,241 A2.5,2.5 0 0 0 933,243.5 " fill="#F1F1F1" style="stroke:#181818;stroke-width:0.5;"/><path d="M979,241 L979,248.5 A2.5,2.5 0 0 0 981.5,251 L989,251 " fill="#F1F1F1" style="stroke:#181818;stroke-width:0.5;"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="36" x="943" y="263.9951">Gaze</text></g><!--MD5=[8832b0af106177f58228d2128c1514c1]
+entity stroop--><g id="elem_stroop"><path d="M1343.5,147.5 L1343.5,178.7969 A2.5,2.5 0 0 0 1346,181.2969 L1458,181.2969 A2.5,2.5 0 0 0 1460.5,178.7969 L1460.5,155 L1450.5,145 L1346,145 A2.5,2.5 0 0 0 1343.5,147.5 " fill="#F1F1F1" style="stroke:#181818;stroke-width:0.5;"/><path d="M1450.5,145 L1450.5,152.5 A2.5,2.5 0 0 0 1453,155 L1460.5,155 " fill="#F1F1F1" style="stroke:#181818;stroke-width:0.5;"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="97" x="1353.5" y="167.9951">Stroop Events</text></g><!--MD5=[d946df2bd214f493f90d5062f47e7776]
+entity led--><g id="elem_led"><path d="M1496,147.5 L1496,178.7969 A2.5,2.5 0 0 0 1498.5,181.2969 L1591.5,181.2969 A2.5,2.5 0 0 0 1594,178.7969 L1594,155 L1584,145 L1498.5,145 A2.5,2.5 0 0 0 1496,147.5 " fill="#F1F1F1" style="stroke:#181818;stroke-width:0.5;"/><path d="M1584,145 L1584,152.5 A2.5,2.5 0 0 0 1586.5,155 L1594,155 " fill="#F1F1F1" style="stroke:#181818;stroke-width:0.5;"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="78" x="1506" y="167.9951">LED Events</text></g><!--MD5=[5e8ec97ffbfc923a317bbe9de600c144]
+entity questResults--><g id="elem_questResults"><path d="M1629.5,147.5 L1629.5,178.7969 A2.5,2.5 0 0 0 1632,181.2969 L1800,181.2969 A2.5,2.5 0 0 0 1802.5,178.7969 L1802.5,155 L1792.5,145 L1632,145 A2.5,2.5 0 0 0 1629.5,147.5 " fill="#F1F1F1" style="stroke:#181818;stroke-width:0.5;"/><path d="M1792.5,145 L1792.5,152.5 A2.5,2.5 0 0 0 1795,155 L1802.5,155 " fill="#F1F1F1" style="stroke:#181818;stroke-width:0.5;"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="153" x="1639.5" y="167.9951">Questionnaire Results</text></g><!--MD5=[b0fd78db2cca6e3dc4cfcb6fdc4395ed]
+entity agg--><g id="elem_agg"><rect fill="#F1F1F1" height="36.2969" rx="2.5" ry="2.5" style="stroke:#181818;stroke-width:0.5;" width="248" x="918" y="435"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="228" x="928" y="457.9951">Synchronisation and Aggregation</text></g><!--MD5=[903e58d00f47cdf6871d23c7781e291e]
+entity targets--><g id="elem_targets"><path d="M47,775.5 L47,806.7969 A2.5,2.5 0 0 0 49.5,809.2969 L176.5,809.2969 A2.5,2.5 0 0 0 179,806.7969 L179,783 L169,773 L49.5,773 A2.5,2.5 0 0 0 47,775.5 " fill="#F1F1F1" style="stroke:#181818;stroke-width:0.5;"/><path d="M169,773 L169,780.5 A2.5,2.5 0 0 0 171.5,783 L179,783 " fill="#F1F1F1" style="stroke:#181818;stroke-width:0.5;"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="112" x="57" y="795.9951">Target Positions</text></g><!--MD5=[703ea5a149c5871c74522bf38bdfe548]
+entity data--><g id="elem_data"><path d="M1092.5,533.5 L1092.5,564.7969 A2.5,2.5 0 0 0 1095,567.2969 L1227,567.2969 A2.5,2.5 0 0 0 1229.5,564.7969 L1229.5,541 L1219.5,531 L1095,531 A2.5,2.5 0 0 0 1092.5,533.5 " fill="#F1F1F1" style="stroke:#181818;stroke-width:0.5;"/><path d="M1219.5,531 L1219.5,538.5 A2.5,2.5 0 0 0 1222,541 L1229.5,541 " fill="#F1F1F1" style="stroke:#181818;stroke-width:0.5;"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="117" x="1102.5" y="553.9951">Aggregated Data</text></g><!--MD5=[d13e4029352d5c1348b4466c046ea46c]
+entity preprocData--><g id="elem_preprocData"><path d="M1434,871.5 L1434,902.7969 A2.5,2.5 0 0 0 1436.5,905.2969 L1589.5,905.2969 A2.5,2.5 0 0 0 1592,902.7969 L1592,879 L1582,869 L1436.5,869 A2.5,2.5 0 0 0 1434,871.5 " fill="#F1F1F1" style="stroke:#181818;stroke-width:0.5;"/><path d="M1582,869 L1582,876.5 A2.5,2.5 0 0 0 1584.5,879 L1592,879 " fill="#F1F1F1" style="stroke:#181818;stroke-width:0.5;"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="138" x="1444" y="891.9951">Pre-Processed Data</text></g><!--MD5=[1d712790968eeac4c84a276dd9491299]
+entity labelling--><g id="elem_labelling"><rect fill="#F1F1F1" height="36.2969" rx="2.5" ry="2.5" style="stroke:#181818;stroke-width:0.5;" width="123" x="1340.5" y="627"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="103" x="1350.5" y="649.9951">Event Labelling</text></g><!--MD5=[de16ac2b79402b225fa79c2522e1dd85]
+entity  Velocity --><g id="elem_ Velocity "><rect fill="#F1F1F1" height="36.2969" rx="2.5" ry="2.5" style="stroke:#181818;stroke-width:0.5;" width="81" x="375.5" y="773"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="53" x="389.5" y="795.9951">Velocity</text></g><!--MD5=[c8bd106169e92d1cec7d5e24ed4a2f44]
+entity acc--><g id="elem_acc"><rect fill="#F1F1F1" height="36.2969" rx="2.5" ry="2.5" style="stroke:#181818;stroke-width:0.5;" width="113" x="227.5" y="773"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="85" x="241.5" y="795.9951">Acceleration</text></g><!--MD5=[6dd1785cc4d2d200a5c026d22c085265]
+entity  IFRC Ray & Gaze --><g id="elem_ IFRC Ray &amp; Gaze "><rect fill="#F1F1F1" height="36.2969" rx="2.5" ry="2.5" style="stroke:#181818;stroke-width:0.5;" width="144" x="286" y="996"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="116" x="300" y="1018.9951">IFRC Ray &amp; Gaze</text></g><!--MD5=[da03eb6a447dc753b4473565ca97ed89]
+entity  Gaze & Target --><g id="elem_ Gaze &amp; Target "><rect fill="#F1F1F1" height="36.2969" rx="2.5" ry="2.5" style="stroke:#181818;stroke-width:0.5;" width="129" x="465.5" y="996"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="101" x="479.5" y="1018.9951">Gaze &amp; Target</text></g><!--MD5=[c65c668f240a925f5a244377189298e9]
+entity  Gaze & Instructions Screen --><g id="elem_ Gaze &amp; Instructions Screen "><rect fill="#F1F1F1" height="36.2969" rx="2.5" ry="2.5" style="stroke:#181818;stroke-width:0.5;" width="218" x="630" y="996"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="190" x="644" y="1018.9951">Gaze &amp; Instructions Screen</text></g><!--MD5=[32f0f799e5791e0aead8280c10f7bfa7]
+entity  Finger & Palm --><g id="elem_ Finger &amp; Palm "><rect fill="#F1F1F1" height="36.2969" rx="2.5" ry="2.5" style="stroke:#181818;stroke-width:0.5;" width="124" x="296" y="1100.5"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="96" x="310" y="1123.4951">Finger &amp; Palm</text></g><!--MD5=[16373a389d12fa0eb4550bc7d4fc69fc]
+entity  Hand & Arm --><g id="elem_ Hand &amp; Arm "><rect fill="#F1F1F1" height="36.2969" rx="2.5" ry="2.5" style="stroke:#181818;stroke-width:0.5;" width="111" x="455.5" y="1100.5"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="83" x="469.5" y="1123.4951">Hand &amp; Arm</text></g><!--MD5=[f814ecc860f08ffa68cf1ed2e78ad5f6]
+entity  Elbow Flexion --><g id="elem_ Elbow Flexion "><rect fill="#F1F1F1" height="36.2969" rx="2.5" ry="2.5" style="stroke:#181818;stroke-width:0.5;" width="121" x="971.5" y="996"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="93" x="985.5" y="1018.9951">Elbow Flexion</text></g><!--MD5=[3fa7513084411e698de44d204ab0794a]
+entity  Finger Extension --><g id="elem_ Finger Extension "><rect fill="#F1F1F1" height="36.2969" rx="2.5" ry="2.5" style="stroke:#181818;stroke-width:0.5;" width="143" x="1127.5" y="996"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="115" x="1141.5" y="1018.9951">Finger Extension</text></g><!--MD5=[f79d6817bf05f1975a25d6dc3b736369]
+entity handRelative--><g id="elem_handRelative"><rect fill="#F1F1F1" height="52.5938" rx="2.5" ry="2.5" style="stroke:#181818;stroke-width:0.5;" width="177" x="943.5" y="1092"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="153" x="953.5" y="1114.9951">Hand Position Relative</text><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="118" x="953.5" y="1131.292">to Body Features</text></g><!--MD5=[a76da631e97d3f6a0903186cd6de8114]
+entity armRelative--><g id="elem_armRelative"><rect fill="#F1F1F1" height="52.5938" rx="2.5" ry="2.5" style="stroke:#181818;stroke-width:0.5;" width="182" x="1156" y="1092"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="158" x="1166" y="1114.9951">Elbow Position Relative</text><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="118" x="1166" y="1131.292">to Body Features</text></g><!--MD5=[f40b4c8ef81d50d4d0f7dd14558f74db]
+entity ifrc--><g id="elem_ifrc"><rect fill="#F1F1F1" height="36.2969" rx="2.5" ry="2.5" style="stroke:#181818;stroke-width:0.5;" width="157" x="685.5" y="773"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="129" x="699.5" y="795.9951">Index Finger (IFRC)</text></g><!--MD5=[bb1c91ba59b70997252910ca2ee499fd]
+entity efrc--><g id="elem_efrc"><rect fill="#F1F1F1" height="36.2969" rx="2.5" ry="2.5" style="stroke:#181818;stroke-width:0.5;" width="159" x="491.5" y="773"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="123" x="509.5" y="795.9951">Eye Finger (EFRC)</text></g><!--MD5=[013a311d82b586c9f94993a79b3baeb3]
+entity rayAcc--><g id="elem_rayAcc"><rect fill="#F1F1F1" height="36.2969" rx="2.5" ry="2.5" style="stroke:#181818;stroke-width:0.5;" width="119" x="511.5" y="869"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="91" x="525.5" y="891.9951">Ray Accuracy</text></g><!--MD5=[feb202790545b0c1496bcc7119912f4b]
+entity encoded--><g id="elem_encoded"><path d="M2624.5,1414.5 L2624.5,1445.7969 A2.5,2.5 0 0 0 2627,1448.2969 L2863,1448.2969 A2.5,2.5 0 0 0 2865.5,1445.7969 L2865.5,1422 L2855.5,1412 L2627,1412 A2.5,2.5 0 0 0 2624.5,1414.5 " fill="#F1F1F1" style="stroke:#181818;stroke-width:0.5;"/><path d="M2855.5,1412 L2855.5,1419.5 A2.5,2.5 0 0 0 2858,1422 L2865.5,1422 " fill="#F1F1F1" style="stroke:#181818;stroke-width:0.5;"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="221" x="2634.5" y="1434.9951">Encoded and Raw Gesture Data</text></g><!--MD5=[a88f6ac92571e5a61df9c8966507c3d5]
+entity segmentation--><g id="elem_segmentation"><rect fill="#F1F1F1" height="36.2969" rx="2.5" ry="2.5" style="stroke:#181818;stroke-width:0.5;" width="177" x="1655.5" y="996"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="157" x="1665.5" y="1018.9951">Gesture Segmentation</text></g><!--MD5=[880ac8c495415bee297654388c22c615]
+entity pwe--><g id="elem_pwe"><rect fill="#F1F1F1" height="36.2969" rx="2.5" ry="2.5" style="stroke:#181818;stroke-width:0.5;" width="210" x="2067" y="1100.5"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="190" x="2077" y="1123.4951">Pointing Window Estimation</text></g><!--MD5=[4a8c0e179593bc94f718eb4a7b822330]
+entity  Gesture Eye Data --><g id="elem_ Gesture Eye Data "><rect fill="#F1F1F1" height="36.2969" rx="2.5" ry="2.5" style="stroke:#181818;stroke-width:0.5;" width="149" x="1869.5" y="1316"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="121" x="1883.5" y="1338.9951">Gesture Eye Data</text></g><!--MD5=[e5fec7016d571c084573fc5c3aff5d5f]
+entity  Gesture Hand Data --><g id="elem_ Gesture Hand Data "><rect fill="#F1F1F1" height="36.2969" rx="2.5" ry="2.5" style="stroke:#181818;stroke-width:0.5;" width="160" x="2054" y="1316"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="132" x="2068" y="1338.9951">Gesture Hand Data</text></g><!--MD5=[d645c4d56ae95448a550863b9da2f625]
+entity  Gesture Segment Movement & Duration --><g id="elem_ Gesture Segment Movement &amp; Duration "><rect fill="#F1F1F1" height="36.2969" rx="2.5" ry="2.5" style="stroke:#181818;stroke-width:0.5;" width="307" x="2249.5" y="1316"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="279" x="2263.5" y="1338.9951">Gesture Segment Movement &amp; Duration</text></g><!--MD5=[3f4d3333f6e4af5261acc30f00e539e3]
+entity  Hand-Body Alignments --><g id="elem_ Hand-Body Alignments "><rect fill="#F1F1F1" height="36.2969" rx="2.5" ry="2.5" style="stroke:#181818;stroke-width:0.5;" width="185" x="1851.5" y="1412"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="157" x="1865.5" y="1434.9951">Hand-Body Alignments</text></g><!--MD5=[b454dd26b3868998d29dd2afea248958]
+entity  Accuracy at Point of Pointing Gesture --><g id="elem_ Accuracy at Point of Pointing Gesture "><rect fill="#F1F1F1" height="36.2969" rx="2.5" ry="2.5" style="stroke:#181818;stroke-width:0.5;" width="283" x="2071.5" y="1412"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="255" x="2085.5" y="1434.9951">Accuracy at Point of Pointing Gesture</text></g><!--MD5=[d3262d9a84ecf451120c839ac9c2dd06]
+entity exertion--><g id="elem_exertion"><rect fill="#F1F1F1" height="36.2969" rx="2.5" ry="2.5" style="stroke:#181818;stroke-width:0.5;" width="146" x="1688" y="1316"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="126" x="1698" y="1338.9951">Exertion Modelling</text></g><!--MD5=[19d3c6b5579e3fd0554ee5b7b1f08606]
+entity metrics--><g id="elem_metrics"><rect fill="#F1F1F1" height="36.2969" rx="2.5" ry="2.5" style="stroke:#181818;stroke-width:0.5;" width="138" x="2541" y="1587"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="110" x="2555" y="1609.9951">Gesture Metrics</text></g><!--MD5=[adc633e5e2d154b951d8f1e7c544e51a]
+entity clustering--><g id="elem_clustering"><rect fill="#F1F1F1" height="36.2969" rx="2.5" ry="2.5" style="stroke:#181818;stroke-width:0.5;" width="90" x="2714" y="1587"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="70" x="2724" y="1609.9951">Clustering</text></g><!--MD5=[446a6ff8af93fec0bfb5eef16c987394]
+entity questStatsBetween--><g id="elem_questStatsBetween"><rect fill="#F1F1F1" height="36.2969" rx="2.5" ry="2.5" style="stroke:#181818;stroke-width:0.5;" width="173" x="2839.5" y="1587"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="153" x="2849.5" y="1609.9951">Questionnaire Plotting</text></g><!--MD5=[77a5cfea66c9a90aa2ee2b3daa7eb223]
+entity procData--><g id="elem_procData"><path d="M3048,1589.5 L3048,1620.7969 A2.5,2.5 0 0 0 3050.5,1623.2969 L3175.5,1623.2969 A2.5,2.5 0 0 0 3178,1620.7969 L3178,1597 L3168,1587 L3050.5,1587 A2.5,2.5 0 0 0 3048,1589.5 " fill="#F1F1F1" style="stroke:#181818;stroke-width:0.5;"/><path d="M3168,1587 L3168,1594.5 A2.5,2.5 0 0 0 3170.5,1597 L3178,1597 " fill="#F1F1F1" style="stroke:#181818;stroke-width:0.5;"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="110" x="3058" y="1609.9951">Processed Data</text></g><!--MD5=[cfb181896f1382c75e3ee2662899f0ef]
+reverse link labels to fbx--><!--MD5=[25e84e9d76eddf6c1d0a63377ab9af9b]
+reverse link labels to gaze--><!--MD5=[6570679a96681b847da512835c13d066]
+reverse link rayAcc to pose--><!--MD5=[cdacf7dca03a2cf0200c11a3d3070110]
+reverse link rayAcc to align--><!--MD5=[33d1076bcf3499302ee586e4395420e3]
+link server to events--><g id="link_server_events"><path d="M1308,78.13 C1308,81.62 1308,85.4945 1308,89.6093 C1308,91.6667 1308,93.7841 1308,95.9436 C1308,97.0233 1308,98.1136 1308,99.212 C1308,99.7613 1308,100.3126 1308,100.8657 C1308,101.1422 1308,101.4192 1308,101.6966 " fill="none" id="server-to-events" style="stroke:#181818;stroke-width:1.0;"/><polygon fill="#181818" points="1308,101.6966,1312,92.6966,1308,96.6966,1304,92.6966,1308,101.6966" style="stroke:#181818;stroke-width:1.0;"/></g><!--MD5=[398cc29c52d1fe8addf8c27506a1d5e7]
+link qtm to mocap--><g id="link_qtm_mocap"><path d="M720.28,78.02 C718.69,80.61 717.2,83.32 716,86 C714.2763,89.8475 712.6914,93.8777 711.2371,97.9898 C710.8735,99.0178 710.5181,100.051 710.1707,101.0877 C710.0838,101.3469 709.9975,101.6063 709.9117,101.8659 " fill="none" id="qtm-to-mocap" style="stroke:#181818;stroke-width:1.0;"/><polygon fill="#181818" points="709.9117,101.8659,716.5351,94.5769,711.4815,97.1187,708.9397,92.0651,709.9117,101.8659" style="stroke:#181818;stroke-width:1.0;"/></g><!--MD5=[3577cfcac01c84407f3c8f4ad767aee8]
+link labels to agg--><g id="link_labels_agg"><path d="M807.14,181.17 C821.37,194.33 842.81,211.75 865,221 C923.83,245.52 961.39,196.49 1007,241 C1058.59,291.34 1052.07,386.65 1045.9,429.79 " fill="none" id="labels-to-agg" style="stroke:#181818;stroke-width:1.0;"/><polygon fill="#181818" points="1045.15,434.79,1050.4432,426.4844,1045.8931,429.8455,1042.532,425.2955,1045.15,434.79" style="stroke:#181818;stroke-width:1.0;"/></g><!--MD5=[27ebc7b985a83dbffe3713211d26e36a]
+link skeleton to agg--><g id="link_skeleton_agg"><path d="M969.78,181.06 C985.94,192.86 1008.34,208.6 1029,221 C1045.7,231.03 1057.84,224.38 1068,241 C1104.89,301.38 1071.95,389.65 1053.08,430.18 " fill="none" id="skeleton-to-agg" style="stroke:#181818;stroke-width:1.0;"/><polygon fill="#181818" points="1050.85,434.89,1058.323,428.4748,1052.9941,430.3731,1051.0959,425.0442,1050.85,434.89" style="stroke:#181818;stroke-width:1.0;"/></g><!--MD5=[060b1e8281f259ad6fbecc589e4f8bd8]
+link 6dof to agg--><g id="link_6dof_agg"><path d="M1138.86,181.04 C1134.47,213.13 1123.07,284.38 1102,341 C1089.88,373.58 1069.72,408.43 1056.16,430.21 " fill="none" id="6dof-to-agg" style="stroke:#181818;stroke-width:1.0;"/><polygon fill="#181818" points="1053.37,434.65,1061.537,429.1454,1056.0238,430.4124,1054.7568,424.8993,1053.37,434.65" style="stroke:#181818;stroke-width:1.0;"/></g><!--MD5=[16f61cd622ec8eb180d5e1e24d235110]
+link fbx to agg--><g id="link_fbx_agg"><path d="M835.14,277.04 C876.96,312.41 973.02,393.65 1017.97,431.68 " fill="none" id="fbx-to-agg" style="stroke:#181818;stroke-width:1.0;"/><polygon fill="#181818" points="1021.9,435,1017.5984,426.1402,1018.0777,431.7767,1012.4411,432.2559,1021.9,435" style="stroke:#181818;stroke-width:1.0;"/></g><!--MD5=[2dc12ec89ea7cb822a6b4624335f5cef]
+link gaze to agg--><g id="link_gaze_agg"><path d="M968.19,277.04 C982.9,311.91 1016.42,391.37 1032.74,430.04 " fill="none" id="gaze-to-agg" style="stroke:#181818;stroke-width:1.0;"/><polygon fill="#181818" points="1034.83,435,1035.024,425.1531,1032.8897,430.3918,1027.6509,428.2575,1034.83,435" style="stroke:#181818;stroke-width:1.0;"/></g><!--MD5=[80d215085e1f4605017979c005953d97]
+link agg to data--><g id="link_agg_data"><path d="M1063.55,471.02 C1083.64,486.89 1113.65,510.59 1135.05,527.5 " fill="none" id="agg-to-data" style="stroke:#181818;stroke-width:1.0;"/><polygon fill="#181818" points="1139.21,530.79,1134.6226,522.0748,1135.2849,527.6927,1129.6669,528.355,1139.21,530.79" style="stroke:#181818;stroke-width:1.0;"/></g><!--MD5=[ff195dd41e3bebf37d2ada19b9bddef4]
+link agg to targets--><g id="link_agg_targets"><path d="M917.69,462.57 C746.39,479.41 433.7,528.68 211,671 C171.99,695.93 140.95,741.51 124.92,768.44 " fill="none" id="agg-to-targets" style="stroke:#181818;stroke-width:1.0;"/><polygon fill="#181818" points="122.29,772.92,130.3001,767.1895,124.8245,768.61,123.404,763.1343,122.29,772.92" style="stroke:#181818;stroke-width:1.0;"/></g><!--MD5=[5f12e23d9a663876d9024c66159e8c9d]
+link data to labelling--><g id="link_data_labelling"><path d="M1204.64,567.02 C1246.65,583.41 1310.06,608.14 1353.6,625.12 " fill="none" id="data-to-labelling" style="stroke:#181818;stroke-width:1.0;"/><polygon fill="#181818" points="1358.27,626.95,1351.3359,619.9559,1353.6111,625.135,1348.4319,627.4102,1358.27,626.95" style="stroke:#181818;stroke-width:1.0;"/></g><!--MD5=[40e1ddf4843664d84b02fa058c32f857]
+link led to labelling--><g id="link_led_labelling"><path d="M1540.25,181.36 C1524.84,237.43 1474.57,418.59 1428,567 C1422.15,585.63 1415.03,606.61 1409.72,621.96 " fill="none" id="led-to-labelling" style="stroke:#181818;stroke-width:1.0;"/><polygon fill="#181818" points="1407.99,626.94,1414.7027,619.7331,1409.6182,622.2125,1407.1388,617.128,1407.99,626.94" style="stroke:#181818;stroke-width:1.0;"/></g><!--MD5=[32419208bfbe5e748fe1977c2735d421]
+link stroop to labelling--><g id="link_stroop_labelling"><path d="M1402,181.08 C1402,254.05 1402,539.57 1402,621.76 " fill="none" id="stroop-to-labelling" style="stroke:#181818;stroke-width:1.0;"/><polygon fill="#181818" points="1402,626.87,1406,617.87,1402,621.87,1398,617.87,1402,626.87" style="stroke:#181818;stroke-width:1.0;"/></g><!--MD5=[efb098aa9493f62bb53886f38bc9f557]
+link labelling to cfe--><g id="link_labelling_cfe"><path d="M1402,663.08 C1402,667.7738 1402,673.2341 1402,679.2012 C1402,680.693 1402,682.2165 1402,683.7676 C1402,684.5431 1402,685.3256 1402,686.1144 C1402,686.3116 1402,686.5093 1402,686.7073 " fill="none" id="labelling-to-cfe" style="stroke:#181818;stroke-width:1.0;"/><polygon fill="#181818" points="1402,686.7073,1406,677.7073,1402,681.7073,1398,677.7073,1402,686.7073" style="stroke:#181818;stroke-width:1.0;"/></g><!--MD5=[5681ecda1888aea0922406b94a3a9841]
+link ifrc to rayAcc--><g id="link_ifrc_rayAcc"><path d="M729.05,809.02 C695.68,825.28 645.45,849.74 610.61,866.71 " fill="none" id="ifrc-to-rayAcc" style="stroke:#181818;stroke-width:1.0;"/><polygon fill="#181818" points="606.02,868.95,615.8632,868.6159,610.5175,866.7655,612.368,861.4198,606.02,868.95" style="stroke:#181818;stroke-width:1.0;"/></g><!--MD5=[1b2b802fe939d76ee14d722118fcd6d1]
+link efrc to rayAcc--><g id="link_efrc_rayAcc"><path d="M571,809.24 C571,824.48 571,846.81 571,863.46 " fill="none" id="efrc-to-rayAcc" style="stroke:#181818;stroke-width:1.0;"/><polygon fill="#181818" points="571,868.87,575,859.87,571,863.87,567,859.87,571,868.87" style="stroke:#181818;stroke-width:1.0;"/></g><!--MD5=[6b89bfcf4c90f055bd619dd86969adee]
+link targets to rayAcc--><g id="link_targets_rayAcc"><path d="M179.11,805.57 C266.55,823.51 419.68,854.94 506.37,872.74 " fill="none" id="targets-to-rayAcc" style="stroke:#181818;stroke-width:1.0;"/><polygon fill="#181818" points="511.47,873.78,503.4516,868.0611,506.571,872.7802,501.8519,875.8996,511.47,873.78" style="stroke:#181818;stroke-width:1.0;"/></g><!--MD5=[d2ad49c7b48f160203375601a3166b61]
+link cfe to preprocData--><g id="link_cfe_preprocData"><path d="M1410.0292,798.8 C1410.6786,799.3498 1411.3616,799.9282 1412.0762,800.5333 C1417.7931,805.3741 1425.53,811.9256 1434.1925,819.2613 C1451.5175,833.9325 1472.545,851.74 1488.52,865.27 " fill="none" id="cfe-to-preprocData" style="stroke:#181818;stroke-width:1.0;"/><polygon fill="#181818" points="1492.7,868.81,1488.4148,859.9423,1488.8836,865.5796,1483.2462,866.0485,1492.7,868.81" style="stroke:#181818;stroke-width:1.0;"/></g><!--MD5=[efb31c4c488c87da6c56ae2f62b50968]
+link preprocData to segmentation--><g id="link_preprocData_segmentation"><path d="M1544.64,905.12 C1587.28,928.2 1663.03,969.18 1707.87,993.45 " fill="none" id="preprocData-to-segmentation" style="stroke:#181818;stroke-width:1.0;"/><polygon fill="#181818" points="1712.38,995.89,1706.3552,988.0989,1707.9786,993.5178,1702.5596,995.1412,1712.38,995.89" style="stroke:#181818;stroke-width:1.0;"/></g><!--MD5=[ea90c6034a64054241c879841751bd84]
+link segmentation to pwe--><g id="link_segmentation_pwe"><path d="M1815.16,1032.04 C1892.61,1050.59 2016.01,1080.14 2095.5,1099.18 " fill="none" id="segmentation-to-pwe" style="stroke:#181818;stroke-width:1.0;"/><polygon fill="#181818" points="2100.67,1100.42,2092.8547,1094.4266,2095.8086,1099.251,2090.9842,1102.2049,2100.67,1100.42" style="stroke:#181818;stroke-width:1.0;"/></g><!--MD5=[4cdd8b74458ca7fd22a4df6d319874e6]
+link pwe to dfe--><g id="link_pwe_dfe"><path d="M2277.02,1128.39 C2367.6,1141.64 2495.54,1174.68 2572,1257 C2574.8788,1260.0988 2577.3536,1263.5614 2579.4801,1267.2544 C2580.5434,1269.1009 2581.5196,1271.005 2582.4157,1272.9499 " fill="none" id="pwe-to-dfe" style="stroke:#181818;stroke-width:1.0;"/><polygon fill="#181818" points="2582.4157,1272.9499,2582.2827,1263.102,2580.3235,1268.4087,2575.0167,1266.4495,2582.4157,1272.9499" style="stroke:#181818;stroke-width:1.0;"/></g><!--MD5=[8f02fd3f6f612d02c1b19603780cfe75]
+link dfe to encoded--><g id="link_dfe_encoded"><path d="M2600.0692,1339.9598 C2600.2662,1340.0808 2600.4664,1340.2038 2600.6698,1340.3288 C2602.2966,1341.3282 2604.1243,1342.4511 2606.1286,1343.6825 C2614.1459,1348.6081 2624.9894,1355.27 2637.1038,1362.7125 C2661.3325,1377.5975 2690.645,1395.605 2712.6,1409.09 " fill="none" id="dfe-to-encoded" style="stroke:#181818;stroke-width:1.0;"/><polygon fill="#181818" points="2717.02,1411.81,2711.4439,1403.6917,2712.7593,1409.1935,2707.2575,1410.5089,2717.02,1411.81" style="stroke:#181818;stroke-width:1.0;"/></g><!--MD5=[f5a44cc4f94e4525a3492a6cf7ca9801]
+link encoded to clustering--><g id="link_encoded_clustering"><path d="M2746.39,1448.22 C2748.94,1479.7 2754.35,1546.5 2757.18,1581.51 " fill="none" id="encoded-to-clustering" style="stroke:#181818;stroke-width:1.0;"/><polygon fill="#181818" points="2757.61,1586.85,2760.851,1577.5497,2757.196,1581.8672,2752.8785,1578.2121,2757.61,1586.85" style="stroke:#181818;stroke-width:1.0;"/></g><!--MD5=[313901256758d4a325e49d8db28a4e6b]
+link encoded to metrics--><g id="link_encoded_metrics"><path d="M2731.56,1448.22 C2706.7,1480.09 2653.58,1548.15 2626.55,1582.79 " fill="none" id="encoded-to-metrics" style="stroke:#181818;stroke-width:1.0;"/><polygon fill="#181818" points="2623.38,1586.85,2632.0664,1582.2081,2626.4527,1582.9055,2625.7552,1577.2919,2623.38,1586.85" style="stroke:#181818;stroke-width:1.0;"/></g><!--MD5=[2b3aaaa2bb4cc801542af35600bd6a6e]
+link encoded to questStatsBetween--><g id="link_encoded_questStatsBetween"><path d="M2763.02,1448.22 C2796.49,1480.22 2868.15,1548.7 2904.25,1583.22 " fill="none" id="encoded-to-questStatsBetween" style="stroke:#181818;stroke-width:1.0;"/><polygon fill="#181818" points="2908.06,1586.85,2904.3211,1577.7384,2904.4468,1583.3939,2898.7913,1583.5196,2908.06,1586.85" style="stroke:#181818;stroke-width:1.0;"/></g><!--MD5=[14190c0f06f672904c4fae018b8d56bd]
+link questResults to questStatsBetween--><g id="link_questResults_questStatsBetween"><path d="M1802.56,165.81 C2081.68,173.95 2940,218.01 2940,452 C2940,452 2940,452 2940,1335 C2940,1426.63 2931.8,1535.59 2927.95,1581.67 " fill="none" id="questResults-to-questStatsBetween" style="stroke:#181818;stroke-width:1.0;"/><polygon fill="#181818" points="2927.52,1586.71,2932.2515,1578.0721,2927.934,1581.7272,2924.279,1577.4097,2927.52,1586.71" style="stroke:#181818;stroke-width:1.0;"/></g><!--MD5=[ea1a37f59eb70d33e3b7278d7a915d17]
+link clustering to procData--><g id="link_clustering_procData"><path d="M2773.08,1586.76 C2784.72,1572.95 2802.46,1554.6 2822,1544 C2829.01,1540.2 2831.57,1540.89 2839.5,1540 C2877.48,1535.71 2973.52,1535.71 3011.5,1540 C3043.08,1543.56 3072.91,1565.78 3091.96,1583.26 " fill="none" id="clustering-to-procData" style="stroke:#181818;stroke-width:1.0;"/><polygon fill="#181818" points="3095.62,1586.68,3091.7887,1577.6069,3091.9719,1583.2608,3086.318,1583.4439,3095.62,1586.68" style="stroke:#181818;stroke-width:1.0;"/></g><!--MD5=[0e4a58e80e0bc0588a31d051493aecae]
+link metrics to procData--><g id="link_metrics_procData"><path d="M2628.01,1586.71 C2647.39,1568.88 2680.11,1543.88 2714.5,1540 C2747.29,1536.3 2978.71,1536.3 3011.5,1540 C3043.08,1543.56 3072.91,1565.78 3091.96,1583.26 " fill="none" id="metrics-to-procData" style="stroke:#181818;stroke-width:1.0;"/><polygon fill="#181818" points="3095.62,1586.68,3091.7887,1577.6069,3091.9719,1583.2608,3086.318,1583.4439,3095.62,1586.68" style="stroke:#181818;stroke-width:1.0;"/></g><!--MD5=[408ab58fcb0bf41793abafd03c855699]
+link questStatsBetween to procData--><g id="link_questStatsBetween_procData"><path d="M3012.56,1605 C3022.58,1605 3032.61,1605 3042.63,1605 " fill="none" id="questStatsBetween-to-procData" style="stroke:#181818;stroke-width:1.0;"/><polygon fill="#181818" points="3047.87,1605,3038.87,1601,3042.87,1605,3038.87,1609,3047.87,1605" style="stroke:#181818;stroke-width:1.0;"/></g><!--MD5=[4fb2501378dc26e6a1200b30800d08b3]
+@startuml Data Analysis Pipeline
+
+skinparam componentStyle rectangle
+top to bottom direction
+
+frame "Data Generation" as gen {
+    [ Mocap (QTM) ] as qtm
+    folder "Mocap Export" as mocap {
+        file "Marker Labels" as labels
+        file "Hand Skeletons" as skeleton
+        file "Tobii Glasses Rigid Body" as 6dof
+        file "Marker-less Skeleton" as fbx
+        file Gaze as gaze
+    }
+
+    [ Server ] as server
+    folder "Events" as events {
+        file "Stroop Events" as stroop
+        file "LED Events" as led
+        file "Questionnaire Results" as questResults
+    }
+}
+
+frame "Analysis Pipeline" as pipeline {
+    frame "Pre-Processing" as pre {
+        component "Synchronisation and Aggregation" as agg 
+        file "Target Positions" as targets
+        file "Aggregated Data" as data
+        component "Event Labelling" as labelling {
+            ' note as nLab 
+            '     Use the LED on/off events from server to define windows within which pointing occurs.
+            '     Slice aggregated data halfway through the 'off' sections, such that we have a bit before 
+            '      and after a gesture while knowing when the LED was actually on.
+            ' end note
+        }
+        component "Continuous Feature Extraction" as cfe {
+            ' note as nCFE 
+            '     Velocity and Acceleration (both linear and angular?) - Filtering?
+            '     Hand pose (finger extensions) - binning or map between 0-1?
+            '     Arm pose (arm body alignment, elbow flexion, finger arm alignment) - binning or map between 0-1?
+            '     gaze (alignment to target, alignment to rays, alignment to screen, eye closure (excluding blinking?))
+            ' end note
+            [ Velocity ]
+            [ Acceleration ] as acc
+            component Alignment as align {
+                [ IFRC Ray & Gaze ]
+                [ Gaze & Target ]
+                [ Gaze & Instructions Screen ]
+                [ Finger & Palm ]
+                [ Hand & Arm ]
+
+            }
+            component Pose as pose {
+                [ Elbow Flexion ]
+                [ Finger Extension ]
+                component handRelative [ 
+                    Hand Position Relative 
+                    to Body Features 
+                ]
+                component armRelative [ 
+                    Elbow Position Relative 
+                    to Body Features 
+                ]
+            }
+            component "Ray Casting" as ray {
+                [ Index Finger (IFRC) ] as ifrc
+                [  Eye Finger (EFRC)  ] as efrc
+
+                [ Ray Accuracy ] as rayAcc
+                ' note as nRC
+                '     Calculate using the estimated skeleton, 
+                '     rather than the markers.
+                ' end note
+            }
+            ' align -[hidden]u-> ray
+        }
+        file "Pre-Processed Data" as preprocData
+    }
+    frame "Gesture Encoding" as encoding {
+        component "Gesture Segmentation" as segmentation {
+            ' note as nSeg
+            '     Split pointing gesture into rest, ballistic, pin-pointing sections 
+            '     (there may be multiple, based on thresholds).
+            ' end note
+        }
+        component "Pointing Window Estimation" as pwe {
+            ' note as nPWE
+            '     Determine which frames of the gesture should be used for measuring accuracy
+            ' end note
+        }
+        component "Discrete Feature Extraction" as dfe {
+            ' note as nDFE
+            '     Extract change in features and features for the gesture as a whole,
+            '      encode gesture using these features,
+            '      drop and log gestures that cannot be processed (missing data)
+            '     (do for both pointing windows (if multiple) and whole event window?)
+            ' end note
+            component "Exertion Modelling" as exertion {
+                ' note as nExertion
+                '     Using the models used in XRgonomics, estimate the exertion during the pointing gesture
+                ' end note
+            }
+            [ Gesture Eye Data ]
+            [ Gesture Hand Data ]
+            [ Gesture Segment Movement & Duration ]
+            [ Hand-Body Alignments ]
+            [ Accuracy at Point of Pointing Gesture ]
+        }
+        file "Encoded and Raw Gesture Data" as encoded
+    }
+}
+frame Analysis as analysis {
+    component "Clustering" as clustering {
+        ' note as nClustering
+
+        ' end note
+    }
+
+    [ Gesture Metrics ] as metrics
+
+    component "Questionnaire Plotting" as questStatsBetween {
+        ' note as nQuestStats
+        '     How did perceived effort, performance, and enjoyment change between conditions 
+        '     Get box plot values for across participants
+        ' end note
+    }
+}
+file "Processed Data" as procData
+
+' layout Tweaking
+fbx -[hidden]u-> labels
+gaze -[hidden]u-> labels
+pose -[hidden]u-> rayAcc
+align -[hidden]u-> rayAcc
+' preprocData -[hidden]u-> handRelative
+
+' Data generation
+server - -> events
+qtm - -> mocap
+
+' Data analysis
+' aggregation
+labels - -> agg
+skeleton - -> agg
+6dof - -> agg
+fbx - -> agg
+gaze - -> agg
+
+agg - -> data
+agg - -> targets
+
+' event labelling
+data - -> labelling
+led - -> labelling
+stroop - -> labelling
+
+' get rays
+labelling - -> cfe
+
+' accuracy
+ifrc - -> rayAcc
+efrc - -> rayAcc
+targets - -> rayAcc
+
+' rayAcc - -> cfe
+
+cfe - -> preprocData
+
+preprocData - -> segmentation
+
+segmentation - -> pwe
+
+pwe - -> dfe
+
+dfe - -> encoded
+
+
+encoded - -> clustering
+encoded - -> metrics
+encoded - -> questStatsBetween
+questResults - -> questStatsBetween
+
+clustering -> procData
+metrics -> procData
+questStatsBetween -> procData
+
+@enduml
+
+@startuml Data Analysis Pipeline
+
+skinparam componentStyle rectangle
+top to bottom direction
+
+frame "Data Generation" as gen {
+    [ Mocap (QTM) ] as qtm
+    folder "Mocap Export" as mocap {
+        file "Marker Labels" as labels
+        file "Hand Skeletons" as skeleton
+        file "Tobii Glasses Rigid Body" as 6dof
+        file "Marker-less Skeleton" as fbx
+        file Gaze as gaze
+    }
+
+    [ Server ] as server
+    folder "Events" as events {
+        file "Stroop Events" as stroop
+        file "LED Events" as led
+        file "Questionnaire Results" as questResults
+    }
+}
+
+frame "Analysis Pipeline" as pipeline {
+    frame "Pre-Processing" as pre {
+        component "Synchronisation and Aggregation" as agg 
+        file "Target Positions" as targets
+        file "Aggregated Data" as data
+        component "Event Labelling" as labelling {
+        }
+        component "Continuous Feature Extraction" as cfe {
+            [ Velocity ]
+            [ Acceleration ] as acc
+            component Alignment as align {
+                [ IFRC Ray & Gaze ]
+                [ Gaze & Target ]
+                [ Gaze & Instructions Screen ]
+                [ Finger & Palm ]
+                [ Hand & Arm ]
+
+            }
+            component Pose as pose {
+                [ Elbow Flexion ]
+                [ Finger Extension ]
+                component handRelative [ 
+                    Hand Position Relative 
+                    to Body Features 
+                ]
+                component armRelative [ 
+                    Elbow Position Relative 
+                    to Body Features 
+                ]
+            }
+            component "Ray Casting" as ray {
+                [ Index Finger (IFRC) ] as ifrc
+                [  Eye Finger (EFRC)  ] as efrc
+
+                [ Ray Accuracy ] as rayAcc
+            }
+        }
+        file "Pre-Processed Data" as preprocData
+    }
+    frame "Gesture Encoding" as encoding {
+        component "Gesture Segmentation" as segmentation {
+        }
+        component "Pointing Window Estimation" as pwe {
+        }
+        component "Discrete Feature Extraction" as dfe {
+            component "Exertion Modelling" as exertion {
+            }
+            [ Gesture Eye Data ]
+            [ Gesture Hand Data ]
+            [ Gesture Segment Movement & Duration ]
+            [ Hand-Body Alignments ]
+            [ Accuracy at Point of Pointing Gesture ]
+        }
+        file "Encoded and Raw Gesture Data" as encoded
+    }
+}
+frame Analysis as analysis {
+    component "Clustering" as clustering {
+
+    }
+
+    [ Gesture Metrics ] as metrics
+
+    component "Questionnaire Plotting" as questStatsBetween {
+    }
+}
+file "Processed Data" as procData
+
+fbx -[hidden]u-> labels
+gaze -[hidden]u-> labels
+pose -[hidden]u-> rayAcc
+align -[hidden]u-> rayAcc
+
+server - -> events
+qtm - -> mocap
+
+labels - -> agg
+skeleton - -> agg
+6dof - -> agg
+fbx - -> agg
+gaze - -> agg
+
+agg - -> data
+agg - -> targets
+
+data - -> labelling
+led - -> labelling
+stroop - -> labelling
+
+labelling - -> cfe
+
+ifrc - -> rayAcc
+efrc - -> rayAcc
+targets - -> rayAcc
+
+
+cfe - -> preprocData
+
+preprocData - -> segmentation
+
+segmentation - -> pwe
+
+pwe - -> dfe
+
+dfe - -> encoded
+
+
+encoded - -> clustering
+encoded - -> metrics
+encoded - -> questStatsBetween
+questResults - -> questStatsBetween
+
+clustering -> procData
+metrics -> procData
+questStatsBetween -> procData
+
+@enduml
+
+PlantUML version 1.2022.7(Mon Aug 22 18:01:30 BST 2022)
+(GPL source distribution)
+Java Runtime: Java(TM) SE Runtime Environment
+JVM: Java HotSpot(TM) 64-Bit Server VM
+Default Encoding: UTF-8
+Language: en
+Country: null
+--></g></svg>

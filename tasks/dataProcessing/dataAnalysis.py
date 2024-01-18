@@ -195,5 +195,6 @@ freq_slider.on_changed(update)
 
 plt.show()
 
-# extract meta data based on a dictionary of metadata names to regex rules, with an unknown number of lines, then read the remaining lines into a numpy array. data is tab separated
+# given a tab separated file, use a provided regex to denote the match the last line of metadata, storing the line number so that we can later extract the remaining data into a pandas structure. Then use a list of tuples whose first element is a regex matching the first tab separated element in line we want to process, the second element containing a rule for how to extract the data. returning an object containing the extracted metadata as a dictionary, and the pandas data
+
 
